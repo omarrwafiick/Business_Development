@@ -12,4 +12,4 @@ const businessSchema = new mongoose.Schema({
   
 const Business =  mongoose.model('Business', businessSchema);
 
-module.exports = { Business };
+module.exports = Business ;

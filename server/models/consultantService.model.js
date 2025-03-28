@@ -9,4 +9,4 @@ const consultantServiceSchema = new mongoose.Schema({
    
 const ConsultantService = mongoose.model('ConsultantService', consultantServiceSchema);
 
-module.exports = { ConsultantService };
+module.exports = ConsultantService;

@@ -29,11 +29,11 @@ app.listen(process.env.PORT_NUM, async () => {
      DbConnection(process.env.DATABASE_URL);
      console.log(`App is running on port ${process.env.PORT_NUM}`);
      if(!(
-               await Seeding.User.countDocuments() > 0 && 
+               await Seeding.User.countDocuments()> 0 && 
                await Seeding.Role.countDocuments() > 0 &&   
                await Seeding.Service.countDocuments() > 0 &&   
                await Seeding.Category.countDocuments() > 0 &&   
-               await Seeding.Qualification.countDocuments() > 0 &&   
+               await Seeding.Qualification.countDocuments()> 0 &&   
                await Seeding.Consultant.countDocuments() > 0 
           ) 
      ){ 

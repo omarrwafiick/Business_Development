@@ -10,4 +10,4 @@ const applicationServiceSchema = new mongoose.Schema({
 
 const Application =  mongoose.model('Application Service', applicationServiceSchema);
 
-module.exports = { Application };
+module.exports = Application;

@@ -1,5 +1,5 @@
-const { User } = require('../models/user.model');
-const { Role } = require('../models/role.model');
+const User = require('../models/user.model');
+const Role = require('../models/role.model');
 const bcrypt = require('bcryptjs');
 const { SetUpTokenToCookies } = require('../utilities/setUpTokenToCookies');
 
@@ -70,4 +70,4 @@ const Login = async (req, res) =>{
 }
  
 //use verify token middleware
-module.exports = {Test, SignUp, Login};
+module.exports = { Test, SignUp, Login };

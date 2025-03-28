@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const { Decimal128 } = mongoose.Types;
 
 const consultantSchema = new mongoose.Schema({
   salary: { type: Decimal128, required: true },
@@ -11,4 +12,4 @@ const consultantSchema = new mongoose.Schema({
  
 const Consultant = mongoose.model('Consultant', consultantSchema);
 
-module.exports = { Consultant };
+module.exports = Consultant;
