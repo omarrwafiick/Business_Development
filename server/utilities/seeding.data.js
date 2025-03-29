@@ -1,26 +1,54 @@
-const mongoose = require('mongoose'); 
+const bcrypt = require('bcryptjs');
+const mongoose = require("mongoose"); 
 const User = require('../models/user.model');
 const Role = require('../models/role.model');
 const Service = require('../models/service.model');
 const Category = require('../models/category.model');
 const Qualification = require('../models/qualification.model');
-const Consultant = require('../models/consultant.model');
-   
+const Consultant = require('../models/consultant.model'); 
 //Seed roles
 const seedRoles = async () => {
-  const roles = [process.env.ADMIN, process.env.ENTREPRENEUR, process.env.CONSULTANT]; 
-  const RoleDocs=  await Promise.all(roles.map(name =>  Role.create({ name })));
-  RoleDocs ? console.log('Roles Seeded:') : console.error('Roles Seeding Error:'); 
+  const roles = [
+    { name: process.env.ADMIN },
+    { name: process.env.ENTREPRENEUR },
+    { name: process.env.CONSULTANT }
+  ];
+
+  const RoleDocs = await Role.insertMany(roles);
+
+  if (!RoleDocs || RoleDocs.length === 0) {
+    throw new Error("Roles seeding failed");
+  }
+
+  console.log("Roles Seeded:", RoleDocs);
+  return RoleDocs; 
 };
 
 // Seed services
-const seedServices = async () => {
+const seedServices = async () => { 
   const services = [
-    { name: process.env.MARKET_ANALYSIS, description: process.env.MARKET_ANALYSIS_DESCRIPTION },
-    { name: process.env.FINANCIAL_PLANNING, description: process.env.FINANCIAL_PLANNING_DESCRIPTION },
-    { name: process.env.LOCATION_OPTIMIZATION, description: process.env.LOCATION_OPTIMIZATION_DESCRIPTION },
-    { name: process.env.MARKETING_STRATEGY, description: process.env.MARKETING_STRATEGY_DESCRIPTION }
+      { 
+          name: process.env.MARKET_ANALYSIS, 
+          description: process.env.MARKET_ANALYSIS_DESCRIPTION, 
+          amount: mongoose.Types.Decimal128.fromString(process.env.MARKET_ANALYSIS_AMOUNT || 0.00)
+      },
+      { 
+          name: process.env.FINANCIAL_PLANNING, 
+          description: process.env.FINANCIAL_PLANNING_DESCRIPTION, 
+          amount: mongoose.Types.Decimal128.fromString(process.env.FINANCIAL_PLANNING_AMOUNT || 0.00)
+      },
+      { 
+          name: process.env.LOCATION_OPTIMIZATION, 
+          description: process.env.LOCATION_OPTIMIZATION_DESCRIPTION, 
+          amount: mongoose.Types.Decimal128.fromString(process.env.LOCATION_OPTIMIZATION_AMOUNT || 0.00)
+      },
+      { 
+          name: process.env.MARKETING_STRATEGY, 
+          description: process.env.MARKETING_STRATEGY_DESCRIPTION, 
+          amount: mongoose.Types.Decimal128.fromString(process.env.MARKETING_STRATEGY_AMOUNT || 0.00)
+      }
   ];
+  
   const serviceDocs = await Service.insertMany(services);
   serviceDocs ? console.log('Services Seeded:') : console.error('Services Seeding Error:'); 
   return serviceDocs;
@@ -28,15 +56,31 @@ const seedServices = async () => {
 
 // Seed categories
 const seedCategories = async () => {
-  const categories = [ process.env.RETAIL,  process.env.FOOD_BEVERAGE,  process.env.HEALTHCARE,  process.env.TECHNOLOGY];
-  const categoryDocs = await Promise.all(categories.map(name => Category.create({ name })));
+  const categories = [ {name: process.env.RETAIL}, {name: process.env.FOOD_BEVERAGE} , {name: process.env.HEALTHCARE}, {name: process.env.TECHNOLOGY} ];
+  const categoryDocs = await Category.insertMany(categories);
   categoryDocs ? console.log('Categories Seeded:') : console.error('Categories Seeding Error:'); 
 };
 
 // Seed admin
-const seedAdmin = async () => {
-  const adminRole = await Role.findOne({name: process.env.ADMIN}); 
-  const adminDoc = await User.create({ rolesId: adminRole._id, fullName: 'bedaytak Admin', email:"bedaytakAdmin2@bedaytak.com", password:"Bedaytak+18005550199", phoneNumber:"+18005550199"});
+const seedAdmin = async () => { 
+  console.log("ENV ADMIN VALUE:", process.env.ADMIN);
+  const adminRole = await Role.findOne({ name: process.env.ADMIN })
+
+  if (!adminRole) {
+    throw new Error("Admin role not found!");
+  }
+
+  const hashedPassword = await bcrypt.hash(process.env.DEFAULT_PASSWORD, Number(process.env.CRYPTO_KEY));
+
+  const adminDoc = await User.create(
+      { rolesId: adminRole._id,
+        fullName: process.env.ADMIN_USERNAME, 
+        email: process.env.ADMIN_EMAIL, 
+        password: hashedPassword , 
+        phoneNumber: process.env.ADMIN_PHONE_NUMBER
+      }
+    );
+
   adminDoc ? console.log('Admin Seeded:') : console.error('Admin Seeding Error:'); 
 };
 
@@ -54,37 +98,51 @@ const seedQualifications = async () => {
 
 // Seed consultant with user account
 const seedConsultants = async (services, qualifications) => {
-  const consultantRole = await Role.find({name: process.env.CONSULTANT});
+  const consultantRole = await Role.findOne({name: process.env.CONSULTANT});
  
   const consultants = ['Salma Ahmed', 'Ahmed Mahmoud', 'Ibrahim Alaa'];
-  for (let i= 0; i < consultants.length; i++) { 
-    const consultantUser = await User.create({
-        fullName: consultants[i],
-        email: `${consultants[i]}.consultant@bedaytak.com`,
-        password: 'securePass123',
-        role: consultantRole._id
-    }); 
-    const ConsultantDocs = await Consultant.create({
-        salary: 210.0,
-        bonus: 20.0,
-        user: consultantUser._id,
-        services: [services[0]._id, services[1]._id],
-        qualifications: [qualifications[1]._id],
-        experienceYears: 5
-      }); 
+  for ( let i = 0; i < consultants.length; i++ ){ 
+
+    const hashedPassword = await bcrypt.hash(process.env.DEFAULT_PASSWORD, Number(process.env.CRYPTO_KEY));
+
+    const consultantUser = await User.create(
+      {
+          fullName: consultants[i],
+          email: `${consultants[i].replace(" ", "")}.consultant@bedaytak.com`, 
+          password: hashedPassword,
+          rolesId: consultantRole._id
+        }
+      ); 
+  
+    const ConsultantDocs = await Consultant.create(
+        {
+          salary: mongoose.Types.Decimal128.fromString(process.env.DEFAULT_SALARY || 0.00) ,
+          bonus:  mongoose.Types.Decimal128.fromString(process.env.DEFAULT_BONUS || 0.00),
+          userId: consultantUser._id, 
+          servicesIds: [services[0]._id, services[1]._id], 
+          qualificationsIds: [qualifications[1]._id], 
+          experienceYears: 5
+        }
+      ); 
+
     ConsultantDocs ? console.log(`Consultant Seeded Named : ${consultantUser.fullName}`) : console.error(`Consultants Seeding Error: Named : ${consultantUser.fullName}`); 
   };
 };
 
 // Main function to seed all data
-const seedDatabase = async () => {  
-  await seedRoles();
-  await seedAdmin();
-  const services = await seedServices();
-  const qualifications = await seedQualifications();
-  await seedConsultants(services, qualifications);
-  await seedCategories();  
-  console.log('Seeding Completed!');
+const seedDatabase = async () => { 
+  try {
+      await seedRoles(); 
+      const services = await seedServices();
+      const qualifications = await seedQualifications();
+      await seedCategories();
+      await seedConsultants(services, qualifications);
+      await seedAdmin();
+ 
+      console.log("Seeding Completed!");
+  } catch (error) { 
+      console.error("Seeding Failed!", error);
+  } 
 };
 
 module.exports = { seedDatabase, User, Role, Service, Category, Qualification, Consultant } ;

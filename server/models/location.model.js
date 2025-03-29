@@ -5,7 +5,8 @@ const locationSchema = new mongoose.Schema({
   district: { type: String, required: true },
   footTrafficScore: { type: Decimal128, required: true },
   longitude: { type: Decimal128, required: true },
-  latitude: { type: Decimal128, required: true }
+  latitude: { type: Decimal128, required: true },
+  businessId: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Business' }]
 });
 
  

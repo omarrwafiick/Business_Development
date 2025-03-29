@@ -1,8 +1,27 @@
-
 const getConsultantTest = async (req, res) =>{
     res.send("consultant route works");
 }
 
-//use verify token middleware
+const addConsultant = async (req, res) => {
+    res.send("Consultant added successfully");
+};
 
-module.exports = {getConsultantTest};
+const getAllConsultants = async (req, res) => {
+    res.send("Fetched all consultants");
+};
+
+const getConsultantById = async (req, res) => {
+    res.send(`Consultant details for ID ${req.params.id}`);
+};
+
+const updateConsultant = async (req, res) => {
+    res.send(`Consultant ${req.params.id} updated`);
+};
+
+const deleteConsultant = async (req, res) => {
+    res.send(`Consultant ${req.params.id} deleted`);
+};
+
+
+//use verify token middleware
+module.exports = { addConsultant, getAllConsultants, getConsultantById, updateConsultant, deleteConsultant, getConsultantTest }; 

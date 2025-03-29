@@ -18,8 +18,7 @@ const SignUp = async (req, res) =>{
         if(user){
             throw new Error("User is already created try to sign in!");
         }
-        const hashedPassword = bcrypt.hash(password, 40);
-
+        const hashedPassword = bcrypt.hash(password, Number(process.env.CRYPTO_KEY)); 
         const newUser = new User({
             email,
             password : hashedPassword,
