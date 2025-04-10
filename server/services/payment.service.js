@@ -1,7 +1,7 @@
 const strip = require('strip')(process.env.STRIP_PRIVATE_KEY);
 
 const paymentViaStrip = async (req) => {
-    const session = await strip.checkout.sessions.create({
+    return await strip.checkout.sessions.create({
         payment_method_types: ['card'],
         mode: 'payment',
         line_items: req.body.services.map(service => {
