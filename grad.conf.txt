@@ -3,10 +3,4 @@ s7Yid6aCMWEBXe3T
 
 mongodb+srv://bedaytak2:s7Yid6aCMWEBXe3T@bedaytakdb.cykpfj2.mongodb.net/?retryWrites=true&w=majority&appName=BedaytakDB
 ////////////////// 
-
-email : bedaytak2@gmail.com
-password : %Bedaytak2002
-
-
-git remote set-url origin https://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@github.com/bedaytakProjectEgypt/Demo.git
  
