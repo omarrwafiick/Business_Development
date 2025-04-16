@@ -1,65 +1,72 @@
-const User = require('../models/user.model');
-const Role = require('../models/role.model');
+const User = require('../models/user.model'); 
+const Role = require('../models/role.model'); 
+const mongoose = require('mongoose'); 
 const bcrypt = require('bcryptjs');
 const { SetUpTokenToCookies } = require('../utilities/setUpTokenToCookies');
 
-const Test = async (req, res) =>{
-    res.send("Test route works");
-}
-
-const SignUp = async (req, res) =>{ 
-    const {fullName, email, password, phoneNumber} = res.body;
-    if(!fullName || !email || !password || !phoneNumber){
-        throw new Error("All fields are required!");
-    }
-
+const SignUp = async (req, res) => {  
     try {
-        const user = User.findOne({email});
-        if(user){
-            throw new Error("User is already created try to sign in!");
+        const { fullName, email, password, phoneNumber } = req.body;
+
+        if (!fullName || !email || !password || !phoneNumber) {
+            return res.status(400).json({ success: false, message: "All fields are required!" });
         }
-        const hashedPassword = bcrypt.hash(password, Number(process.env.CRYPTO_KEY)); 
+        const user = await User.findOne({ email });
+        if (user) {
+            return res.status(400).json({ success: false, message: "User already exists. Try to sign in!" });
+        }
+
+        const hashedPassword = await bcrypt.hash(password, Number(process.env.CRYPTO_KEY)); 
+
+        const role = await Role.findOne({name: process.env.ENTREPRENEUR});
+
         const newUser = new User({
             email,
-            password : hashedPassword,
+            password: hashedPassword,
             fullName,
-            phoneNumber
+            phoneNumber,
+            rolesId: new mongoose.Types.ObjectId(role.id)
         });
 
-        await newUser.save();
+        const result = await newUser.save(); 
 
-        const roleName = "Entrepreneur";
+        if (!result || !result._id) {
+            throw new Error("User couldn't be created");
+        }
 
-        const role = Role.findOne({name: roleName});
+        SetUpTokenToCookies(res, result._id);  
 
-        SetUpTokenToCookies(res, newUser._id, role.name);
-
-        res.status(201).json({success: true, message: "User is created successfully", user: {...user._doc, password: undefined}});
+        res.status(201).json({
+            success: true,
+            message: "User is created successfully",
+            user: { ...result._doc, password: undefined }
+        });
 
     } catch (error) {
-        return res.status(400).json({success : false, message : error.message});
+        return res.status(400).json({ success: false, message: error.message });
     }
-}
+};
 
-const Login = async (req, res) =>{ 
-    const { email, password } = res.body;
-
-    if(!email || !password){
-        throw new Error("All fields are required!");
-    }
-
+const Login = async (req, res) =>{  
     try {
-        const user = User.findOne({email});
+        const { email, password } = req.body;
+    
+        if(!email || !password){
+            throw new Error("All fields are required!");
+        }
+
+        const user = await User.findOne({email});
         if(!user){
             return res.status(404).json({success : false, message : `User was not found using this email : ${email}`}); 
         }
-        const passwordCompare = bcrypt.compare(password, user.password);
+        const passwordCompare = await bcrypt.compare(password, user.password);
 
         if(!passwordCompare){
             return res.status(404).json({success : false, message : "User password is incorrect"}); 
         }
+        const role = await Role.findById(user.rolesId);
 
-        SetUpTokenToCookies(res, newUser._id, role.name);
+        SetUpTokenToCookies(res, user._id, role);
 
         res.status(200).json({success: true, message: "User is logged in successfully", user: {...user._doc, password: undefined}});
 
@@ -67,6 +74,5 @@ const Login = async (req, res) =>{
         return res.status(400).json({success : false, message : error.message});
     }
 }
- 
-//use verify token middleware
-module.exports = { Test, SignUp, Login };
+  
+module.exports = { SignUp, Login };

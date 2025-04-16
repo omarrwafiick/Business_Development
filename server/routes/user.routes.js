@@ -1,11 +1,12 @@
 const express = require('express'); 
-const { Test, SignUp, Login } = require('../controllers/user.controller');
+const { SignUp, Login } = require('../controllers/user.controller');
 const router = express.Router();
+const { VerifyToken } = require('../middlewares/verifyToken'); 
 
-router.get('/test_user', Test);
+//router.use(VerifyToken); 
 
-router.post('/signup_user', SignUp);
+router.post('/signup-user', SignUp);
 
-router.post('/login_user', Login);
+router.post('/login-user', Login); 
 
 module.exports = router;

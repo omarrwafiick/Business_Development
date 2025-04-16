@@ -6,7 +6,12 @@ const businessSchema = new mongoose.Schema({
   ownerId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true }, 
   categoryId: { type: mongoose.Schema.Types.ObjectId, ref: 'Category', required: true }, 
   locations: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Location' }], 
-  competiotionScore: { type: Number },
+  competitionScore: { type: Number , required: true},
+  employees: { type: Number, required: true },
+  operatingHoursPerDay: { type: Number, required: true },
+  workingDaysPerMonth: { type: Number, required: true },
+  serviceProductAvgPrice: { type: mongoose.Types.Decimal128, required: true },
+  expectedCustomersPerDay: { type: mongoose.Types.Decimal128, required: true },
   createdAt: { type: Date, default: Date.now }
 });
   

@@ -22,6 +22,5 @@ const deleteConsultant = async (req, res) => {
     res.send(`Consultant ${req.params.id} deleted`);
 };
 
-
-//use verify token middleware
+  
 module.exports = { addConsultant, getAllConsultants, getConsultantById, updateConsultant, deleteConsultant, getConsultantTest }; 

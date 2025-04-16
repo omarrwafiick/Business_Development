@@ -16,4 +16,4 @@ const getBusinessById = async (req, res) => {
 };
 
 module.exports = { addBusiness, getAllBusinesses, getBusinessById, getBusinessTest };
-//use verify token middleware 
+ 

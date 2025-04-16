@@ -1,20 +1,41 @@
 const express = require('express'); 
-const { applyConsulting, processPayment, freeTrial, getFullService, getApplicationStatus, updateApplication, updatePaymentStatus, getServiceTest } = require('../controllers/service.controller');
+const { 
+    processPayment, locationMarkrtAnalysis, salesRevenueOptimization, financialPlanningService, financialPlanningFreeTrialService,
+    financialPlanningPremiumService, consultancyService, getApplicationStatus, updateApplication, updatePaymentStatus, 
+    addServiceApplication, getUserApplications, getConsultantApplications, getAllConsultants, getAllServices
+} = require('../controllers/service.controller');
 const router = express.Router();
+const { VerifyToken } = require('../middlewares/verifyToken'); 
+ 
+//router.use(VerifyToken); 
 
-router.get('/test_service', getServiceTest);
+router.post('/payment', processPayment); 
 
-router.post('/add', applyConsulting);
+router.post('/add-service-application', addServiceApplication); 
+////////////////////////////////////////////////////////
+router.post('/location-markrt-analysis', locationMarkrtAnalysis);
 
-router.post('/payment', processPayment);
+router.post('/sales-revenue-optimization', salesRevenueOptimization);
+ ////////////////////////////////////////////////////////
+router.post('/financial-planning-service', financialPlanningService);
 
-router.post('/freetrail', freeTrial);
+router.get('/financial-planning-free-trial-service/:applicantid/:applicationid', financialPlanningFreeTrialService);
 
-router.post('/getfullservice', getFullService);
+router.get('/financial-planning-premium-service/:applicantid/:applicationid', financialPlanningPremiumService);
+
+router.post('/consultancy', consultancyService);
+
+router.get('/get-consultants', getAllConsultants);
+
+router.get('/get-services', getAllServices);
+
+router.get('/user/:applicantId', getUserApplications);
+
+router.get('/consultant', getConsultantApplications);
 
 router.get('/getstatus/:id', getApplicationStatus);
 
-router.put('/service/update/:id', updateApplication);
+router.put('/update/:id', updateApplication);
 
 router.put('/update/paymentstatus/:id', updatePaymentStatus);
 

@@ -1,19 +1,20 @@
 const express = require('express'); 
-const { getLocationTest, addLocation, getAllLocations, getLocationById, deleteLocation, searchLocations, getNearbyLocations} = require('../controllers/location.controller');
+const { addLocation, getAllBusinessLocations, getAllLocation, deleteBusinessLocation, searchLocations, getNearbyLocations} = require('../controllers/location.controller');
 const router = express.Router();
+const { VerifyToken } = require('../middlewares/verifyToken'); 
 
-router.get('/test_location', getLocationTest);
+//router.use(VerifyToken);
+  
+router.post('/add', addLocation);  
 
-router.post('/add/:userid', addLocation);
+router.get('/getall/:businessid', getAllBusinessLocations);
  
-router.get('/getall', getAllLocations);
+router.get('/get', getAllLocation);
  
-router.get('/get/:id', getLocationById);
+router.delete('/delete/:id/:businessid', deleteBusinessLocation);
+  
+router.get('/search/:city/:district', searchLocations);
  
-router.delete('/delete/:id', deleteLocation);
- 
-router.get('/search', searchLocations);
- 
-router.get('/nearby', getNearbyLocations);
+router.get('/nearby/:longitude/:latitude', getNearbyLocations);
 
 module.exports = router;

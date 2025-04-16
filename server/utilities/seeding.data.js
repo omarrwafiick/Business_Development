@@ -28,24 +28,24 @@ const seedRoles = async () => {
 const seedServices = async () => { 
   const services = [
       { 
-          name: process.env.MARKET_ANALYSIS, 
-          description: process.env.MARKET_ANALYSIS_DESCRIPTION, 
-          amount: mongoose.Types.Decimal128.fromString(process.env.MARKET_ANALYSIS_AMOUNT || 0.00)
-      },
-      { 
           name: process.env.FINANCIAL_PLANNING, 
           description: process.env.FINANCIAL_PLANNING_DESCRIPTION, 
           amount: mongoose.Types.Decimal128.fromString(process.env.FINANCIAL_PLANNING_AMOUNT || 0.00)
       },
-      { 
-          name: process.env.LOCATION_OPTIMIZATION, 
-          description: process.env.LOCATION_OPTIMIZATION_DESCRIPTION, 
-          amount: mongoose.Types.Decimal128.fromString(process.env.LOCATION_OPTIMIZATION_AMOUNT || 0.00)
+      {  
+          name: process.env.LOCATION_MARKET_ANALYSIS, 
+          description: process.env.LOCATION_MARKET_ANALYSIS_DESCRIPTION , 
+          amount: mongoose.Types.Decimal128.fromString(process.env.LOCATION_MARKET_ANALYSIS_AMOUNT || 0.00)
       },
       { 
-          name: process.env.MARKETING_STRATEGY, 
-          description: process.env.MARKETING_STRATEGY_DESCRIPTION, 
-          amount: mongoose.Types.Decimal128.fromString(process.env.MARKETING_STRATEGY_AMOUNT || 0.00)
+          name: process.env.SALES_REVENUE_OPTIMIZATION, 
+          description: process.env.SALES_REVENUE_OPTIMIZATION_DESCRIPTION, 
+          amount: mongoose.Types.Decimal128.fromString(process.env.SALES_REVENUE_OPTIMIZATION_AMOUNT || 0.00)
+      },
+      { 
+          name: process.env.CONSULTANCY, 
+          description: process.env.CONSULTANCY_DESCRIPTION, 
+          amount: mongoose.Types.Decimal128.fromString(process.env.CONSULTANCY_AMOUNT || 0.00)
       }
   ];
   
@@ -100,7 +100,7 @@ const seedQualifications = async () => {
 const seedConsultants = async (services, qualifications) => {
   const consultantRole = await Role.findOne({name: process.env.CONSULTANT});
  
-  const consultants = ['Salma Ahmed', 'Ahmed Mahmoud', 'Ibrahim Alaa'];
+  const consultants = [process.env.CONSULTANT_1, process.env.CONSULTANT_2, process.env.CONSULTANT_3];
   for ( let i = 0; i < consultants.length; i++ ){ 
 
     const hashedPassword = await bcrypt.hash(process.env.DEFAULT_PASSWORD, Number(process.env.CRYPTO_KEY));
@@ -128,7 +128,7 @@ const seedConsultants = async (services, qualifications) => {
     ConsultantDocs ? console.log(`Consultant Seeded Named : ${consultantUser.fullName}`) : console.error(`Consultants Seeding Error: Named : ${consultantUser.fullName}`); 
   };
 };
-
+ 
 // Main function to seed all data
 const seedDatabase = async () => { 
   try {
