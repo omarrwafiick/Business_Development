@@ -1,0 +1,29 @@
+
+_id
+67ffc1aac35d9db6fdeaa147
+name
+"SmartStyle Boutique"
+description
+"A modern retail fashion boutique offering trendy clothing and accessor…"
+ownerId
+67ffc1aac35d9db6fdeaa147
+categoryId
+67fbccece73fbb0089383cde
+competitionScore
+6.5
+employees
+4
+operatingHoursPerDay
+9
+workingDaysPerMonth
+26
+serviceProductAvgPrice
+45.99
+expectedCustomersPerDay
+25
+createdAt
+2025-02-26T16:37:48.244+00:00
+consultationid
+67fbccebe73fbb0089383cd7
+financial planning id
+67fbccebe73fbb0089383cd4

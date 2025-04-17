@@ -48,16 +48,15 @@ const addServiceApplication = async (req, res) => {
     } catch (error) { 
         return res.status(500).json({ message: 'Internal server error', error: error.message });
     }
-};
-////////////////////////////////////////////////////////
+}; 
+
 const locationMarkrtAnalysis = async (req, res) => {
     res.send("marketingStrategyService applied");
 };
 
 const salesRevenueOptimization  = async (req, res) => {
     res.send("marketAnalysisService applied");
-};
-////////////////////////////////////////////////////////
+}; 
  
 const financialPlanningService = async (req, res) => {
     try {
@@ -222,8 +221,7 @@ const consultancyService  = async (req, res) => {
     try {  
         const { 
             consultantId,
-            applicantId,
-            businessId,
+            applicantId, 
             serviceId,  
             applicationId,
             businessOverview ,  

@@ -7,7 +7,7 @@ const businessSchema = new mongoose.Schema({
   categoryId: { type: mongoose.Schema.Types.ObjectId, ref: 'Category', required: true }, 
   locations: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Location' }], 
   competitionScore: { type: Number , required: true},
-  employees: { type: Number, required: true },
+  employees: { type: Number, required: true }, 
   operatingHoursPerDay: { type: Number, required: true },
   workingDaysPerMonth: { type: Number, required: true },
   serviceProductAvgPrice: { type: mongoose.Types.Decimal128, required: true },

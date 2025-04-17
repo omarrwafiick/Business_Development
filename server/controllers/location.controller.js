@@ -3,9 +3,9 @@ const mongoose = require('mongoose');
 
 const addLocation = async (req, res) => { 
     try {  
-        const { city, district, footTrafficScore, longitude, latitude, businessId } = req.body;
+        const { city, district, longitude, latitude, businessId } = req.body;
 
-        if(!city || !district || !footTrafficScore || !longitude || !latitude || !businessId){
+        if(!city || !district || !longitude || !latitude || !businessId){
             throw new Error("All fields are required!");
         }  
         
@@ -21,7 +21,6 @@ const addLocation = async (req, res) => {
         const newLocation = await Location.create({
             city, 
             district, 
-            footTrafficScore, 
             longitude, 
             latitude,
             businessId: new mongoose.Types.ObjectId(businessId)
