@@ -14,7 +14,7 @@ const locationMarketAnalysisSchema = new mongoose.Schema({
     locationSuitabilityCommentary: { type: String }, 
     reportPublishedAt: { type: Date, default: Date.now }
 });
-   
+    
 const LocationMarketAnalysis = mongoose.model('LocationMarketAnalysis', locationMarketAnalysisSchema);
 
 module.exports = LocationMarketAnalysis;

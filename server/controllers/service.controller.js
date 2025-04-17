@@ -6,7 +6,7 @@ const Service = require('../models/service.model');
 const Consultant = require('../models/consultant.model'); 
 const FinancialPlanning = require('../models/financialPlanning.model');
 const Business = require('../models/business.model'); 
-
+ 
 const processPayment = async (req, res) => {  
     try {
         await paymentService(req).then(res => {

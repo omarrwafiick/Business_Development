@@ -3,8 +3,7 @@ const { addConsultant, getAllConsultants, getConsultantById, updateConsultant, d
 const router = express.Router();
 const { VerifyToken } = require('../middlewares/verifyToken'); 
 
-router.use(VerifyToken);
- 
+//router.use(VerifyToken);
 
 router.post('/addconsultant', addConsultant);
 

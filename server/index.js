@@ -12,7 +12,7 @@ const consultantRoutes = require('./routes/consultant.routes');
 require('../node_modules/dotenv').config();
 const DbConnection = require('../server/config/dbConnection'); 
 const Seeding = require('../server/utilities/seeding.data');
-
+ 
 const app = express();
 //Middle ware 
 app.use(cors());

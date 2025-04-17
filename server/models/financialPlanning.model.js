@@ -19,7 +19,7 @@ const financialPlanningSchema = new mongoose.Schema({
   finalRecommendation: { type: String }, // Summary advice from planner      
   reportPublishedAt: { type: Date, default: Date.now }
 });
-
+ 
 const FinancialPlanning = mongoose.model('FinancialPlanning', financialPlanningSchema);
   
 module.exports = FinancialPlanning;

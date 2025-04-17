@@ -6,17 +6,17 @@ const {
 } = require('../controllers/service.controller');
 const router = express.Router();
 const { VerifyToken } = require('../middlewares/verifyToken'); 
- 
+  
 //router.use(VerifyToken); 
 
 router.post('/payment', processPayment); 
 
 router.post('/add-service-application', addServiceApplication); 
-////////////////////////////////////////////////////////
+
 router.post('/location-markrt-analysis', locationMarkrtAnalysis);
 
 router.post('/sales-revenue-optimization', salesRevenueOptimization);
- ////////////////////////////////////////////////////////
+
 router.post('/financial-planning-service', financialPlanningService);
 
 router.get('/financial-planning-free-trial-service/:applicantid/:applicationid', financialPlanningFreeTrialService);

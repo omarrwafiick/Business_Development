@@ -1,8 +1,8 @@
 const Consultant = require("../models/consultant.model");  
 const User = require("../models/user.model");  
-
+ 
 const addConsultant = async (req, res) => {
-    try {  
+    try {   
         const { salary, bonus, userId, qualificationsIds, experienceYears } = req.body;
 
         if(!salary || !bonus || !userId || !qualificationsIds || !experienceYears){

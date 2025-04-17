@@ -3,7 +3,7 @@ const Role = require('../models/role.model');
 const mongoose = require('mongoose'); 
 const bcrypt = require('bcryptjs');
 const { SetUpTokenToCookies } = require('../utilities/setUpTokenToCookies');
-
+ 
 const SignUp = async (req, res) => {  
     try {
         const { fullName, email, password, phoneNumber } = req.body;

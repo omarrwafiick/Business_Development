@@ -10,3 +10,4 @@ const consultantSchema = new mongoose.Schema({
 const Consultant = mongoose.model('Consultant', consultantSchema);
 
 module.exports = Consultant;
+ 

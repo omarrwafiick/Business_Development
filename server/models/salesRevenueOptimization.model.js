@@ -15,7 +15,7 @@ const salesRevenueOptimizationSchema = new mongoose.Schema({
     revenueBoostPlan: { type: String }, // Strategic summary 
     reportPublishedAt: { type: Date, default: Date.now }
 });
-  
+   
 const SalesRevenueOptimization = mongoose.model('SalesRevenueOptimization', salesRevenueOptimizationSchema);
 
 module.exports = SalesRevenueOptimization;

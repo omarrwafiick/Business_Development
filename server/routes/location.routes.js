@@ -4,7 +4,7 @@ const router = express.Router();
 const { VerifyToken } = require('../middlewares/verifyToken'); 
 
 //router.use(VerifyToken);
-  
+   
 router.post('/add', addLocation);  
 
 router.get('/getall/:businessid', getAllBusinessLocations);

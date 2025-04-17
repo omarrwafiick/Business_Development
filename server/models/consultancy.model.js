@@ -19,7 +19,7 @@ const consultancySchema = new mongoose.Schema({
   deliveryFormat: { type: String, required: true }, //In-Person, Zoom, Phone Call, Google Meet  
   reportPublishedAt: { type: Date, default: Date.now}
 }); 
-
+ 
 const Consultancy = mongoose.model('Consultancy', consultancySchema);
 
 module.exports = Consultancy;

@@ -4,7 +4,7 @@ const mongoose = require('mongoose');
 const addLocation = async (req, res) => { 
     try {  
         const { city, district, longitude, latitude, businessId } = req.body;
-
+ 
         if(!city || !district || !longitude || !latitude || !businessId){
             throw new Error("All fields are required!");
         }  

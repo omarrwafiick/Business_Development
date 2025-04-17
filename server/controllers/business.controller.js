@@ -1,7 +1,7 @@
 const Business = require("../models/business.model");  
 
 const addBusiness = async (req, res) => {
-    try {  
+    try {   
         const { name, description, ownerId, categoryId, competitionScore,employees, operatingHoursPerDay,
          workingDaysPerMonth, serviceProductAvgPrice, expectedCustomersPerDay } = req.body;
 
