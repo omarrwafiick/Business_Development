@@ -1,0 +1,55 @@
+Consultant Pages
+Consultants will manage their profiles, services, and interact with entrepreneur applications.
+
+Consultant Dashboard
+
+View Active Service Applications
+
+Track Service Status (Completed, Pending, etc.)
+
+View Earnings (Salary, Bonuses)
+
+Service Management
+
+View and Manage Available Services
+
+View Service Request Details (Applicants, Service Progress)
+
+Update Service Status (Approved, Completed, etc.)
+
+Profile Management
+
+View/Edit Consultant Profile
+
+Update Qualifications
+
+Manage Service Portfolio (Associated Services)
+
+View Work History (Experience, Past Services)
+
+4. Additional Pages for All Roles
+These pages are generally available across all user roles.
+
+Signup/Login
+
+User Registration
+
+Login
+
+Password Recovery
+
+Full Service Page
+
+View Full Service Packages (if available, like marketing strategies or market analysis)
+
+Payment Page
+
+Make Payments for Services
+
+View Payment Status and History
+
+Notifications
+
+View Service Status Updates (Payment, Application Status)
+
+Receive Important Updates from Admin/Consultant

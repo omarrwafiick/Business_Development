@@ -1,0 +1,60 @@
+ Admin Pages
+Admins will have control over business listings, consultants, services, and location management, with a focus on overseeing the platform and ensuring smooth operations.
+
+Admin Dashboard
+
+View Overall Platform Stats (Number of Businesses, Consultants, Locations, etc.)
+
+Review Service Applications and Payment Status
+
+Approve/Reject Applications for Services
+
+View User Roles and Activities
+
+Business Management
+
+View All Businesses
+
+Add/Edit/Delete Businesses
+
+View Business Performance Reports
+
+Monitor Competition Scores
+
+View Business Owner Information
+
+Consultant Management
+
+View All Consultants
+
+Add/Edit/Delete Consultants
+
+View Consultant Applications and Service Requests
+
+Approve/Reject Consultant Service Applications
+
+Service Management
+
+View All Services (Marketing, Financial Planning, etc.)
+
+Add/Edit/Delete Services
+
+Set Service Prices and Descriptions
+
+Track Application Status
+
+Location Management
+
+View All Locations
+
+Add/Edit/Delete Locations
+
+Search and Optimize Locations Based on Foot Traffic and Other Metrics
+
+User Management
+
+View User Profiles (Entrepreneurs, Consultants)
+
+Assign User Roles (Entrepreneur, Consultant, Admin)
+
+Delete User Accounts

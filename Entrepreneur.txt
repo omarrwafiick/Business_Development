@@ -1,0 +1,49 @@
+1. Entrepreneur Pages
+Entrepreneurs will mainly interact with services for their business needs, such as applying for consultancy services, managing businesses, and optimizing locations.
+
+Dashboard
+Displays a summary of business performance, applications status, and services applied for.
+
+Business Management
+
+View All Businesses
+
+Add New Business
+
+Edit Existing Business
+
+View Business Details
+
+Business Performance Insights (Including Competition Score)
+
+Services
+
+View Available Services (e.g., Marketing Strategy, Market Analysis, Financial Planning, Location Optimization)
+
+Apply for Services
+
+View Service Application Status (Pending/Approved/Rejected)
+
+Make Payment for Services
+
+Consultant Services
+
+View Consultant Profiles
+
+Request a Consultant
+
+View Consultant Service Details
+
+View Service Status
+
+Location Management
+
+View Business Locations
+
+Add New Location
+
+View Location Analytics (e.g., Foot Traffic, Nearby Businesses)
+
+Payment History
+
+View Payments and Status (Payment Pending/Completed)
