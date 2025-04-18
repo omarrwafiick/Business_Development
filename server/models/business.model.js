@@ -5,7 +5,7 @@ const businessSchema = new mongoose.Schema({
   description: { type: String },
   ownerId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true }, 
   categoryId: { type: mongoose.Schema.Types.ObjectId, ref: 'Category', required: true }, 
-  locations: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Location' }], 
+  locationId: { type: mongoose.Schema.Types.ObjectId, ref: 'Location' }, 
   competitionScore: { type: Number , required: true},
   employees: { type: Number, required: true }, 
   operatingHoursPerDay: { type: Number, required: true },

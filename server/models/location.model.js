@@ -5,6 +5,8 @@ const locationSchema = new mongoose.Schema({
   district: { type: String, required: true }, 
   longitude: { type: mongoose.Types.Decimal128, required: true },
   latitude: { type: mongoose.Types.Decimal128, required: true },
+  populationDensity: { type: Number, required: true },
+  footTrafficScore: { type: String, enum: ['Low', 'Moderate', 'High'] , required: true },
   businessId: { type: mongoose.Schema.Types.ObjectId, ref: 'Business' }
 });
  

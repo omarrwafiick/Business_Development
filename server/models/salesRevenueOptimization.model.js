@@ -2,20 +2,22 @@ const mongoose = require('mongoose');
 
 const salesRevenueOptimizationSchema = new mongoose.Schema({
     applicantId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+    applicationId: { type: mongoose.Schema.Types.ObjectId, ref: 'Application Service', required: true }, 
+    serviceId: { type: mongoose.Schema.Types.ObjectId, ref: 'Service', required: true },  
     businessId: { type: mongoose.Schema.Types.ObjectId, ref: 'Business', required: true },
-    serviceId: { type: mongoose.Schema.Types.ObjectId, ref: 'Service', required: true },
-    applicationId: { type: mongoose.Schema.Types.ObjectId, ref: 'Application Service', required: true },  
-    currentMonthlyRevenue: { type: Number },
-    salesConversionRate: { type: Number },
-    averageTransactionValue: { type: Number },
-    suggestedUpsellingStrategies: [{ type: String }],
-    pricingOptimizationTips: [{ type: String }],
-    channelPerformance: [{ channel: String, percentage: Number }],  
-    performanceBenchmarks: { type: String },
-    revenueBoostPlan: { type: String }, // Strategic summary 
-    reportPublishedAt: { type: Date, default: Date.now }
-});
+    avgPrice: { type: Number, required: true },
+    expectedDailySales: { type: Number, required: true },
+    workingDaysPerMonth: { type: Number, required: true },
+    estimatedMonthlyRevenue: { type: Number, required: true }, 
+    pricingStrategySuggestions: { type: [String], required: true },
+    upsellOpportunities: { type: [String], required: true },
+    revenueBoostIdeas: { type: [String], required: true },
+    revenueRiskFactors: { type: [String], required: true },
+    finalOptimizationAdvice: { type: String, required: true },
+    reportGeneratedAt: { type: Date, default: Date.now }
+});  
    
 const SalesRevenueOptimization = mongoose.model('SalesRevenueOptimization', salesRevenueOptimizationSchema);
 
 module.exports = SalesRevenueOptimization;
+            

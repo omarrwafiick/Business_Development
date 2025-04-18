@@ -1,12 +1,13 @@
-const Business = require("../models/business.model");  
-
+const Business = require("../models/business.model");   
+//test
 const addBusiness = async (req, res) => {
     try {   
         const { name, description, ownerId, categoryId, competitionScore,employees, operatingHoursPerDay,
-         workingDaysPerMonth, serviceProductAvgPrice, expectedCustomersPerDay } = req.body;
+         workingDaysPerMonth, serviceProductAvgPrice, expectedCustomersPerDay} = req.body;
 
         if(!name || !description || !ownerId || !categoryId || !competitionScore || !employees || 
-            !operatingHoursPerDay || !workingDaysPerMonth || !serviceProductAvgPrice || !expectedCustomersPerDay ){
+            !operatingHoursPerDay || !workingDaysPerMonth || !serviceProductAvgPrice || !expectedCustomersPerDay
+             ){
             throw new Error("All fields are required!");
         }  
         
@@ -14,7 +15,7 @@ const addBusiness = async (req, res) => {
 
         if (businessExist) {
             return res.status(400).json({  success: false, message:"Business already exists with same owner", });
-        }  
+        } 
 
         const newBusiness = await Business.create({
             name, 
@@ -28,10 +29,10 @@ const addBusiness = async (req, res) => {
             serviceProductAvgPrice, 
             expectedCustomersPerDay
         }); 
+ 
+        const businessResult = await newBusiness.save();
 
-        const result = await newBusiness.save();
-
-        if (!result || !result._id) { 
+        if (!businessResult || !businessResult._id) { 
             return res.status(400).json({ success: false, message: 'Failed to create new Business' });
         }
 
@@ -40,8 +41,8 @@ const addBusiness = async (req, res) => {
     } catch (error) { 
         return res.status(500).json({ message: 'Internal server error', error: error.message });
     }
-};
-
+}; 
+//test
 const getAllBusinesses = async (req, res) => {
     try {       
         const businesses = await Business.find();
@@ -56,7 +57,7 @@ const getAllBusinesses = async (req, res) => {
             return res.status(500).json({ message: 'Internal server error' });
         } 
 };
-
+//test
 const getBusinessById = async (req, res) => {
     try {       
         const businessId = req.params.id;

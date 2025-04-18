@@ -3,9 +3,11 @@ const Application = require('../models/application.model');
 const paymentService = require('../services/payment.service');
 const Consultancy = require('../models/consultancy.model'); 
 const Service = require('../models/service.model'); 
-const Consultant = require('../models/consultant.model'); 
+const Consultant = require('../models/consultant.model');  
 const FinancialPlanning = require('../models/financialPlanning.model');
 const Business = require('../models/business.model'); 
+const LocationMarketAnalysis = require('../models/locationMarkrtAnalysis.model'); 
+const SalesRevenueOptimization = require('../models/salesRevenueOptimization.model'); 
  
 const processPayment = async (req, res) => {  
     try {
@@ -49,20 +51,281 @@ const addServiceApplication = async (req, res) => {
         return res.status(500).json({ message: 'Internal server error', error: error.message });
     }
 }; 
+//test
+const locationMarkrtAnalysisService = async (req, res) => {
+  try {
+    const { applicantId, applicationId } = req.body;
 
-const locationMarkrtAnalysis = async (req, res) => {
-    res.send("marketingStrategyService applied");
+    const business = await Business.findOne({ ownerId: applicantId }).populate('categoryId locationId');
+    const application = await Application.findById(applicationId);
+
+    if (!business || !application) {
+      return res.status(404).json({ success: false, message: "Business or application not found" });
+    }
+
+    const location = business.locationId;
+    const category = business.categoryId.name;
+
+    const nearbyBusinesses = await Business.find({ 
+      locationId: location._id,
+      _id: { $ne: business._id }
+    }).populate('categoryId');
+
+    const sameCategoryNearby = nearbyBusinesses.filter(b => b.categoryId.name === category).length; 
+
+    const competitionLevel = sameCategoryNearby > 10
+      ? "High competition in this location"
+      : sameCategoryNearby >= 5
+        ? "Moderate competition detected"
+        : "Low competition – potential opportunity";
+
+    const populationDensity = location.populationDensity;
+    const footTrafficScore = location.distanceToMainRoad < 2 ? "High" : "Moderate";
+
+    const marketingStrategies = [];
+    let finalLocationAdvice = ""; 
+
+    switch (business.categoryId.name) {
+      case process.env.RETAIL: 
+        marketingStrategies.push("Launch local influencer campaigns", "Use bold storefront visuals");
+        finalLocationAdvice = competitionLevel.includes("Low")
+          ? "Capitalize on low competition and promote opening deals"
+          : "Focus on branding and loyalty programs to stand out.";
+        break;
+    
+      case process.env.FOOD_BEVERAGE:
+        marketingStrategies.push("Offer app-based delivery promotions", "Create neighborhood tasting events");
+        finalLocationAdvice = footTrafficScore === "High"
+          ? "High foot traffic supports walk-in customers—optimize your exterior and signage."
+          : "Focus on delivery optimization and online marketing due to moderate foot traffic.";
+        break;
+    
+      case process.env.HEALTHCARE:
+        marketingStrategies.push("Partner with local gyms or spas", "Advertise health awareness locally");
+        finalLocationAdvice = sameCategoryNearby < 3
+          ? "There’s a service gap—great potential for gaining loyal patients"
+          : "You’ll need to differentiate with service quality and pricing.";
+        break;
+    
+      default:
+        marketingStrategies.push("Test localized ad campaigns", "Engage through community events");
+        finalLocationAdvice = "Observe your category’s local presence and align your strategy with underserved needs.";
+    }
+
+    const analysisData = {
+      applicantId,
+      businessId: business._id,
+      applicationId,
+      serviceId: application.serviceId,
+      locationId: location._id,
+      sameCategoryCount,
+      totalNearbyBusinesses: sameCategoryNearby,
+      populationDensity,
+      footTrafficScore,
+      competitionLevel,
+      marketingStrategies,
+      finalLocationAdvice
+    };
+
+    const locationResult = await LocationMarketAnalysis.create(analysisData);
+
+    if (!locationResult || !locationResult._id) { 
+      return res.status(400).json({ success: false, message: 'Failed to create new Service' });
+    }
+
+    return res.status(201).json({ success: true, serviceId: locationResult._id });
+
+  } catch (error) {
+    return res.status(500).json({ success: false, message: "Internal server error", error: error.message });
+  }
 };
+//test
+const locationMarkrtAnalysisFreeTrialService = async (req, res) => {
+  try {  
+    const applicantId = req.params.applicantid;
+    const applicationId = req.params.applicationid;
 
-const salesRevenueOptimization  = async (req, res) => {
-    res.send("marketAnalysisService applied");
+    const serviceExist = await LocationMarketAnalysis.findOne({applicantId: applicantId, applicationId: applicationId});
+ 
+    if (!serviceExist) {
+      return res.status(404).json({ success: false, message: "No service was found" });
+    }  
+    
+    return res.status(200).json({ success: true, 
+        data :{ 
+            totalNearbyBusinesses: serviceExist.totalNearbyBusinesses,
+            sameCategoryCount: serviceExist.sameCategoryCount, 
+            competitionLevel: serviceExist.competitionLevel
+        }
+     });
+
+  } catch (error) {
+    return res.status(500).json({ message: 'Internal server error', error: error.message });
+  }
+}
+//test
+const locationMarkrtAnalysisPremiumService = async (req, res) => { 
+  try {  
+    const applicantId = req.params.applicantid;
+    const applicationId = req.params.applicationid;
+
+    const serviceExist = await LocationMarketAnalysis.findOne({applicantId: applicantId, applicationId: applicationId});
+ 
+    if (!serviceExist) {
+      return res.status(404).json({ success: false, message: "No service was found" });
+    }  
+    
+    return res.status(200).json({ success: true, 
+        data : {
+          ...serviceExist
+        }
+     });
+
+  } catch (error) {
+    return res.status(500).json({ message: 'Internal server error', error: error.message });
+  }
+}
+//test 
+const salesRevenueOptimizationService = async (req, res) => {
+  try {
+    const { applicantId, applicationId } = req.body;
+
+    const business = await Business.findOne({ ownerId: applicantId }).populate('categoryId');
+    const application = await Application.findOne({ _id: applicationId, applicantId });
+
+    if (!business || !application) {
+      return res.status(404).json({ success: false, message: "Business or application not found" });
+    }
+
+    const avgPrice = Number(business.serviceProductAvgPrice);
+    const expectedDailySales = Number(business.expectedCustomersPerDay);
+    const workingDays = Number(business.workingDaysPerMonth);
+    const estRevenue = avgPrice * expectedDailySales * workingDays;
+    const category = business.categoryId.name;
+
+    const pricingStrategySuggestions = [];
+    const upsellOpportunities = [];
+    const revenueBoostIdeas = [];
+    const revenueRiskFactors = []; 
+    let finalOptimizationAdvice = "";
+ 
+    switch (category) {
+      case process.env.RETAIL: 
+        pricingStrategySuggestions.push("Use tiered pricing for product lines", "Offer time-limited bundle deals");
+        upsellOpportunities.push("Offer accessories at checkout", "Highlight premium product alternatives");
+        revenueBoostIdeas.push("Run seasonal campaigns", "Partner with local influencers");
+        finalOptimizationAdvice = "Focus on bundling products, optimizing shelf placement and localized ads.";
+        break;
+    
+      case process.env.FOOD_BEVERAGE:
+        pricingStrategySuggestions.push("Happy hour discounts", "Combo meals with fixed pricing");
+        upsellOpportunities.push("Add drink or dessert suggestions", "Offer premium upgrades");
+        revenueBoostIdeas.push("Launch a loyalty program", "Promote limited-time items");
+        finalOptimizationAdvice = "Create combos, upsell sides and reward repeat customers through loyalty programs.";
+        break;
+    
+      case process.env.HEALTHCARE:
+        pricingStrategySuggestions.push("Offer consultation packages", "First-time checkup discounts");
+        upsellOpportunities.push("Recommend regular checkups", "Promote wellness programs");
+        revenueBoostIdeas.push("Enable digital booking", "Offer subscription wellness plans");
+        finalOptimizationAdvice = "Bundle care services, upsell health packages and digitize patient interaction.";
+        break;
+    
+      default:
+        pricingStrategySuggestions.push("Introductory pricing", "A/B test price points");
+        upsellOpportunities.push("Offer premium upgrades", "Cross-sell related services");
+        revenueBoostIdeas.push("Email remarketing", "Google/Meta ads");
+        finalOptimizationAdvice = "Test price points, upsell effectively and market online strategically.";
+    }
+ 
+    if (business.employees < 2) revenueRiskFactors.push("Low staffing may limit service capacity");
+    if (avgPrice < 10) revenueRiskFactors.push("Low product pricing reduces margin buffer");
+    if (estRevenue < 10000) revenueRiskFactors.push("Revenue below sustainability threshold");
+
+    const salesData = {
+      applicantId,
+      applicationId,
+      businessId: business._id,
+      serviceId: application.serviceId,
+      avgPrice,
+      expectedDailySales,
+      workingDaysPerMonth: workingDays,
+      estimatedMonthlyRevenue: estRevenue, 
+      pricingStrategySuggestions,
+      upsellOpportunities,
+      revenueBoostIdeas,
+      revenueRiskFactors,
+      finalOptimizationAdvice
+    };
+
+    const newSales = await SalesRevenueOptimization.create(salesData);
+
+    const salesResult = await newSales.save();
+      
+    if(!salesResult || !salesResult._id){
+      return res.status(400).json({ success: false, message: "Failed to create new Service" });
+    }
+
+    return res.status(201).json({ success: true, serviceId :salesResult._id }); 
+  } catch (error) {
+    return res.status(500).json({ success: false, message: "Internal server error", error: error.message });
+  }
+};
+//test
+const salesRevenueOptimizationFreeTrialService  = async (req, res) => {
+  try {  
+    const applicantId = req.params.applicantid;
+    const applicationId = req.params.applicationid;
+
+    const serviceExist = await SalesRevenueOptimization.findOne({applicantId: applicantId, applicationId: applicationId});
+    console.log(serviceExist)
+    if (!serviceExist) {
+      return res.status(404).json({ success: false, message: "No service was found" });
+    }   
+    
+    return res.status(200).json({ success: true, 
+        data :{
+            expectedDailySales: serviceExist.expectedDailySales,
+            estimatedMonthlyRevenue: serviceExist.estimatedMonthlyRevenue, 
+        }
+     });
+
+  } catch (error) {
+    return res.status(500).json({ message: 'Internal server error', error: error.message });
+  }
+}; 
+//test
+const salesRevenueOptimizationPremiumService  = async (req, res) => {
+  try {  
+    const applicantId = req.params.applicantid;
+    const applicationId = req.params.applicationid;
+
+    const application = await Application.findOne({ _id: applicationId, applicantId: applicantId });
+
+    console.log(application)
+    if (!application || !application.paymentStatus) { 
+        return res.status(400).json({success: false, message: "User has not completed payment for the service."});
+    }     
+    const serviceExist = await SalesRevenueOptimization.findOne({applicantId: applicantId, applicationId: applicationId}); 
+ 
+    if (!serviceExist) {
+      return res.status(404).json({ success: false, message: "No service was found" });
+    }  
+    
+    return res.status(200).json({ success: true, 
+        data :{
+            ...serviceExist
+        }
+     });
+
+  } catch (error) {
+    return res.status(500).json({ message: 'Internal server error', error: error.message });
+  }
 }; 
  
 const financialPlanningService = async (req, res) => {
     try {
       const {
-        applicantId, 
-        applicationid,
         personalSavings,
         externalFunding,
         breakEvenTargetInMonths,
@@ -72,16 +335,20 @@ const financialPlanningService = async (req, res) => {
         legalConsultationCost
       } = req.body; 
 
-      const application = await Application.findOne({_id: applicationid, applicantId: applicantId});
-  
-        if (!application) { 
-            return res.status(400).json({success: false, message: "Application was not found "});
-        }  
+      if(!personalSavings || !externalFunding|| !breakEvenTargetInMonths || !expectedROIInMonths 
+        || !marketingBudget || !registrationCost || !legalConsultationCost){
+        throw new Error("All fields are required!");
+      }  
 
-      const business = await Business.findOne({ ownerId: applicantId }).populate('categoryId');
-      if (!business) {
-        return res.status(400).json({success: false, message: "No business found for user"}); }
-   
+      const applicantId = req.params.applicantid;
+      const applicationId = req.params.applicationid;
+      const application = await Application.findOne({_id: applicationId, applicantId: applicantId});
+      const business = await Business.findOne({ ownerId: applicantId }).populate('categoryId'); 
+     
+      if (!business || !application) {
+        return res.status(404).json({ success: false, message: "Business or application not found" });
+      }
+
       const startupCostsBreakdown = {
         registration: registrationCost,
         legal: legalConsultationCost,
@@ -109,21 +376,21 @@ const financialPlanningService = async (req, res) => {
         let finalRecommendation = "";
         
       switch (business.categoryId.name) {
-          case "Retail":
+          case process.env.RETAIL: 
             expectedRevenueStreams = ["In-store Sales", "Online Sales"];
             taxStrategy = "Retail-specific deductions like inventory write-offs";
             complianceConsiderations = ["Sales tax registration", "Return policy regulations"];
             finalRecommendation = "Use (E-commerce Ads, Influencer Marketing, Search Engine Optimization and Email Marketing)to drive foot traffic and expand e-commerce reach.";
             break;
         
-          case "Food & Beverage":
+          case process.env.FOOD_BEVERAGE:
             expectedRevenueStreams = ["Dine-in Sales", "Delivery Services", "Takeaway"];
             taxStrategy = "Include food-related deductions like spoilage and delivery mileage";
             complianceConsiderations = ["Health inspections", "Food safety certifications"];
             finalRecommendation = "Promote specials via (Instagram and Facebook, Food Bloggers and Influencers and Event Sponsorships) and prioritize hygiene compliance.";
             break;
         
-          case "Healthcare":
+          case process.env.HEALTHCARE:
             expectedRevenueStreams = ["Consultation Fees", "Treatment Packages"];
             taxStrategy = "Healthcare-specific deductions like equipment depreciation";
             complianceConsiderations = ["Medical licenses", "Patient data regulations (HIPAA-like rules)"];
@@ -137,11 +404,11 @@ const financialPlanningService = async (req, res) => {
             finalRecommendation = "Focus marketing on (Google Ads, Search Engine Optimization and Email Newsletters) and ensure compliance with local laws.";
       }
         
-      const financialPlan = {
-        applicantId,
+      const financialPlanData  = {
+        applicantId, 
         businessId: business._id,
         serviceId: application.serviceId,
-        applicationId: applicationid, 
+        applicationId: applicationId, 
         capitalAvailable: personalSavings + externalFunding,
         startupCostsBreakdown,
         monthlyFixedCosts,
@@ -154,10 +421,16 @@ const financialPlanningService = async (req, res) => {
         finalRecommendation
       };
    
-      const newFinancialPlanning = await FinancialPlanning.create(financialPlan);
+      const newFinancialPlanning = await FinancialPlanning.create(financialPlanData);
       const financialPlanningResult = await newFinancialPlanning.save();
-  
-      return res.status(201).json({ success: true, financialPlanningId :financialPlanningResult._id });
+      
+      application.status = 'Approved';
+      const result = await application.save();
+      
+      if(!result || !result._id){
+        return res.status(400).json({ success: false, message:"Failed to create new Service" });
+      }
+      return res.status(201).json({ success: true, serviceId :financialPlanningResult._id });
     } catch (error) {
       return res.status(500).json({ message: 'Internal server error', error: error.message });
     }
@@ -220,43 +493,8 @@ const financialPlanningPremiumService  = async (req, res) => {
 const consultancyService  = async (req, res) => {
     try {  
         const { 
-            consultantId,
-            applicantId, 
-            serviceId,  
-            applicationId,
-            businessOverview ,  
-            industryAnalysis,
-            competitorInsights,
-            locationRecommendation,
-            targetAudienceDefinition,
-            marketingSuggestions,
-            operationsAdvice,
-            legalConsiderations,
-            growthStrategy,
-            commonPitfalls,
-            summaryRecommendation, 
-            sessionsCount,
-            deliveryFormat
-            } = req.body;
-
-        if(!consultantId || !applicantId || !serviceId || !businessOverview || !industryAnalysis || !competitorInsights ||
-             !locationRecommendation || !targetAudienceDefinition || !marketingSuggestions || !operationsAdvice || !legalConsiderations ||
-             !growthStrategy || !commonPitfalls || !summaryRecommendation || !deliveryFormat || !applicationId
-        ){
-            throw new Error("All fields are required!");
-        }    
-
-        const application = await Application.findOne({_id: applicationId, applicantId: applicantId, serviceId: serviceId});
-    
-        if (!application) { 
-            return res.status(400).json({success: false, message: "Application was not found "});
-        }   
-
-        const newConsultancyService = await Consultancy.create({
-            consultantId ,
-            applicantId ,
-            serviceId ,  
-            applicationId,
+            consultantId, 
+            serviceId,   
             businessOverview ,  
             industryAnalysis,
             competitorInsights,
@@ -269,7 +507,44 @@ const consultancyService  = async (req, res) => {
             commonPitfalls,
             summaryRecommendation,  
             deliveryFormat
-        });  
+            } = req.body;
+
+        if(!consultantId || !applicantId || !serviceId || !businessOverview || !industryAnalysis || !competitorInsights ||
+             !locationRecommendation || !targetAudienceDefinition || !marketingSuggestions || !operationsAdvice || !legalConsiderations ||
+             !growthStrategy || !commonPitfalls || !summaryRecommendation || !deliveryFormat || !applicationId 
+        ){
+            throw new Error("All fields are required!");
+        }    
+
+        const applicantId = req.params.applicantid;
+        const applicationId = req.params.applicationid;
+
+        const application = await Application.findOne({_id: applicationId, applicantId: applicantId, serviceId: serviceId});
+    
+        if (!application) { 
+            return res.status(400).json({success: false, message: "Application was not found "});
+        }   
+
+        const consultancyData = {
+            consultantId ,
+            applicantId ,
+            serviceId ,  
+            applicationId, 
+            businessOverview ,  
+            industryAnalysis,
+            competitorInsights,
+            locationRecommendation,
+            targetAudienceDefinition,
+            marketingSuggestions,
+            operationsAdvice,
+            legalConsiderations,
+            growthStrategy,
+            commonPitfalls,
+            summaryRecommendation,  
+            deliveryFormat
+        };  
+
+        const newConsultancyService = await Consultancy.create(consultancyData);
 
         const consultancyServiceResult = await newConsultancyService.save();
  
@@ -280,14 +555,14 @@ const consultancyService  = async (req, res) => {
         application.status = 'Approved';
         await application.save();
 
-        return res.status(201).json({ success: true, consultsncyId : consultancyServiceResult._id });
+        return res.status(201).json({ success: true, serviceId : consultancyServiceResult._id });
 
     } catch (error) {
         console.error('Error in addLocation:', error); 
         return res.status(500).json({ message: 'Internal server error', error: error.message });
     }
 }; 
- 
+//test
 const getApplicationStatus = async (req, res) => {
   
     try {
@@ -309,7 +584,7 @@ const getApplicationStatus = async (req, res) => {
       return res.status(500).json({ message: 'Internal server error', error });
     }
 };
- 
+//test
 const getUserApplications = async (req, res) => {
   try {  
     const applicantId = req.params.applicantId;
@@ -326,7 +601,7 @@ const getUserApplications = async (req, res) => {
     return res.status(500).json({ message: 'Internal server error', error });
   }
 };
- 
+//test
 const getConsultantApplications = async (req, res) => {
   try {
     //if status is pending mean consultant can respond to application 
@@ -430,7 +705,9 @@ const updatePaymentStatus = async (req, res) => {
 };
 
 module.exports = { 
-    processPayment, locationMarkrtAnalysis, salesRevenueOptimization, financialPlanningService, financialPlanningFreeTrialService,
-    financialPlanningPremiumService, consultancyService, getApplicationStatus, updateApplication, updatePaymentStatus, 
-    addServiceApplication, getUserApplications, getConsultantApplications, getAllConsultants, getAllServices
+    processPayment, locationMarkrtAnalysisService, locationMarkrtAnalysisFreeTrialService, locationMarkrtAnalysisPremiumService,
+    salesRevenueOptimizationService, salesRevenueOptimizationFreeTrialService, salesRevenueOptimizationPremiumService,
+    financialPlanningService, financialPlanningFreeTrialService,financialPlanningPremiumService, consultancyService,
+    getApplicationStatus, updateApplication, updatePaymentStatus, addServiceApplication, getUserApplications, 
+    getConsultantApplications, getAllConsultants, getAllServices
 }; 

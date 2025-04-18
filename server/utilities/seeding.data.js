@@ -56,7 +56,7 @@ const seedServices = async () => {
 
 // Seed categories
 const seedCategories = async () => {
-  const categories = [ {name: process.env.RETAIL}, {name: process.env.FOOD_BEVERAGE} , {name: process.env.HEALTHCARE}, {name: process.env.TECHNOLOGY} ];
+  const categories = [ {name: process.env.RETAIL}, {name: process.env.FOOD_BEVERAGE} , {name: process.env.HEALTHCARE} ];
   const categoryDocs = await Category.insertMany(categories);
   categoryDocs ? console.log('Categories Seeded:') : console.error('Categories Seeding Error:'); 
 };

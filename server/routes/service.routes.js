@@ -1,8 +1,10 @@
 const express = require('express'); 
 const { 
-    processPayment, locationMarkrtAnalysis, salesRevenueOptimization, financialPlanningService, financialPlanningFreeTrialService,
-    financialPlanningPremiumService, consultancyService, getApplicationStatus, updateApplication, updatePaymentStatus, 
-    addServiceApplication, getUserApplications, getConsultantApplications, getAllConsultants, getAllServices
+    processPayment, locationMarkrtAnalysisService, salesRevenueOptimizationService, salesRevenueOptimizationFreeTrialService, 
+    salesRevenueOptimizationPremiumService, financialPlanningService, financialPlanningFreeTrialService,financialPlanningPremiumService,
+    locationMarkrtAnalysisFreeTrialService, locationMarkrtAnalysisPremiumService,consultancyService, getApplicationStatus, 
+    updateApplication, updatePaymentStatus, addServiceApplication, getUserApplications, getConsultantApplications, getAllConsultants, 
+    getAllServices
 } = require('../controllers/service.controller');
 const router = express.Router();
 const { VerifyToken } = require('../middlewares/verifyToken'); 
@@ -13,17 +15,25 @@ router.post('/payment', processPayment);
 
 router.post('/add-service-application', addServiceApplication); 
 
-router.post('/location-markrt-analysis', locationMarkrtAnalysis);
+router.post('/sales-revenue-optimization/:applicantid/:applicationid', salesRevenueOptimizationService);
 
-router.post('/sales-revenue-optimization', salesRevenueOptimization);
+router.post('/sales-revenue-optimization-free-trial-service/:applicantid/:applicationid', salesRevenueOptimizationFreeTrialService);
 
-router.post('/financial-planning-service', financialPlanningService);
+router.post('/sales-revenue-optimization-premium-service/:applicantid/:applicationid', salesRevenueOptimizationPremiumService);
+
+router.post('/location-markrt-analysis/:applicantid/:applicationid', locationMarkrtAnalysisService);
+
+router.post('/location-markrt-analysis-free-trial-service/:applicantid/:applicationid', locationMarkrtAnalysisFreeTrialService);
+
+router.post('/location-markrt-analysis-premium-service/:applicantid/:applicationid', locationMarkrtAnalysisPremiumService);
+ 
+router.post('/financial-planning-service/:applicantid/:applicationid', financialPlanningService); 
 
 router.get('/financial-planning-free-trial-service/:applicantid/:applicationid', financialPlanningFreeTrialService);
 
 router.get('/financial-planning-premium-service/:applicantid/:applicationid', financialPlanningPremiumService);
 
-router.post('/consultancy', consultancyService);
+router.post('/consultancy/:applicantid/:applicationid', consultancyService);
 
 router.get('/get-consultants', getAllConsultants);
 

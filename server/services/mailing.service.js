@@ -1,6 +1,6 @@
 var nodemailer = require('nodemailer');
 
-const mail = (receiverMail, mailSubject, mailBody) => {
+const Mailing = (receiverMail, mailSubject, mailBody) => {
     var transporter = nodemailer.createTransport({
         service: 'gmail',
         auth: {
@@ -25,4 +25,4 @@ const mail = (receiverMail, mailSubject, mailBody) => {
       });
 };
 
-module.exports = mail;
+module.exports = Mailing;

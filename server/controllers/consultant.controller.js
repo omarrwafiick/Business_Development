@@ -1,6 +1,6 @@
 const Consultant = require("../models/consultant.model");  
 const User = require("../models/user.model");  
- 
+//test
 const addConsultant = async (req, res) => {
     try {   
         const { salary, bonus, userId, qualificationsIds, experienceYears } = req.body;
@@ -40,7 +40,7 @@ const addConsultant = async (req, res) => {
         return res.status(500).json({ message: 'Internal server error', error: error.message });
     }
 };
-
+//test
 const getAllConsultants = async (req, res) => {
     try {       
         const consutants = await Consultant.find();
@@ -55,7 +55,7 @@ const getAllConsultants = async (req, res) => {
             return res.status(500).json({ message: 'Internal server error' });
         } 
 };
-
+//test
 const getConsultantById = async (req, res) => {
     try {       
         const consultantId = req.params.id;
@@ -71,7 +71,7 @@ const getConsultantById = async (req, res) => {
             return res.status(500).json({ message: 'Internal server error' });
         } 
 };
-
+//test
 const updateConsultant = async (req, res) => {
     try {       
         const { salary, bonus, qualificationsIds, experienceYears } = req.body;
@@ -103,7 +103,7 @@ const updateConsultant = async (req, res) => {
             return res.status(500).json({ message: 'Internal server error' });
         } 
 };
-
+//test
 const deleteConsultant = async (req, res) => {
     try {
       const consultantId = req.params.id;

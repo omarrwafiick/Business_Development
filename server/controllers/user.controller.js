@@ -2,6 +2,7 @@ const User = require('../models/user.model');
 const Role = require('../models/role.model'); 
 const mongoose = require('mongoose'); 
 const bcrypt = require('bcryptjs');
+const Mailing = require('../services/mailing.service');
 const { SetUpTokenToCookies } = require('../utilities/setUpTokenToCookies');
  
 const SignUp = async (req, res) => {  
@@ -45,7 +46,7 @@ const SignUp = async (req, res) => {
     } catch (error) {
         return res.status(400).json({ success: false, message: error.message });
     }
-};
+}; 
 
 const Login = async (req, res) =>{  
     try {
@@ -74,5 +75,67 @@ const Login = async (req, res) =>{
         return res.status(400).json({success : false, message : error.message});
     }
 }
-  
-module.exports = { SignUp, Login };
+//test
+const ForgetPassword = async (req, res) =>{
+    const { email } = req.body; 
+    console.log(email);
+    try { 
+        const user = await User.findOne({email: email});
+        if(!user){
+            return res.status(404).json({success : false, message : "User was not found"});
+        } 
+        const resetToken = Crypto.randomBytes(20).toString("hex");
+        const resetTokenExpiration = Date.now() + 1 * 24 * 24 * 1000;
+
+        user.resetPasswordToken = resetToken;
+        user.resetPasswordExpiresAt = resetTokenExpiration;
+        await user.save();
+
+        await Mailing(user.email,`${process.env.LOCAL_HOST}/reset-password/${resetToken}`);
+
+        res.status(200).json({success: true, message: "Please check your email"});
+    } catch (error) {
+        return res.status(400).json({success : false, message : error.message});
+    } 
+};
+//test
+const ResetPassword = async (req, res) =>{ 
+    const { token } = req.params; 
+    const { password } = req.body; 
+    try { 
+        const user = await User.findOne({resetToken: token, resetTokenExpiration : {$gt: Date.now()}});
+        if(!user){
+            return res.status(404).json({success : false, message : "Invalid or expired token"});
+        }  
+        const hashedPassword = await bcrypt.hash(password, Number(process.env.CRYPTO_KEY)); 
+        user.password = hashedPassword;
+        user.resetPasswordToken = undefined;
+        user.resetPasswordExpiresAt = Date.now();
+        await user.save(); 
+        const message = "Password was reset successfully";
+        await Mailing(user.email, message);
+
+        res.status(200).json({success: true, message});
+    } catch (error) {
+        return res.status(400).json({success : false, message : error.message});
+    } 
+};
+//test
+const LogOut = async (req, res) =>{ 
+    res.clearCookie("token");
+    res.status(200).json({success: true, message: "Logged out successfully"});
+};
+//test
+const CheckAuth = async (req, res) =>{    
+    try {
+        const user = await User.findById(req.userId);
+        if(!user){
+            return res.status(404).json({success : false, message : "User was not found"});
+        }
+        res.status(200).json({success: true,  user: {...user._doc, password: undefined}});
+    } catch (error) {
+        return res.status(400).json({success : false, message : error.message});
+    }
+};
+
+module.exports = { SignUp, Login, ForgetPassword, ResetPassword, LogOut, CheckAuth };
