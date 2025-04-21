@@ -1,9 +1,9 @@
 const express = require('express'); 
 const { addLocation, getAllBusinessLocations, getAllLocation, deleteBusinessLocation, searchLocations, getNearbyLocations} = require('../controllers/location.controller');
 const router = express.Router();
-const { VerifyToken } = require('../middlewares/verifyToken'); 
+const { VerifyTokenByRole } = require('../middlewares/verifyByRole'); 
 
-//router.use(VerifyToken);
+router.use(VerifyTokenByRole(String(process.env.ENTREPRENEUR)));
    
 router.post('/add', addLocation);  
 

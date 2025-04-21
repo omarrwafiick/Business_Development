@@ -3,7 +3,7 @@ const { addBusiness, getAllBusinesses, getBusinessById } = require('../controlle
 const router = express.Router();  
 const { VerifyToken } = require('../middlewares/verifyToken'); 
 
-//router.use(VerifyToken);
+router.use(VerifyToken);
   
 router.post('/add', addBusiness); 
 

@@ -1,7 +1,7 @@
 const jwtToken = require('jsonwebtoken');
 
 const VerifyToken = (req, res, next) => {
-    const token = req.cookie?.token;
+    const token = req.cookies?.token;   
     if(!token){
         return res.status(401).json({ success: false, message: 'Unauthorized access - no token was provided' });
     }
@@ -11,8 +11,9 @@ const VerifyToken = (req, res, next) => {
         req.userRole = decodedToken.userRole;
         next();
     } catch (error) {
-        return res.status(401).json({ success: false, message: 'Unauthorized access - token is expired' });
+        return res.status(401).json({ success: false, message: 'Unauthorized access - token is expired or invalid' });
     }
 };
+
 
 module.exports = { VerifyToken };

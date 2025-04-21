@@ -6,10 +6,10 @@ const {
     updateApplication, updatePaymentStatus, addServiceApplication, getUserApplications, getConsultantApplications, getAllConsultants, 
     getAllServices
 } = require('../controllers/service.controller');
-const router = express.Router();
-const { VerifyToken } = require('../middlewares/verifyToken'); 
-  
-//router.use(VerifyToken); 
+const router = express.Router(); 
+const { VerifyTokenByRole } = require('../middlewares/verifyByRole'); 
+
+router.use(VerifyTokenByRole(String(process.env.ENTREPRENEUR)));
 
 router.post('/payment', processPayment); 
 
@@ -33,8 +33,6 @@ router.get('/financial-planning-free-trial-service/:applicantid/:applicationid',
 
 router.get('/financial-planning-premium-service/:applicantid/:applicationid', financialPlanningPremiumService);
 
-router.post('/consultancy/:applicantid/:applicationid', consultancyService);
-
 router.get('/get-consultants', getAllConsultants);
 
 router.get('/get-services', getAllServices);
@@ -48,5 +46,9 @@ router.get('/getstatus/:id', getApplicationStatus);
 router.put('/update/:id', updateApplication);
 
 router.put('/update/paymentstatus/:id', updatePaymentStatus);
+
+router.use(VerifyTokenByRole(String(process.env.CONSULTANT)));
+
+router.post('/consultancy/:applicantid/:applicationid', consultancyService);
 
 module.exports = router;

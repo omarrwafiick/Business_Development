@@ -77,7 +77,7 @@ const seedAdmin = async () => {
         fullName: process.env.ADMIN_USERNAME, 
         email: process.env.ADMIN_EMAIL, 
         password: hashedPassword , 
-        phoneNumber: process.env.ADMIN_PHONE_NUMBER
+        phoneNumber: process.env.DEFAULT_PHONE_NUMBER
       }
     );
 
@@ -110,6 +110,7 @@ const seedConsultants = async (services, qualifications) => {
           fullName: consultants[i],
           email: `${consultants[i].replace(" ", "")}.consultant@bedaytak.com`, 
           password: hashedPassword,
+          phoneNumber: process.env.DEFAULT_PHONE_NUMBER,
           rolesId: consultantRole._id
         }
       ); 

@@ -3,15 +3,15 @@ const { SignUp, Login, ForgetPassword, ResetPassword, LogOut, CheckAuth } = requ
 const router = express.Router();
 const { VerifyToken } = require('../middlewares/verifyToken'); 
 
-//router.use(VerifyToken); 
- 
 router.post('/signup-user', SignUp);
-
+ 
 router.post('/login-user', Login); 
 
 router.post('/forget-password', ForgetPassword); 
 
 router.post('/reset-password/:token', ResetPassword); 
+
+router.use(VerifyToken); 
 
 router.post('/logout', LogOut); 
 

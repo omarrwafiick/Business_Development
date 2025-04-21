@@ -1,6 +1,6 @@
 const Consultant = require("../models/consultant.model");  
 const User = require("../models/user.model");  
-//test
+
 const addConsultant = async (req, res) => {
     try {   
         const { salary, bonus, userId, qualificationsIds, experienceYears } = req.body;
@@ -54,7 +54,7 @@ const getAllConsultants = async (req, res) => {
         } catch (error) {
             return res.status(500).json({ message: 'Internal server error' });
         } 
-};
+}; 
 //test
 const getConsultantById = async (req, res) => {
     try {       
