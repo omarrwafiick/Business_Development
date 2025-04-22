@@ -14,6 +14,14 @@ const salesRevenueOptimizationSchema = new mongoose.Schema({
     revenueBoostIdeas: { type: [String], required: true },
     revenueRiskFactors: { type: [String], required: true },
     finalOptimizationAdvice: { type: String, required: true },
+    chartImage: {
+        type: Buffer, 
+        required: false
+      },
+      chartImageType: {
+        type: String, 
+        required: false
+      },
     reportGeneratedAt: { type: Date, default: Date.now }
 });  
    

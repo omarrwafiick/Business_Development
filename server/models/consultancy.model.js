@@ -15,8 +15,7 @@ const consultancySchema = new mongoose.Schema({
   legalConsiderations: { type: String , required: true}, // Registration, license, permits
   growthStrategy: { type: String, required: true }, // Consultant’s plan to scale the businessS
   commonPitfalls: { type: String, required: true }, // What to avoid based on industry/context
-  summaryRecommendation: { type: String, required: true }, // Final clear call-to-action or conclusion  
-  deliveryFormat: { type: String, required: true }, //In-Person, Zoom, Phone Call, Google Meet  
+  summaryRecommendation: { type: String, required: true }, // Final clear call-to-action or conclusion   
   reportPublishedAt: { type: Date, default: Date.now}
 }); 
  

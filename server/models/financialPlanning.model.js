@@ -17,6 +17,14 @@ const financialPlanningSchema = new mongoose.Schema({
   taxStrategy: { type: String },
   complianceConsiderations: [{ type: String }], 
   finalRecommendation: { type: String }, // Summary advice from planner      
+  chartImage: {
+    type: Buffer, 
+    required: false
+  },
+  chartImageType: {
+    type: String, 
+    required: false
+  },
   reportPublishedAt: { type: Date, default: Date.now }
 });
  

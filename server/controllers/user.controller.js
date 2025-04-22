@@ -5,6 +5,7 @@ const crypto = require('crypto');
 const Mailing = require('../services/mailing.service');
 const { SetUpTokenToCookies } = require('../utilities/setUpTokenToCookies');
 const { createUser } = require('../utilities/common');
+const ContactUs = require('../models/contact.model'); 
   
 const SignUp = async (req, res) => {  
     try {
@@ -138,4 +139,38 @@ const ResetPassword = async (req, res) =>{
     }
 };
 
-module.exports = { SignUp, Login, ForgetPassword, ResetPassword, LogOut, CheckAuth };
+const Contact = async (req, res) =>{  
+    try { 
+        const { message, subject} = req.body; 
+    
+        if(!message || !subject){
+            throw new Error("All fields are required!");
+        }
+
+        const userId = req.params.id;
+
+        const user = await User.findById(userId);
+
+        if(!user){
+            return res.status(404).json({success : false, message : "User was not found"}); 
+        }
+        const newContact = await ContactUs.create({
+            userId,
+            message,
+            subject
+        });  
+
+        const result = await newContact.save();
+
+        if(!result || !result._id){
+            return res.status(400).json({success : false, message : "Message could not be created"}); 
+        }
+
+        res.status(201).json({success: true, messageId: result._id});
+
+    } catch (error) {
+        return res.status(400).json({success : false, message : error.message});
+    }
+}
+
+module.exports = { SignUp, Login, ForgetPassword, ResetPassword, LogOut, CheckAuth, Contact };

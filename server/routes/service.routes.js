@@ -1,6 +1,6 @@
 const express = require('express'); 
 const { 
-    processPayment, locationMarkrtAnalysisService, salesRevenueOptimizationService, salesRevenueOptimizationFreeTrialService, 
+    locationMarkrtAnalysisService, salesRevenueOptimizationService, salesRevenueOptimizationFreeTrialService, 
     salesRevenueOptimizationPremiumService, financialPlanningService, financialPlanningFreeTrialService,financialPlanningPremiumService,
     locationMarkrtAnalysisFreeTrialService, locationMarkrtAnalysisPremiumService,consultancyService, getApplicationStatus, 
     updateApplication, updatePaymentStatus, addServiceApplication, getUserApplications, getConsultantApplications, getAllConsultants, 
@@ -10,8 +10,6 @@ const router = express.Router();
 const { VerifyTokenByRole } = require('../middlewares/verifyByRole'); 
  
 router.use(VerifyTokenByRole(String(process.env.ENTREPRENEUR)));
-
-router.post('/payment', processPayment); 
 
 router.post('/add-service-application', addServiceApplication); 
 

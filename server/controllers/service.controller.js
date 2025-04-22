@@ -1,6 +1,6 @@
 const { default: mongoose } = require('mongoose');
 const Application = require('../models/application.model');
-const paymentService = require('../services/payment.service');
+const { generateChart } = require('../services/generateGraph.service');
 const Consultancy = require('../models/consultancy.model'); 
 const Service = require('../models/service.model'); 
 const Consultant = require('../models/consultant.model');  
@@ -8,16 +8,6 @@ const FinancialPlanning = require('../models/financialPlanning.model');
 const Business = require('../models/business.model'); 
 const LocationMarketAnalysis = require('../models/locationMarkrtAnalysis.model'); 
 const SalesRevenueOptimization = require('../models/salesRevenueOptimization.model'); 
- 
-const processPayment = async (req, res) => {  
-    try {
-        await paymentService(req).then(res => {
-            if(res.ok) return res.json();
-        }).then(({ url }) => window.location = url);
-    } catch (error) {
-        console.error("payment error");
-    }
-};    
 
 const addServiceApplication = async (req, res) => {  
     try {  
@@ -116,6 +106,19 @@ const locationMarkrtAnalysisService = async (req, res) => {
         finalLocationAdvice = "Observe your category’s local presence and align your strategy with underserved needs.";
     }
 
+    const footTrafficValue = location.distanceToMainRoad < 2 ? 100 : 60;  
+    const imageBuffer = await generateChart({
+      labels: ['Same Category Nearby', 'Population Density', 'Foot Traffic Score', 'Total Nearby Businesses'],
+      data: [
+        sameCategoryNearby,
+        populationDensity,
+        footTrafficValue,
+        nearbyBusinesses.length
+      ],
+      colors: ['#FF6384', '#36A2EB', '#FFCE56', '#9966FF'],
+      title: `Location Analysis for ${location.name || 'Selected Area'}`
+    });
+    
     const analysisData = {
       applicantId,
       businessId: business._id,
@@ -128,6 +131,8 @@ const locationMarkrtAnalysisService = async (req, res) => {
       footTrafficScore,
       competitionLevel,
       marketingStrategies,
+      chartImage: imageBuffer,
+      chartImageType: 'image/png',
       finalLocationAdvice
     };
 
@@ -252,6 +257,18 @@ const salesRevenueOptimizationService = async (req, res) => {
     if (avgPrice < 10) revenueRiskFactors.push("Low product pricing reduces margin buffer");
     if (estRevenue < 10000) revenueRiskFactors.push("Revenue below sustainability threshold");
 
+    const imageBuffer = await generateChart({
+      labels: ['Avg Price (USD)', 'Expected Daily Sales', 'Working Days/Month', 'Est. Monthly Revenue (USD)'],
+      data: [
+        avgPrice,
+        expectedDailySales,
+        workingDays,
+        estRevenue
+      ],
+      colors: ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0'],
+      title: `Sales Revenue Insight for ${business.name || 'Your Business'}`
+    });    
+
     const salesData = {
       applicantId,
       applicationId,
@@ -265,6 +282,8 @@ const salesRevenueOptimizationService = async (req, res) => {
       upsellOpportunities,
       revenueBoostIdeas,
       revenueRiskFactors,
+      chartImage: imageBuffer,
+      chartImageType: 'image/png',
       finalOptimizationAdvice
     };
 
@@ -334,121 +353,125 @@ const salesRevenueOptimizationPremiumService  = async (req, res) => {
 }; 
  
 const financialPlanningService = async (req, res) => {
-    try {
-      const {
-        personalSavings,
-        externalFunding,
-        breakEvenTargetInMonths,
-        expectedROIInMonths,
-        marketingBudget, 
-        registrationCost,
-        legalConsultationCost
-      } = req.body; 
+  try {
+    const {
+      applicantId, 
+      applicationid,
+      personalSavings,
+      externalFunding,
+      breakEvenTargetInMonths,
+      expectedROIInMonths,
+      marketingBudget, 
+      registrationCost,
+      legalConsultationCost
+    } = req.body; 
 
-      if(!personalSavings || !externalFunding|| !breakEvenTargetInMonths || !expectedROIInMonths 
-        || !marketingBudget || !registrationCost || !legalConsultationCost){
-        throw new Error("All fields are required!");
+    const application = await Application.findOne({_id: applicationid, applicantId: applicantId});
+
+      if (!application) { 
+          return res.status(400).json({success: false, message: "Application was not found "});
       }  
 
-      const applicantId = req.params.applicantid;
-      const applicationId = req.params.applicationid;
-      const application = await Application.findOne({_id: applicationId, applicantId: applicantId});
-      const business = await Business.findOne({ ownerId: applicantId }).populate('categoryId'); 
-     
-      if (!business || !application) {
-        return res.status(404).json({ success: false, message: "Business or application not found" });
-      }
-      const service = await Service.findOne({ _id: application.serviceId, name: process.env.FINANCIAL_PLANNING });
+    const business = await Business.findOne({ ownerId: applicantId }).populate('categoryId');
+    if (!business) {
+      return res.status(400).json({success: false, message: "No business found for user"}); }
+ 
+    const startupCostsBreakdown = {
+      registration: registrationCost,
+      legal: legalConsultationCost,
+      marketing: marketingBudget,
+      equipment: business.employees * 1000,
+      misc: 2000
+    };
 
-      if (!service) {
-        return res.status(404).json({ success: false, message: "Service was not found" });
-      }
+    const totalStartupCost = Object.values(startupCostsBreakdown).reduce((sum, val) => sum + Number(val), 0);
+ 
+    const monthlyFixedCosts = business.employees * 1500 + 1000;
+    const monthlyVariableCosts = Number(business.serviceProductAvgPrice) * 0.2 * Number(business.expectedCustomersPerDay) * Number(business.workingDaysPerMonth);
+ 
+    const projectedRevenue = Number(business.serviceProductAvgPrice) * Number(business.expectedCustomersPerDay) * Number(business.workingDaysPerMonth);
+ 
+    const expectedROI = (projectedRevenue * expectedROIInMonths) - (monthlyFixedCosts + monthlyVariableCosts) * expectedROIInMonths;
 
-      const startupCostsBreakdown = {
-        registration: registrationCost,
-        legal: legalConsultationCost,
-        marketing: marketingBudget,
-        equipment: business.employees * 1000,
-        misc: 2000
-      };
-  
-      const totalStartupCost = Object.values(startupCostsBreakdown).reduce((sum, val) => sum + Number(val), 0);
-   
-      const monthlyFixedCosts = business.employees * 1500 + 1000;
-      const monthlyVariableCosts = Number(business.serviceProductAvgPrice) * 0.2 * Number(business.expectedCustomersPerDay) * Number(business.workingDaysPerMonth);
-   
-      const projectedRevenue = Number(business.serviceProductAvgPrice) * Number(business.expectedCustomersPerDay) * Number(business.workingDaysPerMonth);
-   
-      const expectedROI = (projectedRevenue * expectedROIInMonths) - (monthlyFixedCosts + monthlyVariableCosts) * expectedROIInMonths;
-  
-      const breakEvenPoint = (projectedRevenue * breakEvenTargetInMonths) >= totalStartupCost
-        ? `Break-even achievable in ${breakEvenTargetInMonths} months`
-        : `Break-even will take more than ${breakEvenTargetInMonths} months`
-   
-        let expectedRevenueStreams = [];
-        let taxStrategy = "";
-        let complianceConsiderations = [];
-        let finalRecommendation = "";
-        
-      switch (business.categoryId.name) {
-          case process.env.RETAIL: 
-            expectedRevenueStreams = ["In-store Sales", "Online Sales"];
-            taxStrategy = "Retail-specific deductions like inventory write-offs";
-            complianceConsiderations = ["Sales tax registration", "Return policy regulations"];
-            finalRecommendation = "Use (E-commerce Ads, Influencer Marketing, Search Engine Optimization and Email Marketing)to drive foot traffic and expand e-commerce reach.";
-            break;
-        
-          case process.env.FOOD_BEVERAGE:
-            expectedRevenueStreams = ["Dine-in Sales", "Delivery Services", "Takeaway"];
-            taxStrategy = "Include food-related deductions like spoilage and delivery mileage";
-            complianceConsiderations = ["Health inspections", "Food safety certifications"];
-            finalRecommendation = "Promote specials via (Instagram and Facebook, Food Bloggers and Influencers and Event Sponsorships) and prioritize hygiene compliance.";
-            break;
-        
-          case process.env.HEALTHCARE:
-            expectedRevenueStreams = ["Consultation Fees", "Treatment Packages"];
-            taxStrategy = "Healthcare-specific deductions like equipment depreciation";
-            complianceConsiderations = ["Medical licenses", "Patient data regulations (HIPAA-like rules)"];
-            finalRecommendation = "Build trust through (Healthcare Portals, Patient Referrals & Testimonials and Healthcare Partnerships) and focus on regulatory approvals.";
-            break;
-        
-          default:
-            expectedRevenueStreams = ["Product Sales", "Services"];
-            taxStrategy = "Standard corporate deductions";
-            complianceConsiderations = ["Business license", "Local permits"];
-            finalRecommendation = "Focus marketing on (Google Ads, Search Engine Optimization and Email Newsletters) and ensure compliance with local laws.";
-      }
-        
-      const financialPlanData  = {
-        applicantId, 
-        businessId: business._id,
-        serviceId: application.serviceId,
-        applicationId: applicationId, 
-        capitalAvailable: personalSavings + externalFunding,
-        startupCostsBreakdown,
+    const breakEvenPoint = (projectedRevenue * breakEvenTargetInMonths) >= totalStartupCost
+      ? `Break-even achievable in ${breakEvenTargetInMonths} months`
+      : `Break-even will take more than ${breakEvenTargetInMonths} months`
+ 
+      let expectedRevenueStreams = [];
+      let taxStrategy = "";
+      let complianceConsiderations = [];
+      let finalRecommendation = "";
+      
+    switch (business.categoryId.name) {
+        case "Retail":
+          expectedRevenueStreams = ["In-store Sales", "Online Sales"];
+          taxStrategy = "Retail-specific deductions like inventory write-offs";
+          complianceConsiderations = ["Sales tax registration", "Return policy regulations"];
+          finalRecommendation = "Use (E-commerce Ads, Influencer Marketing, Search Engine Optimization and Email Marketing)to drive foot traffic and expand e-commerce reach.";
+          break;
+      
+        case "Food & Beverage":
+          expectedRevenueStreams = ["Dine-in Sales", "Delivery Services", "Takeaway"];
+          taxStrategy = "Include food-related deductions like spoilage and delivery mileage";
+          complianceConsiderations = ["Health inspections", "Food safety certifications"];
+          finalRecommendation = "Promote specials via (Instagram and Facebook, Food Bloggers and Influencers and Event Sponsorships) and prioritize hygiene compliance.";
+          break;
+      
+        case "Healthcare":
+          expectedRevenueStreams = ["Consultation Fees", "Treatment Packages"];
+          taxStrategy = "Healthcare-specific deductions like equipment depreciation";
+          complianceConsiderations = ["Medical licenses", "Patient data regulations (HIPAA-like rules)"];
+          finalRecommendation = "Build trust through (Healthcare Portals, Patient Referrals & Testimonials and Healthcare Partnerships) and focus on regulatory approvals.";
+          break;
+      
+        default:
+          expectedRevenueStreams = ["Product Sales", "Services"];
+          taxStrategy = "Standard corporate deductions";
+          complianceConsiderations = ["Business license", "Local permits"];
+          finalRecommendation = "Focus marketing on (Google Ads, Search Engine Optimization and Email Newsletters) and ensure compliance with local laws.";
+    }
+
+    const imageBuffer = await generateChart({
+      labels: ['Startup Costs', 'Fixed Costs', 'Variable Costs', 'Expected ROI'],
+      data: [
+        totalStartupCost,
         monthlyFixedCosts,
         monthlyVariableCosts,
-        expectedRevenueStreams,
-        expectedROI,
-        breakEvenPoint,
-        taxStrategy,
-        complianceConsiderations,
-        finalRecommendation
-      };
-   
-      const newFinancialPlanning = await FinancialPlanning.create(financialPlanData);
-      const financialPlanningResult = await newFinancialPlanning.save();
-      
-      application.status = 'Approved';
-      const result = await application.save();
-      
-      if(!result || !result._id){
-        return res.status(400).json({ success: false, message:"Failed to create new Service" });
-      }
-      return res.status(201).json({ success: true, serviceId :financialPlanningResult._id });
-    } catch (error) {
-      return res.status(500).json({ message: 'Internal server error', error: error.message });
-    }
+        expectedROI
+      ],
+      colors: ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0'],
+      title: 'Business Financial Overview'
+    });
+    
+    const financialPlan = {
+      applicantId,
+      businessId: business._id,
+      serviceId: application.serviceId,
+      applicationId: applicationid, 
+      capitalAvailable: personalSavings + externalFunding,
+      startupCostsBreakdown,
+      monthlyFixedCosts,
+      monthlyVariableCosts,
+      expectedRevenueStreams,
+      expectedROI,
+      breakEvenPoint,
+      taxStrategy,
+      complianceConsiderations,
+      finalRecommendation,
+      chartImage: imageBuffer,
+      chartImageType: 'image/png'
+    };
+    
+    const newFinancialPlanning = await FinancialPlanning.create(financialPlan);
+    const financialPlanningResult = await newFinancialPlanning.save();  
+     
+    application.status = 'Approved';
+    await application.save();
+
+    return res.status(201).json({ success: true, financialPlanningId :financialPlanningResult._id });
+  } catch (error) {
+    return res.status(500).json({ message: 'Internal server error', error: error.message });
+  }
 }; 
  
 const financialPlanningFreeTrialService  = async (req, res) => { 
@@ -516,17 +539,16 @@ const consultancyService  = async (req, res) => {
             locationRecommendation,
             targetAudienceDefinition,
             marketingSuggestions,
-            operationsAdvice,
+            operationsAdvice, 
             legalConsiderations,
             growthStrategy,
             commonPitfalls,
-            summaryRecommendation,  
-            deliveryFormat
+            summaryRecommendation
             } = req.body;
 
         if(!consultantId || !applicantId || !serviceId || !businessOverview || !industryAnalysis || !competitorInsights ||
              !locationRecommendation || !targetAudienceDefinition || !marketingSuggestions || !operationsAdvice || !legalConsiderations ||
-             !growthStrategy || !commonPitfalls || !summaryRecommendation || !deliveryFormat || !applicationId 
+             !growthStrategy || !commonPitfalls || !summaryRecommendation || !applicationId 
         ){
             throw new Error("All fields are required!");
         }    
@@ -543,8 +565,8 @@ const consultancyService  = async (req, res) => {
 
         if (!service) {
           return res.status(404).json({ success: false, message: "Service was not found" });
-        }
-
+        } 
+    
         const consultancyData = {
             consultantId ,
             applicantId ,
@@ -560,8 +582,7 @@ const consultancyService  = async (req, res) => {
             legalConsiderations,
             growthStrategy,
             commonPitfalls,
-            summaryRecommendation,  
-            deliveryFormat
+            summaryRecommendation
         };  
 
         const newConsultancyService = await Consultancy.create(consultancyData);
