@@ -1,15 +1,15 @@
 const mongoose = require('mongoose');
 
+const businessSchema = new mongoose.Schema({
+  categoryId: { type: mongoose.Schema.Types.ObjectId, ref: 'Category' },
+  count: { type: Number, required: true }
+}, { _id: false });
+
 const locationSchema = new mongoose.Schema({
-  city: { type: String, required: true },
-  district: { type: String, required: true }, 
-  longitude: { type: mongoose.Types.Decimal128, required: true },
-  latitude: { type: mongoose.Types.Decimal128, required: true },
-  populationDensity: { type: Number, required: true },
-  footTrafficScore: { type: String, enum: ['Low', 'Moderate', 'High'] , required: true },
-  businessId: { type: mongoose.Schema.Types.ObjectId, ref: 'Business' }
+  name: { type: String, required: true },
+  businesses: [businessSchema]
 }); 
- 
+
 const Location = mongoose.model('Location', locationSchema);
 
 module.exports = Location; 

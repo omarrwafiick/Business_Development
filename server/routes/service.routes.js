@@ -4,13 +4,13 @@ const {
     salesRevenueOptimizationPremiumService, financialPlanningService, financialPlanningFreeTrialService,financialPlanningPremiumService,
     locationMarkrtAnalysisFreeTrialService, locationMarkrtAnalysisPremiumService,consultancyService, getApplicationStatus, 
     updateApplication, updatePaymentStatus, addServiceApplication, getUserApplications, getConsultantApplications, getAllConsultants, 
-    getAllServices
+    getAllServices, seedDataToConsultant
 } = require('../controllers/service.controller');
 const router = express.Router(); 
 const { VerifyTokenByRole } = require('../middlewares/verifyByRole'); 
  
 router.use(VerifyTokenByRole(String(process.env.ENTREPRENEUR)));
-
+ 
 router.post('/add-service-application', addServiceApplication); 
 
 router.post('/sales-revenue-optimization/:applicantid/:applicationid', salesRevenueOptimizationService);
@@ -32,7 +32,7 @@ router.get('/financial-planning-free-trial-service/:applicantid/:applicationid',
 router.get('/financial-planning-premium-service/:applicantid/:applicationid', financialPlanningPremiumService);
 
 router.get('/get-consultants', getAllConsultants);
-
+ 
 router.get('/get-services', getAllServices);
 
 router.get('/user/:applicantId', getUserApplications);
@@ -45,8 +45,10 @@ router.put('/update/:id', updateApplication);
 
 router.put('/update/paymentstatus/:id', updatePaymentStatus);
 
+router.post('/seed-consultant', seedDataToConsultant);
+
 router.use(VerifyTokenByRole(String(process.env.CONSULTANT)));
 
-router.post('/consultancy/:applicantid/:applicationid', consultancyService);
+router.post('/consultancy/:consultencyid', consultancyService);
 
 module.exports = router;

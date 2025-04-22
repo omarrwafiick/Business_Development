@@ -3,12 +3,9 @@ const Categories = require("../models/category.model");
 
 const addBusiness = async (req, res) => {
     try {   
-        const { name, description, ownerId, categoryId, competitionScore,employees, operatingHoursPerDay,
-         workingDaysPerMonth, serviceProductAvgPrice, expectedCustomersPerDay } = req.body;
-
-        if(!name || !description || !ownerId || !categoryId || !competitionScore || !employees || 
-            !operatingHoursPerDay || !workingDaysPerMonth || !serviceProductAvgPrice || !expectedCustomersPerDay
-             ){
+        const { name, description, ownerId, categoryId } = req.body;
+ 
+        if(!name || !description || !ownerId || !categoryId){
             throw new Error("All fields are required!");
         }  
         
@@ -22,13 +19,7 @@ const addBusiness = async (req, res) => {
             name, 
             description, 
             ownerId, 
-            categoryId, 
-            competitionScore,
-            employees, 
-            operatingHoursPerDay,
-            workingDaysPerMonth, 
-            serviceProductAvgPrice, 
-            expectedCustomersPerDay
+            categoryId
         }); 
  
         const businessResult = await newBusiness.save();

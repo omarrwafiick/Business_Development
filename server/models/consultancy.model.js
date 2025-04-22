@@ -5,20 +5,25 @@ const consultancySchema = new mongoose.Schema({
   applicantId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true }, 
   serviceId: { type: mongoose.Schema.Types.ObjectId, ref: 'Service', required: true },  
   applicationId: { type: mongoose.Schema.Types.ObjectId, ref: 'Application Service', required: true },  
-  businessOverview: { type: String, required: true }, // User's business description
-  industryAnalysis: { type: String, required: true }, // Consultant's summary of market/sector
-  competitorInsights: { type: String, required: true }, // Competitor evaluation & gaps
-  locationRecommendation: { type: String, required: true }, // Suggested city/area
-  targetAudienceDefinition: { type: String, required: true }, // Who the user should target
-  marketingSuggestions: { type: String, required: true }, // Channels, branding, messaging
-  operationsAdvice: { type: String, required: true }, // Staffing, process setup, logistics
-  legalConsiderations: { type: String , required: true}, // Registration, license, permits
-  growthStrategy: { type: String, required: true }, // Consultant’s plan to scale the businessS
-  commonPitfalls: { type: String, required: true }, // What to avoid based on industry/context
-  summaryRecommendation: { type: String, required: true }, // Final clear call-to-action or conclusion   
+  businessIdea: { type: String, required: true  },
+  stageOfBusiness : { type: String , enum: ["Just an idea","Starting soon","Already running"], required: true },
+  targetMarket: { type: String, required: true  },
+  monthlyBudget: { type: Number, required: true },
+  mainGoal: { type: String, required: true  },
+  businessOverview: { type: String }, // User's business description
+  industryAnalysis: { type: String }, // Consultant's summary of market/sector
+  competitorInsights: { type: String }, // Competitor evaluation & gaps
+  locationRecommendation: { type: String }, // Suggested city/area
+  targetAudienceDefinition: { type: String }, // Who the user should target
+  marketingSuggestions: { type: String }, // Channels, branding, messaging
+  operationsAdvice: { type: String }, // Staffing, process setup, logistics
+  legalConsiderations: { type: String }, // Registration, license, permits
+  growthStrategy: { type: String }, // Consultant’s plan to scale the businessS
+  commonPitfalls: { type: String }, // What to avoid based on industry/context
+  summaryRecommendation: { type: String }, // Final clear call-to-action or conclusion   
   reportPublishedAt: { type: Date, default: Date.now}
-}); 
- 
+});  
+
 const Consultancy = mongoose.model('Consultancy', consultancySchema);
 
 module.exports = Consultancy;
