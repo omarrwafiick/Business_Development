@@ -1,9 +1,10 @@
-const Business = require("../models/business.model");   
-//test
+const Business = require("../models/business.model"); 
+const Categories = require("../models/category.model");     
+
 const addBusiness = async (req, res) => {
     try {   
         const { name, description, ownerId, categoryId, competitionScore,employees, operatingHoursPerDay,
-         workingDaysPerMonth, serviceProductAvgPrice, expectedCustomersPerDay} = req.body;
+         workingDaysPerMonth, serviceProductAvgPrice, expectedCustomersPerDay } = req.body;
 
         if(!name || !description || !ownerId || !categoryId || !competitionScore || !employees || 
             !operatingHoursPerDay || !workingDaysPerMonth || !serviceProductAvgPrice || !expectedCustomersPerDay
@@ -42,7 +43,7 @@ const addBusiness = async (req, res) => {
         return res.status(500).json({ message: 'Internal server error', error: error.message });
     }
 }; 
-//test
+ 
 const getAllBusinesses = async (req, res) => {
     try {       
         const businesses = await Business.find();
@@ -57,7 +58,7 @@ const getAllBusinesses = async (req, res) => {
             return res.status(500).json({ message: 'Internal server error' });
         } 
 };
-//test
+ 
 const getBusinessById = async (req, res) => {
     try {       
         const businessId = req.params.id;
@@ -74,5 +75,20 @@ const getBusinessById = async (req, res) => {
         } 
 };
 
-module.exports = { addBusiness, getAllBusinesses, getBusinessById };
+const getAllCategories = async (req, res) => {
+    try {        
+        const categories = await Categories.find();
+            
+        if(!categories){
+            return res.status(404).json({ success: false, message: "No category was found"}); 
+        };  
+    
+        return res.status(200).json({ success: true, categories });    
+    
+        } catch (error) {
+            return res.status(500).json({ message: 'Internal server error' });
+        } 
+};
+
+module.exports = { addBusiness, getAllBusinesses, getBusinessById, getAllCategories };
  

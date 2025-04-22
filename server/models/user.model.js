@@ -5,7 +5,7 @@ const userSchema = new mongoose.Schema({
     email: { type: String, required: true, unique: true },
     password: { type: String, required: true },
     phoneNumber: { type: String, required: true } ,
-    rolesId: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Role' }],
+    rolesId: { type: mongoose.Schema.Types.ObjectId, ref: 'Role' },
     resetToken: { type: String, default: "" },
     resetTokenExpiration: { type: Date, default: Date.now },
     createdAt: { type: Date, default: Date.now },

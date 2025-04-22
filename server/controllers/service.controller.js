@@ -17,7 +17,7 @@ const processPayment = async (req, res) => {
     } catch (error) {
         console.error("payment error");
     }
-};   
+};    
 
 const addServiceApplication = async (req, res) => {  
     try {  
@@ -51,25 +51,29 @@ const addServiceApplication = async (req, res) => {
         return res.status(500).json({ message: 'Internal server error', error: error.message });
     }
 }; 
-//test
+
 const locationMarkrtAnalysisService = async (req, res) => {
   try {
-    const { applicantId, applicationId } = req.body;
+    const applicationId = req.params.applicationid;
+    const applicantId = req.params.applicantid;
 
     const business = await Business.findOne({ ownerId: applicantId }).populate('categoryId locationId');
     const application = await Application.findById(applicationId);
-
+ 
     if (!business || !application) {
       return res.status(404).json({ success: false, message: "Business or application not found" });
     }
 
+    const service = await Service.findOne({ _id: application.serviceId, name: process.env.LOCATION_MARKET_ANALYSIS });
+  
+    if (!service) {
+      return res.status(404).json({ success: false, message: "Service was not found" });
+    }
+
     const location = business.locationId;
     const category = business.categoryId.name;
-
-    const nearbyBusinesses = await Business.find({ 
-      locationId: location._id,
-      _id: { $ne: business._id }
-    }).populate('categoryId');
+    console.log(business.locationId) 
+    const nearbyBusinesses = await Business.find({locationId: location._id, _id: { $ne: business._id }}).populate('categoryId');
 
     const sameCategoryNearby = nearbyBusinesses.filter(b => b.categoryId.name === category).length; 
 
@@ -118,7 +122,7 @@ const locationMarkrtAnalysisService = async (req, res) => {
       applicationId,
       serviceId: application.serviceId,
       locationId: location._id,
-      sameCategoryCount,
+      sameCategoryCount : sameCategoryNearby,
       totalNearbyBusinesses: sameCategoryNearby,
       populationDensity,
       footTrafficScore,
@@ -139,7 +143,7 @@ const locationMarkrtAnalysisService = async (req, res) => {
     return res.status(500).json({ success: false, message: "Internal server error", error: error.message });
   }
 };
-//test
+
 const locationMarkrtAnalysisFreeTrialService = async (req, res) => {
   try {  
     const applicantId = req.params.applicantid;
@@ -163,7 +167,7 @@ const locationMarkrtAnalysisFreeTrialService = async (req, res) => {
     return res.status(500).json({ message: 'Internal server error', error: error.message });
   }
 }
-//test
+
 const locationMarkrtAnalysisPremiumService = async (req, res) => { 
   try {  
     const applicantId = req.params.applicantid;
@@ -173,8 +177,7 @@ const locationMarkrtAnalysisPremiumService = async (req, res) => {
  
     if (!serviceExist) {
       return res.status(404).json({ success: false, message: "No service was found" });
-    }  
-    
+    }   
     return res.status(200).json({ success: true, 
         data : {
           ...serviceExist
@@ -185,16 +188,23 @@ const locationMarkrtAnalysisPremiumService = async (req, res) => {
     return res.status(500).json({ message: 'Internal server error', error: error.message });
   }
 }
-//test 
+
 const salesRevenueOptimizationService = async (req, res) => {
   try {
-    const { applicantId, applicationId } = req.body;
+    const applicationId = req.params.applicationid;
+    const applicantId = req.params.applicantid;
 
     const business = await Business.findOne({ ownerId: applicantId }).populate('categoryId');
-    const application = await Application.findOne({ _id: applicationId, applicantId });
-
+    const application = await Application.findOne({ _id: applicationId, applicantId: applicantId});
+  
     if (!business || !application) {
       return res.status(404).json({ success: false, message: "Business or application not found" });
+    }
+    
+    const service = await Service.findOne({ _id: application.serviceId, name: process.env.SALES_REVENUE_OPTIMIZATION });
+
+    if (!service) {
+      return res.status(404).json({ success: false, message: "Service was not found" });
     }
 
     const avgPrice = Number(business.serviceProductAvgPrice);
@@ -271,7 +281,7 @@ const salesRevenueOptimizationService = async (req, res) => {
     return res.status(500).json({ success: false, message: "Internal server error", error: error.message });
   }
 };
-//test
+ 
 const salesRevenueOptimizationFreeTrialService  = async (req, res) => {
   try {  
     const applicantId = req.params.applicantid;
@@ -294,7 +304,7 @@ const salesRevenueOptimizationFreeTrialService  = async (req, res) => {
     return res.status(500).json({ message: 'Internal server error', error: error.message });
   }
 }; 
-//test
+ 
 const salesRevenueOptimizationPremiumService  = async (req, res) => {
   try {  
     const applicantId = req.params.applicantid;
@@ -347,6 +357,11 @@ const financialPlanningService = async (req, res) => {
      
       if (!business || !application) {
         return res.status(404).json({ success: false, message: "Business or application not found" });
+      }
+      const service = await Service.findOne({ _id: application.serviceId, name: process.env.FINANCIAL_PLANNING });
+
+      if (!service) {
+        return res.status(404).json({ success: false, message: "Service was not found" });
       }
 
       const startupCostsBreakdown = {
@@ -524,6 +539,11 @@ const consultancyService  = async (req, res) => {
         if (!application) { 
             return res.status(400).json({success: false, message: "Application was not found "});
         }   
+        const service = await Service.findOne({ _id: application.serviceId, name: process.env.CONSULTANCY });
+
+        if (!service) {
+          return res.status(404).json({ success: false, message: "Service was not found" });
+        }
 
         const consultancyData = {
             consultantId ,
@@ -562,7 +582,7 @@ const consultancyService  = async (req, res) => {
         return res.status(500).json({ message: 'Internal server error', error: error.message });
     }
 }; 
-//test
+
 const getApplicationStatus = async (req, res) => {
   
     try {
@@ -584,7 +604,7 @@ const getApplicationStatus = async (req, res) => {
       return res.status(500).json({ message: 'Internal server error', error });
     }
 };
-//test
+
 const getUserApplications = async (req, res) => {
   try {  
     const applicantId = req.params.applicantId;
@@ -601,7 +621,7 @@ const getUserApplications = async (req, res) => {
     return res.status(500).json({ message: 'Internal server error', error });
   }
 };
-//test
+
 const getConsultantApplications = async (req, res) => {
   try {
     //if status is pending mean consultant can respond to application 

@@ -8,7 +8,7 @@ const {
 } = require('../controllers/service.controller');
 const router = express.Router(); 
 const { VerifyTokenByRole } = require('../middlewares/verifyByRole'); 
-
+ 
 router.use(VerifyTokenByRole(String(process.env.ENTREPRENEUR)));
 
 router.post('/payment', processPayment); 
@@ -17,15 +17,15 @@ router.post('/add-service-application', addServiceApplication);
 
 router.post('/sales-revenue-optimization/:applicantid/:applicationid', salesRevenueOptimizationService);
 
-router.post('/sales-revenue-optimization-free-trial-service/:applicantid/:applicationid', salesRevenueOptimizationFreeTrialService);
+router.get('/sales-revenue-optimization-free-trial-service/:applicantid/:applicationid', salesRevenueOptimizationFreeTrialService);
 
-router.post('/sales-revenue-optimization-premium-service/:applicantid/:applicationid', salesRevenueOptimizationPremiumService);
+router.get('/sales-revenue-optimization-premium-service/:applicantid/:applicationid', salesRevenueOptimizationPremiumService);
 
 router.post('/location-markrt-analysis/:applicantid/:applicationid', locationMarkrtAnalysisService);
 
-router.post('/location-markrt-analysis-free-trial-service/:applicantid/:applicationid', locationMarkrtAnalysisFreeTrialService);
+router.get('/location-markrt-analysis-free-trial-service/:applicantid/:applicationid', locationMarkrtAnalysisFreeTrialService);
 
-router.post('/location-markrt-analysis-premium-service/:applicantid/:applicationid', locationMarkrtAnalysisPremiumService);
+router.get('/location-markrt-analysis-premium-service/:applicantid/:applicationid', locationMarkrtAnalysisPremiumService);
  
 router.post('/financial-planning-service/:applicantid/:applicationid', financialPlanningService); 
 

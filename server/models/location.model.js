@@ -8,7 +8,7 @@ const locationSchema = new mongoose.Schema({
   populationDensity: { type: Number, required: true },
   footTrafficScore: { type: String, enum: ['Low', 'Moderate', 'High'] , required: true },
   businessId: { type: mongoose.Schema.Types.ObjectId, ref: 'Business' }
-});
+}); 
  
 const Location = mongoose.model('Location', locationSchema);
 
