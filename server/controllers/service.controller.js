@@ -40,13 +40,13 @@ const addServiceApplication = async (req, res) => {
     } catch (error) { 
         return res.status(500).json({ message: 'Internal server error', error: error.message });
     }
-};  
+};    
 
 const locationMarkrtAnalysisService = async (req, res) => {
   try {
     const applicationId = req.params.applicationid;
     const applicantId = req.params.applicantid;
-
+ 
     const business = await Business.findOne({ ownerId: applicantId }).populate('categoryId locationId');
     const application = await Application.findById(applicationId);
  
@@ -55,70 +55,52 @@ const locationMarkrtAnalysisService = async (req, res) => {
     }
 
     const service = await Service.findOne({ _id: application.serviceId, name: process.env.LOCATION_MARKET_ANALYSIS });
-  
+   
     if (!service) {
       return res.status(404).json({ success: false, message: "Service was not found" });
     }
 
-    const location = business.locationId;
-    const category = business.categoryId.name;
-    console.log(business.locationId) 
-    const nearbyBusinesses = await Business.find({locationId: location._id, _id: { $ne: business._id }}).populate('categoryId');
+    const businessLocation = business.locationId;
+    const businessCategory = business.categoryId;
+ 
+    const nearbyBusinessesLocations = await Location.find({name: businessLocation.name, 'businesses.categoryId': businessCategory });
 
-    const sameCategoryNearby = nearbyBusinesses.filter(b => b.categoryId.name === category).length; 
+    const sameCategoryNearby = nearbyBusinessesLocations.count; 
 
     const competitionLevel = sameCategoryNearby > 10
       ? "High competition in this location"
       : sameCategoryNearby >= 5
         ? "Moderate competition detected"
-        : "Low competition – potential opportunity";
-
-    const populationDensity = location.populationDensity;
-    const footTrafficScore = location.distanceToMainRoad < 2 ? "High" : "Moderate";
+        : "Low competition – potential opportunity"; 
 
     const marketingStrategies = [];
     let finalLocationAdvice = ""; 
 
-    switch (business.categoryId.name) {
+    //todos make it dynamic
+    switch (businessCategory.name) {
       case process.env.RETAIL: 
         marketingStrategies.push("Launch local influencer campaigns", "Use bold storefront visuals");
         finalLocationAdvice = competitionLevel.includes("Low")
           ? "Capitalize on low competition and promote opening deals"
           : "Focus on branding and loyalty programs to stand out.";
-        break;
-    
-      case process.env.FOOD_BEVERAGE:
-        marketingStrategies.push("Offer app-based delivery promotions", "Create neighborhood tasting events");
-        finalLocationAdvice = footTrafficScore === "High"
-          ? "High foot traffic supports walk-in customers—optimize your exterior and signage."
-          : "Focus on delivery optimization and online marketing due to moderate foot traffic.";
-        break;
-    
-      case process.env.HEALTHCARE:
-        marketingStrategies.push("Partner with local gyms or spas", "Advertise health awareness locally");
-        finalLocationAdvice = sameCategoryNearby < 3
-          ? "There’s a service gap—great potential for gaining loyal patients"
-          : "You’ll need to differentiate with service quality and pricing.";
-        break;
-    
+        break;  
       default:
         marketingStrategies.push("Test localized ad campaigns", "Engage through community events");
         finalLocationAdvice = "Observe your category’s local presence and align your strategy with underserved needs.";
     }
+ 
+    const totalNearbyBusinesses = await Location.find({name: businessLocation.name});
 
-    const footTrafficValue = location.distanceToMainRoad < 2 ? 100 : 60;  
     const imageBuffer = await generateChart({
-      labels: ['Same Category Nearby', 'Population Density', 'Foot Traffic Score', 'Total Nearby Businesses'],
+      labels: ['Same Category Nearby', 'Total Near by Businesses'],
       data: [
-        sameCategoryNearby,
-        populationDensity,
-        footTrafficValue,
-        nearbyBusinesses.length
+        sameCategoryNearby, 
+        totalNearbyBusinesses.count
       ],
-      colors: ['#FF6384', '#36A2EB', '#FFCE56', '#9966FF'],
-      title: `Location Analysis for ${location.name || 'Selected Area'}`
+      colors: ['#FF6384', '#36A2EB'],
+      title: 'Location Analysis'
     });
-    
+
     const analysisData = {
       applicantId,
       businessId: business._id,
@@ -126,17 +108,17 @@ const locationMarkrtAnalysisService = async (req, res) => {
       serviceId: application.serviceId,
       locationId: location._id,
       sameCategoryCount : sameCategoryNearby,
-      totalNearbyBusinesses: sameCategoryNearby,
-      populationDensity,
-      footTrafficScore,
+      totalNearbyBusinesses: totalNearbyBusinesses.count, 
       competitionLevel,
       marketingStrategies,
+      finalLocationAdvice,
       chartImage: imageBuffer,
-      chartImageType: 'image/png',
-      finalLocationAdvice
+      chartImageType: 'image/png'
     };
 
-    const locationResult = await LocationMarketAnalysis.create(analysisData);
+    const newLocation = await LocationMarketAnalysis.create(analysisData);
+
+    const locationResult = await newLocation.save();
 
     if (!locationResult || !locationResult._id) { 
       return res.status(400).json({ success: false, message: 'Failed to create new Service' });
@@ -162,9 +144,8 @@ const locationMarkrtAnalysisFreeTrialService = async (req, res) => {
     
     return res.status(200).json({ success: true, 
         data :{ 
-            totalNearbyBusinesses: serviceExist.totalNearbyBusinesses,
-            sameCategoryCount: serviceExist.sameCategoryCount, 
-            competitionLevel: serviceExist.competitionLevel
+            competitionLevel: serviceExist.competitionLevel,
+            totalNearbyBusinesses: serviceExist.totalNearbyBusinesses
         }
      });
 
@@ -196,6 +177,12 @@ const locationMarkrtAnalysisPremiumService = async (req, res) => {
 
 const salesRevenueOptimizationService = async (req, res) => {
   try {
+    const { numberOfEmployees, averagePrice, expectedDailySales, workingDays, estimatedRevenue } = req.body;
+
+    if(!numberOfEmployees || !averagePrice || !expectedDailySales || !workingDays || !estimatedRevenue ){
+      throw new Error("All fields are required!");
+    }      
+        
     const applicationId = req.params.applicationid;
     const applicantId = req.params.applicantid;
 
@@ -211,11 +198,7 @@ const salesRevenueOptimizationService = async (req, res) => {
     if (!service) {
       return res.status(404).json({ success: false, message: "Service was not found" });
     }
-
-    const avgPrice = Number(business.serviceProductAvgPrice);
-    const expectedDailySales = Number(business.expectedCustomersPerDay);
-    const workingDays = Number(business.workingDaysPerMonth);
-    const estRevenue = avgPrice * expectedDailySales * workingDays;
+  
     const category = business.categoryId.name;
 
     const pricingStrategySuggestions = [];
@@ -224,22 +207,9 @@ const salesRevenueOptimizationService = async (req, res) => {
     const revenueRiskFactors = []; 
     let finalOptimizationAdvice = "";
  
+    //todos :make it dynamic
     switch (category) {
-      case process.env.RETAIL: 
-        pricingStrategySuggestions.push("Use tiered pricing for product lines", "Offer time-limited bundle deals");
-        upsellOpportunities.push("Offer accessories at checkout", "Highlight premium product alternatives");
-        revenueBoostIdeas.push("Run seasonal campaigns", "Partner with local influencers");
-        finalOptimizationAdvice = "Focus on bundling products, optimizing shelf placement and localized ads.";
-        break;
-    
-      case process.env.FOOD_BEVERAGE:
-        pricingStrategySuggestions.push("Happy hour discounts", "Combo meals with fixed pricing");
-        upsellOpportunities.push("Add drink or dessert suggestions", "Offer premium upgrades");
-        revenueBoostIdeas.push("Launch a loyalty program", "Promote limited-time items");
-        finalOptimizationAdvice = "Create combos, upsell sides and reward repeat customers through loyalty programs.";
-        break;
-    
-      case process.env.HEALTHCARE:
+      case process.env.RETAIL:  
         pricingStrategySuggestions.push("Offer consultation packages", "First-time checkup discounts");
         upsellOpportunities.push("Recommend regular checkups", "Promote wellness programs");
         revenueBoostIdeas.push("Enable digital booking", "Offer subscription wellness plans");
@@ -252,18 +222,18 @@ const salesRevenueOptimizationService = async (req, res) => {
         revenueBoostIdeas.push("Email remarketing", "Google/Meta ads");
         finalOptimizationAdvice = "Test price points, upsell effectively and market online strategically.";
     }
- 
-    if (business.employees < 2) revenueRiskFactors.push("Low staffing may limit service capacity");
-    if (avgPrice < 10) revenueRiskFactors.push("Low product pricing reduces margin buffer");
-    if (estRevenue < 10000) revenueRiskFactors.push("Revenue below sustainability threshold");
+    //todos :make it dynamic
+    if (numberOfEmployees < 2) revenueRiskFactors.push("Low staffing may limit service capacity");
+    if (averagePrice < 10) revenueRiskFactors.push("Low product pricing reduces margin buffer");
+    if (estimatedRevenue < 10000) revenueRiskFactors.push("Revenue below sustainability threshold");
 
     const imageBuffer = await generateChart({
       labels: ['Avg Price (USD)', 'Expected Daily Sales', 'Working Days/Month', 'Est. Monthly Revenue (USD)'],
       data: [
-        avgPrice,
+        averagePrice,
         expectedDailySales,
         workingDays,
-        estRevenue
+        estimatedRevenue
       ],
       colors: ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0'],
       title: `Sales Revenue Insight for ${business.name || 'Your Business'}`
@@ -274,17 +244,18 @@ const salesRevenueOptimizationService = async (req, res) => {
       applicationId,
       businessId: business._id,
       serviceId: application.serviceId,
-      avgPrice,
+      numberOfEmployees,
+      avgPrice : averagePrice,
       expectedDailySales,
       workingDaysPerMonth: workingDays,
-      estimatedMonthlyRevenue: estRevenue, 
+      estimatedMonthlyRevenue: estimatedRevenue, 
       pricingStrategySuggestions,
       upsellOpportunities,
       revenueBoostIdeas,
-      revenueRiskFactors,
+      revenueRiskFactors, 
+      finalOptimizationAdvice,
       chartImage: imageBuffer,
-      chartImageType: 'image/png',
-      finalOptimizationAdvice
+      chartImageType: 'image/png'
     };
 
     const newSales = await SalesRevenueOptimization.create(salesData);
@@ -305,7 +276,7 @@ const salesRevenueOptimizationFreeTrialService  = async (req, res) => {
   try {  
     const applicantId = req.params.applicantid;
     const applicationId = req.params.applicationid;
-
+ 
     const serviceExist = await SalesRevenueOptimization.findOne({applicantId: applicantId, applicationId: applicationId});
     console.log(serviceExist)
     if (!serviceExist) {
@@ -314,8 +285,8 @@ const salesRevenueOptimizationFreeTrialService  = async (req, res) => {
     
     return res.status(200).json({ success: true, 
         data :{
-            expectedDailySales: serviceExist.expectedDailySales,
-            estimatedMonthlyRevenue: serviceExist.estimatedMonthlyRevenue, 
+            revenueBoostIdeas: serviceExist.revenueBoostIdeas,
+            upsellOpportunities: serviceExist.upsellOpportunities, 
         }
      });
 
@@ -737,7 +708,7 @@ const updateApplication = async (req, res) => {
             return res.status(500).json({ message: 'Internal server error', error });
         } 
 };
-
+ 
 const updatePaymentStatus = async (req, res) => {
     try {     
         const { paymentStatus } = req.body;

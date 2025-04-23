@@ -1,8 +1,9 @@
 const User = require("../models/user.model");  
+const Joi = require('joi');
 const { createUser, createConsultant } = require('../utilities/common');
-
+ 
 const addConsultantByAdmin = async (req, res) => {
-    try {     
+    try {      
         const { salary, bonus, qualificationsIds, experienceYears, fullName, email, password, phoneNumber } = req.body;
         if(!salary || !bonus || !qualificationsIds || !email 
           || !experienceYears || !fullName || !password || !phoneNumber){
@@ -24,7 +25,7 @@ const addConsultantByAdmin = async (req, res) => {
     } catch (error) { 
         return res.status(500).json({ message: 'Internal server error', error: error.message });
     }
-};
+}; 
  
 const addAdmin = async (req, res) => {
   try {   

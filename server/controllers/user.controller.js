@@ -1,12 +1,12 @@
 const User = require('../models/user.model'); 
-const Role = require('../models/role.model'); 
+const Role = require('../models/role.model');  
 const bcrypt = require('bcryptjs');
 const crypto = require('crypto'); 
 const Mailing = require('../services/mailing.service');
 const { SetUpTokenToCookies } = require('../utilities/setUpTokenToCookies');
 const { createUser } = require('../utilities/common');
 const ContactUs = require('../models/contact.model'); 
-  
+   
 const SignUp = async (req, res) => {  
     try {
         const { fullName, email, password, phoneNumber } = req.body;
@@ -127,7 +127,7 @@ const ResetPassword = async (req, res) =>{
     res.status(200).json({success: true, message: "Logged out successfully"});
 };
 
- const CheckAuth = async (req, res) =>{    
+const CheckAuth = async (req, res) =>{    
     try {
         const user = await User.findById(req.userId);
         if(!user){
@@ -141,7 +141,7 @@ const ResetPassword = async (req, res) =>{
 
 const Contact = async (req, res) =>{  
     try { 
-        const { message, subject} = req.body; 
+        const { message, subject } = req.body; 
     
         if(!message || !subject){
             throw new Error("All fields are required!");
@@ -173,4 +173,19 @@ const Contact = async (req, res) =>{
     }
 }
 
-module.exports = { SignUp, Login, ForgetPassword, ResetPassword, LogOut, CheckAuth, Contact };
+const getAllRoles = async (req, res) => {
+    try {        
+        const roles = await Role.find().where('name').nin([process.env.CONSULTANT, process.env.ADMIN]);
+            
+        if(!roles){
+            return res.status(404).json({ success: false, message: "No role was found"}); 
+        };  
+    
+        return res.status(200).json({ success: true, roles });    
+    
+        } catch (error) {
+            return res.status(500).json({ message: 'Internal server error' });
+        } 
+};
+
+module.exports = { SignUp, Login, ForgetPassword, ResetPassword, LogOut, CheckAuth, Contact, getAllRoles };

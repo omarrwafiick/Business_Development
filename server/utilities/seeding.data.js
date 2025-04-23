@@ -287,6 +287,7 @@ const seedConsultants = async () => {
       {
           fullName: consultants[i],
           email: `${consultants[i].replace(" ", "")}.consultant@bedaytak.com`, 
+          phoneNumber:process.env.DEFAULT_PHONE_NUMBER,
           password: hashedPassword,
           rolesId: consultantRole._id
         }

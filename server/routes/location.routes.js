@@ -3,7 +3,8 @@ const { getAllLocation } = require('../controllers/location.controller');
 const router = express.Router();
 const { VerifyTokenByRole } = require('../middlewares/verifyByRole'); 
 
-router.use(VerifyTokenByRole(String(process.env.ENTREPRENEUR)));
+router.use(VerifyTokenByRole(String(process.env.BUSINESS_OWNER)));
     
-router.get('/get', getAllLocation); 
+router.get('/get', getAllLocation);  
+
 module.exports = router;

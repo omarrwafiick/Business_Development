@@ -15,8 +15,8 @@ const getAllConsultants = async (req, res) => {
         } catch (error) {
             return res.status(500).json({ message: 'Internal server error' });
         } 
-};  
-
+};   
+  
 const getConsultantById = async (req, res) => {
     try {       
         const consultantId = req.params.id;
@@ -46,7 +46,7 @@ const updateConsultant = async (req, res) => {
         if(!consultant){
             return res.status(404).json({ success: false, message: "No consultant was found"}); 
         };   
-
+        
         const qualifications = await Qualifications.find();
         const matchedIds = qualifications
                                 .filter(q => qualificationsIds.includes(q._id.toString()))

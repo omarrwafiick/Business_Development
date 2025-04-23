@@ -3,12 +3,14 @@ const { addAdmin, addConsultantByAdmin, deleteUser, getUser, getAllUsers } = req
 const router = express.Router();   
 require('dotenv').config();
 const { VerifyTokenByRole } = require('../middlewares/verifyByRole'); 
+const { validateInputs } = require('../middlewares/validateInputs'); 
+const { adminCreateConsultantSchema, createAdminSchema } = require("../validationSchemas/adminValidation");  
 
 router.use(VerifyTokenByRole(String(process.env.ADMIN)));
 
-router.post('/add-admin', addAdmin); 
-
-router.post('/add-consultant-by-admin', addConsultantByAdmin); 
+router.post('/add-admin', validateInputs(createAdminSchema), addAdmin); 
+ 
+router.post('/add-consultant-by-admin', validateInputs(adminCreateConsultantSchema), addConsultantByAdmin); 
   
 router.get('/users',  getAllUsers); 
 

@@ -6,6 +6,7 @@ const salesRevenueOptimizationSchema = new mongoose.Schema({
     serviceId: { type: mongoose.Schema.Types.ObjectId, ref: 'Service', required: true },  
     businessId: { type: mongoose.Schema.Types.ObjectId, ref: 'Business', required: true },
     avgPrice: { type: Number, required: true },
+    numberOfEmployees: { type: Number, required: true },
     expectedDailySales: { type: Number, required: true },
     workingDaysPerMonth: { type: Number, required: true },
     estimatedMonthlyRevenue: { type: Number, required: true }, 
@@ -14,7 +15,7 @@ const salesRevenueOptimizationSchema = new mongoose.Schema({
     revenueBoostIdeas: { type: [String], required: true },
     revenueRiskFactors: { type: [String], required: true },
     finalOptimizationAdvice: { type: String, required: true },
-    chartImage: {
+    chartImage: { 
         type: Buffer, 
         required: false
       },
