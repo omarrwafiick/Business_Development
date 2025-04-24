@@ -2,8 +2,7 @@ const mongoose = require('mongoose');
  
 const consultancySchema = new mongoose.Schema({
   consultantId: { type: mongoose.Schema.Types.ObjectId, ref: 'Consultant', required: true },
-  applicantId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true }, 
-  serviceId: { type: mongoose.Schema.Types.ObjectId, ref: 'Service', required: true },  
+  applicantId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },  
   applicationId: { type: mongoose.Schema.Types.ObjectId, ref: 'Application Service', required: true },  
   businessIdea: { type: String, required: true  },
   stageOfBusiness : { type: String , enum: ["Just an idea","Starting soon","Already running"], required: true },

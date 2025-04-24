@@ -2,10 +2,8 @@ const Joi = require('joi');
 //reusables
 const paymentStatus = Joi.boolean().required();
 const status = Joi.string().valid('Pending', 'Approved', 'Rejected').required();
-const consultantId = Joi.string().length(24).required();
-const applicantId = Joi.string().length(24).required();  
-const serviceId = Joi.string().length(24).required();  
-const applicationId = Joi.string().length(24).required();  
+const consultantId = Joi.string().length(24).required(); 
+const serviceId = Joi.string().length(24).required();   
 ////////////////////////////////////////////////////////
 const paymentStatusSchema = Joi.object({
     paymentStatus
@@ -17,10 +15,7 @@ const updateApplicationSchema = Joi.object({
 });
  
 const consultancyServiceSchema = Joi.object({
-    consultantId,
-    applicantId,
-    serviceId,
-    applicationId,
+    consultantId,   
     businessOverview: Joi.string().min(10).required(),
     industryAnalysis: Joi.string().min(10).required(),
     competitorInsights: Joi.string().min(10).required(),
@@ -35,10 +30,7 @@ const consultancyServiceSchema = Joi.object({
 });
 
 const seedConsultantSchema = Joi.object({
-    consultantId,
-    applicantId,
-    serviceId,
-    applicationId,
+    consultantId,  
     businessIdea: Joi.string().min(10).required(), 
     stageOfBusiness: Joi.string().valid('Idea', 'Startup', 'Growth', 'Mature').required(),  
     targetMarket: Joi.string().min(10).required(),  
@@ -47,15 +39,12 @@ const seedConsultantSchema = Joi.object({
 });
  
 const financialPlanningServiceSchema = Joi.object({ 
-    applicantId, 
-    applicationId,
     monthlyRevenue: Joi.number().positive().required(),  
     monthlyCosts: Joi.number().positive().required(),  
     startupCost: Joi.number().positive().required()  
 });
  
-const addApplicationSchema = Joi.object({ 
-    applicantId, 
+const addApplicationSchema = Joi.object({  
     serviceId,
     status, 
     paymentStatus 
@@ -68,8 +57,16 @@ const salesOptimizationSchema = Joi.object({
     workingDays: Joi.number().integer().min(1).max(31).required(),
     estimatedRevenue: Joi.number().min(0).required()
 });
- 
+
+const businessGuideSchema = Joi.object({  
+    stageBusiness: Joi.number().required(), 
+    currentlymakingMonthlyProfit: Joi.number().required(), 
+    customersDoYouGetPerMonth: Joi.number().required(), 
+    repeatCustomers: Joi.number().required(), 
+    mainChallengeRightNow: Joi.number().required(), 
+}); 
+
 module.exports = { 
     paymentStatusSchema, updateApplicationSchema, consultancyServiceSchema, seedConsultantSchema,
-    financialPlanningServiceSchema, addApplicationSchema, salesOptimizationSchema
+    financialPlanningServiceSchema, addApplicationSchema, salesOptimizationSchema, businessGuideSchema
 };

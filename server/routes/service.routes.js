@@ -4,19 +4,24 @@ const {
     salesRevenueOptimizationPremiumService, financialPlanningService, financialPlanningFreeTrialService,financialPlanningPremiumService,
     locationMarkrtAnalysisFreeTrialService, locationMarkrtAnalysisPremiumService,consultancyService, getApplicationStatus, 
     updateApplication, updatePaymentStatus, addServiceApplication, getUserApplications, getConsultantApplications, getAllConsultants, 
-    getAllServices, seedDataToConsultant
+    getAllServices, seedDataToConsultant, businessGuideService
 } = require('../controllers/service.controller');
 const router = express.Router(); 
+const { VerifyToken } = require('../middlewares/verifyToken');  
 const { VerifyTokenByRole } = require('../middlewares/verifyByRole'); 
 const { validateInputs } = require('../middlewares/validateInputs'); 
-const {
-     paymentStatusSchema, updateApplicationSchema, consultancyServiceSchema,seedConsultantSchema,financialPlanningServiceSchema,
-     addApplicationSchema, salesOptimizationSchema 
+const {  
+    paymentStatusSchema, updateApplicationSchema, consultancyServiceSchema,seedConsultantSchema,financialPlanningServiceSchema,
+    addApplicationSchema, salesOptimizationSchema, businessGuideSchema
 } = require("../validationSchemas/serviceValidation");  
+   
+router.use(VerifyToken); 
+
+router.post('/business-guide/:applicantid/:applicationid', validateInputs(businessGuideSchema) , businessGuideService); 
 
 router.use(VerifyTokenByRole(String(process.env.ENTREPRENEUR)));
  
-router.post('/add-service-application', validateInputs(addApplicationSchema), addServiceApplication); 
+router.post('/add-service-application/:applicantid', validateInputs(addApplicationSchema), addServiceApplication); 
 
 router.post('/sales-revenue-optimization/:applicantid/:applicationid', validateInputs(salesOptimizationSchema), salesRevenueOptimizationService);
 
@@ -50,10 +55,10 @@ router.put('/update/:id', validateInputs(updateApplicationSchema), updateApplica
 
 router.put('/update/paymentstatus/:id', validateInputs(paymentStatusSchema), updatePaymentStatus);
 
-router.post('/seed-consultant', validateInputs(seedConsultantSchema), seedDataToConsultant);
+router.post('/seed-consultant/:applicantid/:applicationid', validateInputs(seedConsultantSchema), seedDataToConsultant);
 
 router.use(VerifyTokenByRole(String(process.env.CONSULTANT)));
 
-router.post('/consultancy/:consultencyid', validateInputs(consultancyServiceSchema), consultancyService);
+router.post('/consultancy/:applicantid/:applicationid/:consultencyid', validateInputs(consultancyServiceSchema), consultancyService);
 
 module.exports = router;

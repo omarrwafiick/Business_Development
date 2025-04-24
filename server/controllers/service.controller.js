@@ -8,15 +8,30 @@ const FinancialPlanning = require('../models/financialPlanning.model');
 const Business = require('../models/business.model'); 
 const LocationMarketAnalysis = require('../models/locationMarkrtAnalysis.model'); 
 const SalesRevenueOptimization = require('../models/salesRevenueOptimization.model'); 
+const BusinessGuide = require('../models/businessGuide.model'); 
+const User = require('../models/user.model'); 
 
 const addServiceApplication = async (req, res) => {  
     try {  
-        const { applicantId, serviceId, status, paymentStatus } = req.body;
+        const { serviceId, status, paymentStatus } = req.body;
 
-        if(!applicantId || !serviceId || !status ){
+        if(!serviceId || !status ){
             throw new Error("All fields are required!");
-        }  
-        
+        }   
+        const applicantId = req.params.applicantid;
+ 
+        const user = await User.findOne({ _id: applicantId }).populate('categoryId locationId'); 
+      
+        if (!user) {
+          return res.status(404).json({ success: false, message: "User not found" });
+        }
+
+        const service = await Service.findOne({ _id: serviceId }); 
+      
+        if (!service) {
+          return res.status(404).json({ success: false, message: "Service not found" });
+        }
+         
         const applicationExist = await Application.findOne({ applicantId: applicantId, serviceId: serviceId });
 
         if (applicationExist) {
@@ -41,6 +56,120 @@ const addServiceApplication = async (req, res) => {
         return res.status(500).json({ message: 'Internal server error', error: error.message });
     }
 };    
+ 
+const businessGuideService = async (req, res) => {
+  try {
+    const { 
+      stageOfBusiness,          
+      monthlyProfitStatus,     
+      monthlyCustomerCount,  
+      repeatCustomerLevel,     
+      currentChallenge          
+    } = req.body;
+
+    if(!stageOfBusiness || !monthlyProfitStatus || !monthlyCustomerCount || !repeatCustomerLevel || !currentChallenge ){
+      throw new Error("All fields are required!");
+    }   
+    const applicationId = req.params.applicationid;
+    const applicantId = req.params.applicantid;
+ 
+    const user = await User.findOne({ _id: applicantId });
+    const application = await Application.findById(applicationId);
+ 
+    if (!user || !application) {
+      return res.status(404).json({ success: false, message: "Application or user not found" });
+    } 
+
+    let recommendation = '';
+    let suggestion = '';
+    let cta = '';
+
+    switch (true) {
+      case stageOfBusiness === 1:
+        recommendation = 'You need to validate your idea first. Talk to potential customers, build a simple version of your product, and test demand.';
+        suggestion = 'Use Feasibility Study tool';
+        cta = 'Try our idea checker or book a session.';
+        break;
+
+      case stageOfBusiness === 2 &&
+          monthlyProfitStatus === 1 &&
+          (monthlyCustomerCount === 1 || monthlyCustomerCount === 2):
+        recommendation = 'Focus on improving your product or service and building a small but loyal customer base before thinking about growth.';
+        suggestion = 'Use Sales Estimator and Marketing Estimator';
+        cta = 'Run a mini campaign and measure response.';
+        break;
+
+      case monthlyProfitStatus === 2 &&
+          monthlyCustomerCount === 2 &&
+          repeatCustomerLevel === 2 &&
+          (currentChallenge === 1 || currentChallenge === 3):
+        recommendation = 'Your business shows potential. Focus on improving your marketing and increasing customer retention.';
+        suggestion = 'Use Marketing Estimator';
+        cta = 'Book a growth session to identify quick wins.';
+        break;
+
+      case monthlyProfitStatus === 3 &&
+          monthlyCustomerCount === 3 &&
+          repeatCustomerLevel === 3:
+        recommendation = "You're ready to scale. Explore new markets, products, or digital transformation.";
+        suggestion = 'Business Strategy session';
+        cta = 'Let us help you plan your next growth phase.';
+        break;
+
+      case (repeatCustomerLevel === 2 || repeatCustomerLevel === 3) &&
+          currentChallenge === 3:
+        recommendation = "You have a loyal base. You're missing out by not doing enough marketing. Create a simple campaign.";
+        suggestion = 'Use Marketing Estimator';
+        cta = 'Try our basic marketing plan generator.';
+        break;
+
+      case currentChallenge === 4:
+        recommendation = "Let's help you figure things out. A quick review of your business status can guide your next step.";
+        suggestion = 'Feasibility Study';
+        cta = 'Start with a free assessment.';
+        break;
+
+      default:
+        recommendation = 'We need more context to provide recommendations.';
+        suggestion = 'Speak to our consultants';
+        cta = 'Book a discovery session.';
+        break;
+    }
+
+    const newBusinessGuide = await BusinessGuide.create({
+      applicantId,
+      applicationId,
+      serviceId: application.serviceId,
+      answers: {
+        stageOfBusiness,
+        monthlyProfitStatus,
+        monthlyCustomerCount,
+        repeatCustomerLevel,
+        currentChallenge
+      },
+      suggestion,
+      recommendation,
+      cta
+    });
+
+    const result = await newBusinessGuide.save(); 
+
+    if (!result || !result._id) { 
+      return res.status(400).json({ success: false, message: 'Failed to create new Service' });
+    }
+ 
+    return res.status(201).json({
+      success: true,
+      recommendation,
+      suggestion,
+      cta,
+      assessmentId: record._id
+    });
+
+  } catch (err) {
+    return res.status(500).json({ message: 'Internal Server Error', error: err.message });
+  }
+};
 
 const locationMarkrtAnalysisService = async (req, res) => {
   try {
@@ -52,13 +181,7 @@ const locationMarkrtAnalysisService = async (req, res) => {
  
     if (!business || !application) {
       return res.status(404).json({ success: false, message: "Business or application not found" });
-    }
-
-    const service = await Service.findOne({ _id: application.serviceId, name: process.env.LOCATION_MARKET_ANALYSIS });
-   
-    if (!service) {
-      return res.status(404).json({ success: false, message: "Service was not found" });
-    }
+    } 
 
     const businessLocation = business.locationId;
     const businessCategory = business.categoryId;
@@ -190,14 +313,8 @@ const salesRevenueOptimizationService = async (req, res) => {
     const application = await Application.findOne({ _id: applicationId, applicantId: applicantId});
   
     if (!business || !application) {
-      return res.status(404).json({ success: false, message: "Business or application not found" });
-    }
-    
-    const service = await Service.findOne({ _id: application.serviceId, name: process.env.SALES_REVENUE_OPTIMIZATION });
-
-    if (!service) {
-      return res.status(404).json({ success: false, message: "Service was not found" });
-    }
+      return res.status(404).json({ success: false, message: "Application or business not found" });
+    } 
   
     const category = business.categoryId.name;
 
@@ -293,7 +410,7 @@ const salesRevenueOptimizationFreeTrialService  = async (req, res) => {
   } catch (error) {
     return res.status(500).json({ message: 'Internal server error', error: error.message });
   }
-}; 
+};  
  
 const salesRevenueOptimizationPremiumService  = async (req, res) => {
   try {  
@@ -325,28 +442,25 @@ const salesRevenueOptimizationPremiumService  = async (req, res) => {
  
 const financialPlanningService = async (req, res) => {
   try {  
-    const {
-      applicantId, 
-      applicationId,
+    const {  
       monthlyRevenue, 
       monthlyCosts, 
       startupCost 
     } = req.body; 
     
-    if(!applicationId || !applicantId || !monthlyRevenue || !monthlyCosts || !startupCost ){
+    if(!monthlyRevenue || !monthlyCosts || !startupCost ){
         throw new Error("All fields are required!");
     } 
 
+    const applicantId = req.params.applicantid;
+    const applicationId = req.params.applicationid;
+
     const application = await Application.findOne({ _id: applicationId, applicantId });
-    if (!application) {
-      return res.status(400).json({ success: false, message: 'Application not found for this applicant.' });
+    const business = await Business.findOne({ ownerId: applicantId }).populate('categoryId');
+    if (!application || !business) {
+      return res.status(404).json({ success: false, message: 'Application or business was not found' });
     }
-    
-    const business = await Business.findById(businessId).populate('categoryId');
-    if (!business) {
-      return res.status(404).json({ success: false, message: 'Business not found.' });
-    }
-    
+     
     const location = await Location.findById(locationId).populate('businesses.categoryId');
     if (!location) {
       return res.status(404).json({ success: false, message: 'Location not found.' });
@@ -360,7 +474,7 @@ const financialPlanningService = async (req, res) => {
       ? breakEvenMonths <= 6
         ? 'Healthy'
         : 'Break-even'
-      : 'At Risk';
+        : 'At Risk';
     
     const categoryBusiness = location.businesses.find(
       b => b.categoryId.toString() === business.categoryId._id.toString()
@@ -393,7 +507,8 @@ const financialPlanningService = async (req, res) => {
     
     const financialPlan = await FinancialPlanning.create({
       applicantId,
-      businessId,
+      businessId, 
+      serviceId: application.serviceId,
       locationId,
       applicationId,
       monthlyRevenue,
@@ -477,10 +592,7 @@ const financialPlanningPremiumService  = async (req, res) => {
 const seedDataToConsultant  = async (req, res) => {
   try {  
       const { 
-          consultantId,
-          applicantId, 
-          serviceId,  
-          applicationId,
+          consultantId,  
           businessIdea,
           stageOfBusiness,
           targetMarket,
@@ -488,22 +600,29 @@ const seedDataToConsultant  = async (req, res) => {
           mainGoal
           } = req.body;
 
-      if(!consultantId || !applicantId || !serviceId || !applicationId || !businessIdea ||
-         !stageOfBusiness || !targetMarket || !monthlyBudget || !mainGoal 
+      if(!consultantId  || !businessIdea || !stageOfBusiness 
+       || !targetMarket || !monthlyBudget || !mainGoal 
       ){
           throw new Error("All fields are required!");
-      }    
+      }     
+      const applicantId = req.params.applicantid;
+      const applicationId = req.params.applicationid;
 
-      const application = await Application.findOne({_id: applicationId, applicantId: applicantId, serviceId: serviceId});
-  
-      if (!application) { 
-          return res.status(400).json({success: false, message: "Application was not found "});
+      const application = await Application.findOne({_id: applicationId, applicantId: applicantId});
+      const user = await User.findOne({ _id: applicantId });
+
+      if (!application || !user) { 
+          return res.status(404).json({success: false, message: "Application or user was not found "});
+      }   
+
+      const consultant = await Consultant.findOne({ _id: consultantId });
+      if (!consultant) { 
+        return res.status(404).json({success: false, message: "Consultant was not found "});
       }   
 
       const newConsultancyService = await Consultancy.create({
           consultantId ,
-          applicantId ,
-          serviceId ,  
+          applicantId , 
           applicationId,
           businessIdea,
           stageOfBusiness,
@@ -531,11 +650,7 @@ const seedDataToConsultant  = async (req, res) => {
  
 const consultancyService  = async (req, res) => {
     try {  
-        const { 
-            consultantId,
-            applicantId, 
-            serviceId,  
-            applicationId,
+        const {   
             businessOverview ,  
             industryAnalysis, 
             competitorInsights,
@@ -549,22 +664,29 @@ const consultancyService  = async (req, res) => {
             summaryRecommendation
             } = req.body;
 
-        if(!consultantId || !applicantId || !serviceId || !businessOverview || !industryAnalysis || !competitorInsights ||
-             !locationRecommendation || !targetAudienceDefinition || !marketingSuggestions || !operationsAdvice || !legalConsiderations ||
-             !growthStrategy || !commonPitfalls || !summaryRecommendation || !applicationId
+        if(!businessOverview || !industryAnalysis || !competitorInsights || !locationRecommendation 
+           || !targetAudienceDefinition || !marketingSuggestions || !operationsAdvice || !legalConsiderations ||
+           !growthStrategy || !commonPitfalls || !summaryRecommendation
         ){
             throw new Error("All fields are required!");
         }    
 
-        const application = await Application.findOne({_id: applicationId, applicantId: applicantId, serviceId: serviceId});
-    
-        if (!application) { 
-            return res.status(400).json({success: false, message: "Application was not found "});
-        }   
-
         const consultencyId = req.params.consultencyid;
+        const applicantId = req.params.applicantid;
+        const applicationId = req.params.applicationid;
+
+        const application = await Application.findOne({_id: applicationId, applicantId: applicantId});
+        const user = await User.findOne({ _id: applicantId });
+  
+        if (!application || !user) { 
+            return res.status(404).json({success: false, message: "Application or user was not found "});
+        }  
 
         const consultancyService = await Consultancy.findById(consultencyId);
+
+        if (!consultancyService) { 
+          return res.status(404).json({success: false, message: "Service was not found "});
+        }
 
         consultancyService.businessOverview = businessOverview;
         consultancyService.industryAnalysis = industryAnalysis;
@@ -741,5 +863,5 @@ module.exports = {
     salesRevenueOptimizationService, salesRevenueOptimizationFreeTrialService, salesRevenueOptimizationPremiumService,
     financialPlanningService, financialPlanningFreeTrialService,financialPlanningPremiumService, consultancyService,
     getApplicationStatus, updateApplication, updatePaymentStatus, addServiceApplication, getUserApplications, 
-    getConsultantApplications, getAllConsultants, getAllServices, seedDataToConsultant
+    getConsultantApplications, getAllConsultants, getAllServices, seedDataToConsultant, businessGuideService
 }; 

@@ -49,6 +49,11 @@ const seedServices = async () => {
           name: process.env.CONSULTANCY, 
           description: process.env.CONSULTANCY_DESCRIPTION, 
           amount: mongoose.Types.Decimal128.fromString(process.env.CONSULTANCY_AMOUNT || 0.00)
+      },
+      { 
+          name: process.env.BUSINESS_GUIDE, 
+          description: process.env.BUSINESS_GUIDE_DESCRIPTION, 
+          amount: mongoose.Types.Decimal128.fromString(process.env.BUSINESS_GUIDE_AMOUNT || 0.00)
       }
   ];
   
@@ -291,7 +296,7 @@ const seedConsultants = async () => {
           password: hashedPassword,
           rolesId: consultantRole._id
         }
-      ); 
+      );  
   
     const ConsultantDocs = await Consultant.create(
         {
