@@ -1,6 +1,0 @@
-bedaytak2
-s7Yid6aCMWEBXe3T
-
-mongodb+srv://bedaytak2:s7Yid6aCMWEBXe3T@bedaytakdb.cykpfj2.mongodb.net/?retryWrites=true&w=majority&appName=BedaytakDB
-////////////////// 
- 

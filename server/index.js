@@ -7,6 +7,7 @@ const businessRoutes = require('./routes/business.routes');
 const locationRoutes = require('./routes/location.routes');
 const serviceRoutes = require('./routes/service.routes');
 const consultantRoutes = require('./routes/consultant.routes');
+const adminRoutes = require('./routes/admin.routes');
 
 //Imports
 require('../node_modules/dotenv').config();
@@ -25,6 +26,7 @@ app.use(`${process.env.BASE_URL}${process.env.BUSINESS_URL}`, businessRoutes);
 app.use(`${process.env.BASE_URL}${process.env.LOCATION_URL}`, locationRoutes);
 app.use(`${process.env.BASE_URL}${process.env.SERVICE_URL}`, serviceRoutes);
 app.use(`${process.env.BASE_URL}${process.env.CONSULTANT_URL}`, consultantRoutes);
+app.use(`${process.env.BASE_URL}${process.env.ADMIN_URL}`, adminRoutes);
  
 app.listen(process.env.PORT_NUM, async () => {
      DbConnection(process.env.DATABASE_URL);

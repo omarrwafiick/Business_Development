@@ -1,18 +1,18 @@
 const express = require('express'); 
-const { addConsultant, getAllConsultants, getConsultantById, updateConsultant, deleteConsultant } = require('../controllers/consultant.controller');
-const router = express.Router();
+const { getAllConsultants, getConsultantById, updateConsultant, deleteConsultant } = require('../controllers/consultant.controller');
 const { VerifyToken } = require('../middlewares/verifyToken'); 
+const { validateInputs } = require('../middlewares/validateInputs'); 
+const { updateConsultantSchema } = require("../validationSchemas/consultantValidation");  
+const router = express.Router();
 
-//router.use(VerifyToken);
-
-router.post('/addconsultant', addConsultant);
+router.use(VerifyToken); 
 
 router.get('/getall', getAllConsultants);
-
+ 
 router.get('/get/:id', getConsultantById);
 
-router.put('/update/:id', updateConsultant);
+router.put('/update/:id', validateInputs(updateConsultantSchema), updateConsultant);
 
 router.delete('/delete/:id', deleteConsultant);
-
+ 
 module.exports = router;

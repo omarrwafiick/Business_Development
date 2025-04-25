@@ -1,10 +1,12 @@
 const User = require('../models/user.model'); 
-const Role = require('../models/role.model'); 
-const mongoose = require('mongoose'); 
+const Role = require('../models/role.model');  
 const bcrypt = require('bcryptjs');
+const crypto = require('crypto'); 
 const Mailing = require('../services/mailing.service');
 const { SetUpTokenToCookies } = require('../utilities/setUpTokenToCookies');
- 
+const { createUser } = require('../utilities/common');
+const ContactUs = require('../models/contact.model'); 
+   
 const SignUp = async (req, res) => {  
     try {
         const { fullName, email, password, phoneNumber } = req.body;
@@ -12,28 +14,7 @@ const SignUp = async (req, res) => {
         if (!fullName || !email || !password || !phoneNumber) {
             return res.status(400).json({ success: false, message: "All fields are required!" });
         }
-        const user = await User.findOne({ email });
-        if (user) {
-            return res.status(400).json({ success: false, message: "User already exists. Try to sign in!" });
-        }
-
-        const hashedPassword = await bcrypt.hash(password, Number(process.env.CRYPTO_KEY)); 
-
-        const role = await Role.findOne({name: process.env.ENTREPRENEUR});
-
-        const newUser = new User({
-            email,
-            password: hashedPassword,
-            fullName,
-            phoneNumber,
-            rolesId: new mongoose.Types.ObjectId(role.id)
-        });
-
-        const result = await newUser.save(); 
-
-        if (!result || !result._id) {
-            throw new Error("User couldn't be created");
-        }
+        const result = await createUser({fullName, email, password, phoneNumber, roleName: String(process.env.ENTREPRENEUR)});
 
         SetUpTokenToCookies(res, result._id);  
 
@@ -75,44 +56,64 @@ const Login = async (req, res) =>{
         return res.status(400).json({success : false, message : error.message});
     }
 }
-//test
-const ForgetPassword = async (req, res) =>{
-    const { email } = req.body; 
-    console.log(email);
-    try { 
-        const user = await User.findOne({email: email});
-        if(!user){
-            return res.status(404).json({success : false, message : "User was not found"});
-        } 
-        const resetToken = Crypto.randomBytes(20).toString("hex");
-        const resetTokenExpiration = Date.now() + 1 * 24 * 24 * 1000;
 
-        user.resetPasswordToken = resetToken;
-        user.resetPasswordExpiresAt = resetTokenExpiration;
-        await user.save();
-
-        await Mailing(user.email,`${process.env.LOCAL_HOST}/reset-password/${resetToken}`);
-
-        res.status(200).json({success: true, message: "Please check your email"});
+const ForgetPassword = async (req, res) => {
+    const { email } = req.body;
+    try {
+      const user = await User.findOne({ email: email });
+      if (!user) {
+        return res.status(404).json({ success: false, message: "User was not found" });
+      }
+  
+      const resetToken = crypto.randomBytes(20).toString("hex");
+      const resetTokenExpiration = Date.now() + 1 * 24 * 60 * 60 * 1000;  
+  
+      user.resetToken = resetToken;
+      user.resetTokenExpiration = resetTokenExpiration;
+  
+      await Mailing(
+        user.email,
+        'Password Reset Request',
+        `
+          <p>Please click the button below to reset your password:</p>
+          <a href="${process.env.LOCAL_HOST}/reset-password/${resetToken}" 
+             style="display:inline-block; padding:10px 20px; background-color:#007bff; color:#fff; text-decoration:none; border-radius:5px;">
+             Reset Password
+          </a>
+          <p>If the button doesn't work, copy and paste this link into your browser:</p>
+          <p>${process.env.LOCAL_HOST}/reset-password/${resetToken}</p>
+        `
+      );
+  
+      await user.save();
+  
+      res.status(200).json({ success: true, message: "Please check your email" });
     } catch (error) {
-        return res.status(400).json({success : false, message : error.message});
-    } 
+      return res.status(400).json({ success: false, message: error.message });
+    }
 };
-//test
+ 
 const ResetPassword = async (req, res) =>{ 
     const { token } = req.params; 
     const { password } = req.body; 
     try { 
-        const user = await User.findOne({resetToken: token, resetTokenExpiration : {$gt: Date.now()}});
+        const user = await User.findOne({
+            resetToken: token,
+            resetTokenExpiration: { $gt: Date.now() } 
+        });
+
         if(!user){
             return res.status(404).json({success : false, message : "Invalid or expired token"});
         }  
         const hashedPassword = await bcrypt.hash(password, Number(process.env.CRYPTO_KEY)); 
         user.password = hashedPassword;
-        user.resetPasswordToken = undefined;
-        user.resetPasswordExpiresAt = Date.now();
+        user.resetToken = "";
+        user.resetTokenExpiration = Date.now();
+        
         await user.save(); 
+
         const message = "Password was reset successfully";
+
         await Mailing(user.email, message);
 
         res.status(200).json({success: true, message});
@@ -120,12 +121,12 @@ const ResetPassword = async (req, res) =>{
         return res.status(400).json({success : false, message : error.message});
     } 
 };
-//test
-const LogOut = async (req, res) =>{ 
+
+ const LogOut = async (req, res) =>{ 
     res.clearCookie("token");
     res.status(200).json({success: true, message: "Logged out successfully"});
 };
-//test
+
 const CheckAuth = async (req, res) =>{    
     try {
         const user = await User.findById(req.userId);
@@ -138,4 +139,53 @@ const CheckAuth = async (req, res) =>{
     }
 };
 
-module.exports = { SignUp, Login, ForgetPassword, ResetPassword, LogOut, CheckAuth };
+const Contact = async (req, res) =>{  
+    try { 
+        const { message, subject } = req.body; 
+    
+        if(!message || !subject){
+            throw new Error("All fields are required!");
+        }
+
+        const userId = req.params.id;
+
+        const user = await User.findById(userId);
+
+        if(!user){
+            return res.status(404).json({success : false, message : "User was not found"}); 
+        }
+        const newContact = await ContactUs.create({
+            userId,
+            message,
+            subject
+        });  
+
+        const result = await newContact.save();
+
+        if(!result || !result._id){
+            return res.status(400).json({success : false, message : "Message could not be created"}); 
+        }
+
+        res.status(201).json({success: true, messageId: result._id});
+
+    } catch (error) {
+        return res.status(400).json({success : false, message : error.message});
+    }
+}
+
+const getAllRoles = async (req, res) => {
+    try {        
+        const roles = await Role.find().where('name').nin([process.env.CONSULTANT, process.env.ADMIN]);
+            
+        if(!roles){
+            return res.status(404).json({ success: false, message: "No role was found"}); 
+        };  
+    
+        return res.status(200).json({ success: true, roles });    
+    
+        } catch (error) {
+            return res.status(500).json({ message: 'Internal server error' });
+        } 
+};
+
+module.exports = { SignUp, Login, ForgetPassword, ResetPassword, LogOut, CheckAuth, Contact, getAllRoles };
