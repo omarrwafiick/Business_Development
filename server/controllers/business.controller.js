@@ -20,11 +20,9 @@ const addBusiness = async (req, res) => {
             description, 
             ownerId, 
             categoryId
-        }); 
- 
-        const businessResult = await newBusiness.save();
+        });   
 
-        if (!businessResult || !businessResult._id) { 
+        if (!newBusiness || !newBusiness._id) { 
             return res.status(400).json({ success: false, message: 'Failed to create new Business' });
         }
 

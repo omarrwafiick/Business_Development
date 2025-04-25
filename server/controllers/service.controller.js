@@ -44,13 +44,11 @@ const addServiceApplication = async (req, res) => {
             paymentStatus
         });
 
-        const result = await newApplication.save();
-
-        if (!result || !result._id) { 
+        if (!newApplication || !newApplication._id) { 
             return res.status(400).json({ success: false, message: 'Failed to create new application' });
         }
 
-        return res.status(201).json({ success: true, applicationId: result._id });
+        return res.status(201).json({ success: true, applicationId: newApplication._id });
 
     } catch (error) { 
         return res.status(500).json({ message: 'Internal server error', error: error.message });
@@ -83,7 +81,7 @@ const businessGuideService = async (req, res) => {
     let recommendation = '';
     let suggestion = '';
     let cta = '';
-
+ 
     switch (true) {
       case stageOfBusiness === 1:
         recommendation = 'You need to validate your idea first. Talk to potential customers, build a simple version of your product, and test demand.';
@@ -150,20 +148,15 @@ const businessGuideService = async (req, res) => {
       suggestion,
       recommendation,
       cta
-    });
-
-    const result = await newBusinessGuide.save(); 
-
-    if (!result || !result._id) { 
+    }); 
+  
+    if (!newBusinessGuide || !newBusinessGuide._id) { 
       return res.status(400).json({ success: false, message: 'Failed to create new Service' });
     }
  
     return res.status(201).json({
       success: true,
-      recommendation,
-      suggestion,
-      cta,
-      assessmentId: record._id
+      newBusinessGuide
     });
 
   } catch (err) {
@@ -241,13 +234,11 @@ const locationMarkrtAnalysisService = async (req, res) => {
 
     const newLocation = await LocationMarketAnalysis.create(analysisData);
 
-    const locationResult = await newLocation.save();
-
-    if (!locationResult || !locationResult._id) { 
+    if (!newLocation || !newLocation._id) { 
       return res.status(400).json({ success: false, message: 'Failed to create new Service' });
     }
 
-    return res.status(201).json({ success: true, serviceId: locationResult._id });
+    return res.status(201).json({ success: true, serviceId: newLocation._id });
 
   } catch (error) {
     return res.status(500).json({ success: false, message: "Internal server error", error: error.message });
@@ -376,14 +367,12 @@ const salesRevenueOptimizationService = async (req, res) => {
     };
 
     const newSales = await SalesRevenueOptimization.create(salesData);
-
-    const salesResult = await newSales.save();
-      
-    if(!salesResult || !salesResult._id){
+     
+    if(!newSales || !newSales._id){
       return res.status(400).json({ success: false, message: "Failed to create new Service" });
     }
 
-    return res.status(201).json({ success: true, serviceId :salesResult._id }); 
+    return res.status(201).json({ success: true, serviceId :newSales._id }); 
   } catch (error) {
     return res.status(500).json({ success: false, message: "Internal server error", error: error.message });
   }
@@ -630,17 +619,16 @@ const seedDataToConsultant  = async (req, res) => {
           monthlyBudget,
           mainGoal
       });  
+ 
 
-      const consultancyServiceResult = await newConsultancyService.save();
-
-      if (!consultancyServiceResult || !consultancyServiceResult._id) { 
+      if (!newConsultancyService || !newConsultancyService._id) { 
           return res.status(400).json({ success: false, message: 'Failed to create new Service' });
       }
        
       application.status = 'Approved';
       await application.save();
 
-      return res.status(201).json({ success: true, consultsncyId : consultancyServiceResult._id });
+      return res.status(201).json({ success: true, consultsncyId : newConsultancyService._id });
 
   } catch (error) {
       console.error('Error in addLocation:', error); 
@@ -822,6 +810,10 @@ const updateApplication = async (req, res) => {
 
         application.paymentStatus = paymentStatus;
         
+        if(!application.isModified()){
+          return res.status(400).json({ success: false, message: "Application couldn't be updated"}); 
+        };  
+ 
         await application.save();
  
         return res.status(200).json({ success: true, application});    
@@ -849,6 +841,10 @@ const updatePaymentStatus = async (req, res) => {
 
         application.paymentStatus = paymentStatus;
 
+        if(!application.isModified()){
+          return res.status(400).json({ success: false, message: "Application couldn't be updated"}); 
+        };  
+ 
         await application.save();
  
         return res.status(200).json({ success: true, paymentStatus});    

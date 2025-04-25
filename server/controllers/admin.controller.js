@@ -1,5 +1,4 @@
 const User = require("../models/user.model");  
-const Joi = require('joi');
 const { createUser, createConsultant } = require('../utilities/common');
  
 const addConsultantByAdmin = async (req, res) => {

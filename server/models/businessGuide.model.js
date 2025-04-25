@@ -7,7 +7,7 @@ const businessGuideSchema = new mongoose.Schema({
     stageOfBusiness: {
       type: Number, // 1 = Just an idea, 2 = Started but early, 3 = Running for a while
       required: true,
-      enum: [1, 2, 3]
+      enum: [1, 2, 3] 
     },
     monthlyProfitStatus: {
       type: Number, // 1 = No profit, 2 = Small/inconsistent, 3 = Steady profit

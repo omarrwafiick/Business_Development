@@ -18,11 +18,10 @@ const createUser = async ({ fullName, email, password, phoneNumber, roleName }) 
         phoneNumber,
         rolesId: new mongoose.Types.ObjectId(role.id)
     });
+ 
+    if (!newUser || !newUser._id) throw new Error("User couldn't be created");
 
-    const result = await newUser.save();
-    if (!result || !result._id) throw new Error("User couldn't be created");
-
-    return result;
+    return newUser;
 };
 
 const createConsultant = async ({ salary, bonus, userId, qualificationsIds, experienceYears }) => {
@@ -41,10 +40,9 @@ const createConsultant = async ({ salary, bonus, userId, qualificationsIds, expe
         experienceYears
     });
 
-    const result = await newConsultant.save();
-    if (!result || !result._id) throw new Error('Failed to create new consultant');
+     if (!newConsultant || !newConsultant._id) throw new Error('Failed to create new consultant');
 
-    return result;
+    return newConsultant;
 }; 
 
 module.exports = {createUser, createConsultant}
