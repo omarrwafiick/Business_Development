@@ -8,8 +8,8 @@ const FinancialPlanning = require('../models/financialPlanning.model');
 const Business = require('../models/business.model'); 
 const LocationMarketAnalysis = require('../models/locationMarkrtAnalysis.model'); 
 const SalesRevenueOptimization = require('../models/salesRevenueOptimization.model'); 
-const BusinessGuide = require('../models/businessGuide.model'); 
 const User = require('../models/user.model'); 
+const { VerifyApplication, VerifyService } = require('../utilities/common');
 
 const addServiceApplication = async (req, res) => {  
     try {  
@@ -20,11 +20,10 @@ const addServiceApplication = async (req, res) => {
         }   
         const applicantId = req.params.applicantid;
  
-        const user = await User.findOne({ _id: applicantId }).populate('categoryId locationId'); 
-      
-        if (!user) {
-          return res.status(404).json({ success: false, message: "User not found" });
-        }
+        const userExist = await User.findById(applicantId);
+
+        if (!userExist) {
+            return res.status(404).json({success: false, message: "User was not found" });}  
 
         const service = await Service.findOne({ _id: serviceId }); 
       
@@ -56,8 +55,13 @@ const addServiceApplication = async (req, res) => {
 };    
  
 const businessGuideService = async (req, res) => {
+  // 1 = Just an idea, 2 = Started but early, 3 = Running for a while
+  // 1 = No profit, 2 = Small/inconsistent, 3 = Steady profit
+  // 1 = 0–10, 2 = 10–100, 3 = 100+
+  // 1 = None, 2 = Some, 3 = Regular
+  // 1 = Getting customers, 2 = Managing operations, 3 = Marketing, 4 = Not sure
   try {
-    const { 
+    const {  
       stageOfBusiness,          
       monthlyProfitStatus,     
       monthlyCustomerCount,  
@@ -69,19 +73,24 @@ const businessGuideService = async (req, res) => {
       throw new Error("All fields are required!");
     }   
     const applicationId = req.params.applicationid;
-    const applicantId = req.params.applicantid;
+    const applicantId = req.params.applicantid; 
+  
+    const application = await VerifyApplication(applicantId, applicationId);
  
-    const user = await User.findOne({ _id: applicantId });
-    const application = await Application.findById(applicationId);
+    if (!application) {
+      return res.status(404).json({ success: false, message: "Application not found" });
+    }
+
+    const service = await VerifyService(process.env.BUSINESS_GUIDE, application.serviceId);
  
-    if (!user || !application) {
-      return res.status(404).json({ success: false, message: "Application or user not found" });
-    } 
+    if (!service) {
+      return res.status(404).json({ success: false, message: "Service not found" });
+    }
 
     let recommendation = '';
     let suggestion = '';
     let cta = '';
- 
+
     switch (true) {
       case stageOfBusiness === 1:
         recommendation = 'You need to validate your idea first. Talk to potential customers, build a simple version of your product, and test demand.';
@@ -133,47 +142,48 @@ const businessGuideService = async (req, res) => {
         cta = 'Book a discovery session.';
         break;
     }
-
-    const newBusinessGuide = await BusinessGuide.create({
-      applicantId,
-      applicationId,
-      serviceId: application.serviceId,
-      answers: {
-        stageOfBusiness,
-        monthlyProfitStatus,
-        monthlyCustomerCount,
-        repeatCustomerLevel,
-        currentChallenge
-      },
-      suggestion,
-      recommendation,
-      cta
-    }); 
-  
-    if (!newBusinessGuide || !newBusinessGuide._id) { 
-      return res.status(400).json({ success: false, message: 'Failed to create new Service' });
-    }
  
     return res.status(201).json({
       success: true,
-      newBusinessGuide
+      data : [ 
+        recommendation,
+        suggestion,
+        cta,
+      ]
     });
 
   } catch (err) {
     return res.status(500).json({ message: 'Internal Server Error', error: err.message });
   }
-};
+}; 
 
 const locationMarkrtAnalysisService = async (req, res) => {
   try {
     const applicationId = req.params.applicationid;
-    const applicantId = req.params.applicantid;
+    const applicantId = req.params.applicantid; 
+  
+    const application = await VerifyApplication(applicantId, applicationId);
  
-    const business = await Business.findOne({ ownerId: applicantId }).populate('categoryId locationId');
-    const application = await Application.findById(applicationId);
+    if (!application) {
+      return res.status(404).json({ success: false, message: "Application not found" });
+    }
+
+    const service = await VerifyService(process.env.LOCATION_MARKET_ANALYSIS, application.serviceId);
  
-    if (!business || !application) {
-      return res.status(404).json({ success: false, message: "Business or application not found" });
+    if (!service) {
+      return res.status(404).json({ success: false, message: "Service was not found" });
+    }
+
+    const serviceFullfilled = await LocationMarketAnalysis.find({applicationId, applicantId}); 
+ 
+    if (serviceFullfilled) {
+      return res.status(400).json({ success: false, message: "Service is already exists with this application" });
+    }
+ 
+    const business = await Business.findOne({ ownerId: applicantId }).populate('categoryId locationId'); 
+ 
+    if (!business) {
+      return res.status(404).json({ success: false, message: "Business was not found" });
     } 
 
     const businessLocation = business.locationId;
@@ -249,6 +259,12 @@ const locationMarkrtAnalysisFreeTrialService = async (req, res) => {
   try {  
     const applicantId = req.params.applicantid;
     const applicationId = req.params.applicationid;
+    
+    const application = await VerifyApplication(applicantId, applicationId);
+ 
+    if (!application) {
+      return res.status(404).json({ success: false, message: "Application not found" });
+    }
 
     const serviceExist = await LocationMarketAnalysis.findOne({applicantId: applicantId, applicationId: applicationId});
  
@@ -272,11 +288,17 @@ const locationMarkrtAnalysisPremiumService = async (req, res) => {
   try {  
     const applicantId = req.params.applicantid;
     const applicationId = req.params.applicationid;
+    
+    const application = await VerifyApplication(applicantId, applicationId);
+ 
+    if (!application) {
+      return res.status(404).json({ success: false, message: "Application not found" });
+    }
 
     const serviceExist = await LocationMarketAnalysis.findOne({applicantId: applicantId, applicationId: applicationId});
  
-    if (!serviceExist) {
-      return res.status(404).json({ success: false, message: "No service was found" });
+    if (!serviceExist || !application.paymentStatus) {
+      return res.status(404).json({ success: false, message: "User has not completed payment for the service." });
     }   
     return res.status(200).json({ success: true, 
         data : {
@@ -299,12 +321,29 @@ const salesRevenueOptimizationService = async (req, res) => {
         
     const applicationId = req.params.applicationid;
     const applicantId = req.params.applicantid;
+      
+    const application = await VerifyApplication(applicantId, applicationId);
 
-    const business = await Business.findOne({ ownerId: applicantId }).populate('categoryId');
-    const application = await Application.findOne({ _id: applicationId, applicantId: applicantId});
+    if (!application) {
+      return res.status(404).json({ success: false, message: "Application not found" });
+    }
+
+    const service = await VerifyService(process.env.SALES_REVENUE_OPTIMIZATION, application.serviceId);
+
+    if (!service) {
+      return res.status(404).json({ success: false, message: "Service was not found" });
+    }
+
+    const serviceFullfilled = await SalesRevenueOptimization.find({applicationId, applicantId}); 
+
+    if (serviceFullfilled) {
+      return res.status(400).json({ success: false, message: "Service is already exists with this application" });
+    }
+
+    const business = await Business.findOne({ ownerId: applicantId }).populate('categoryId'); 
   
-    if (!business || !application) {
-      return res.status(404).json({ success: false, message: "Application or business not found" });
+    if (!business) {
+      return res.status(404).json({ success: false, message: "Business was not found" });
     } 
   
     const category = business.categoryId.name;
@@ -382,9 +421,15 @@ const salesRevenueOptimizationFreeTrialService  = async (req, res) => {
   try {  
     const applicantId = req.params.applicantid;
     const applicationId = req.params.applicationid;
+
+    const application = await VerifyApplication(applicantId, applicationId);
+ 
+    if (!application) {
+      return res.status(404).json({ success: false, message: "Application not found" });
+    }
  
     const serviceExist = await SalesRevenueOptimization.findOne({applicantId: applicantId, applicationId: applicationId});
-    console.log(serviceExist)
+
     if (!serviceExist) {
       return res.status(404).json({ success: false, message: "No service was found" });
     }   
@@ -406,9 +451,8 @@ const salesRevenueOptimizationPremiumService  = async (req, res) => {
     const applicantId = req.params.applicantid;
     const applicationId = req.params.applicationid;
 
-    const application = await Application.findOne({ _id: applicationId, applicantId: applicantId });
+    const application = await VerifyApplication(applicantId, applicationId);
 
-    console.log(application)
     if (!application || !application.paymentStatus) { 
         return res.status(400).json({success: false, message: "User has not completed payment for the service."});
     }     
@@ -431,7 +475,7 @@ const salesRevenueOptimizationPremiumService  = async (req, res) => {
  
 const financialPlanningService = async (req, res) => {
   try {  
-    const {  
+    const { 
       monthlyRevenue, 
       monthlyCosts, 
       startupCost 
@@ -441,20 +485,38 @@ const financialPlanningService = async (req, res) => {
         throw new Error("All fields are required!");
     } 
 
-    const applicantId = req.params.applicantid;
     const applicationId = req.params.applicationid;
-
-    const application = await Application.findOne({ _id: applicationId, applicantId });
-    const business = await Business.findOne({ ownerId: applicantId }).populate('categoryId');
-    if (!application || !business) {
-      return res.status(404).json({ success: false, message: 'Application or business was not found' });
+    const applicantId = req.params.applicantid;   
+  
+    const application = await VerifyApplication(applicantId, applicationId);
+ 
+    if (!application) {
+      return res.status(404).json({ success: false, message: "Application not found" });
     }
-     
-    const location = await Location.findById(locationId).populate('businesses.categoryId');
+
+    const service = await VerifyService(process.env.FINANCIAL_PLANNING, application.serviceId);
+ 
+    if (!service) {
+      return res.status(404).json({ success: false, message: "Service was not found" });
+    }
+
+    const serviceFullfilled = await FinancialPlanning.find({applicationId, applicantId}); 
+ 
+    if (serviceFullfilled) {
+      return res.status(400).json({ success: false, message: "Service is already exists with this application" });
+    }
+ 
+    const business = await Business.findOne({ownerId: applicantId}).populate('categoryId');
+
+    if (!business) {
+      return res.status(404).json({ success: false, message: 'Business was not found' });
+    } 
+    
+    const location = await Location.find({name: business.locationName}).populate('businesses.categoryId').lean();
     if (!location) {
       return res.status(404).json({ success: false, message: 'Location not found.' });
-    }
-    
+    } 
+
     const netProfit = monthlyRevenue - monthlyCosts;
     const breakEvenMonths = netProfit > 0 ? Math.ceil(startupCost / netProfit) : null;
     const roi6Months = (netProfit * 6) - startupCost;
@@ -463,16 +525,20 @@ const financialPlanningService = async (req, res) => {
       ? breakEvenMonths <= 6
         ? 'Healthy'
         : 'Break-even'
-        : 'At Risk';
+      : 'At Risk';
     
-    const categoryBusiness = location.businesses.find(
-      b => b.categoryId.toString() === business.categoryId._id.toString()
+    const categoryBusiness = location.businesses?.find(
+      (b) => b.categoryId._id.toString() === business.categoryId._id.toString()
     );
-    const totalBusinesses = location.businesses.reduce((sum, b) => sum + b.count, 0);
+
+    const totalBusinesses = location.businesses?.reduce(
+      (sum, b) => sum + b.count,
+      0
+    ) || 0;
+    
     const locationMarketScore = categoryBusiness
       ? Math.round((categoryBusiness.count / totalBusinesses) * 100)
       : 0;
-    
     let competitiveInsight = '';
     let suggestedStrategy = '';
     
@@ -496,9 +562,7 @@ const financialPlanningService = async (req, res) => {
     
     const financialPlan = await FinancialPlanning.create({
       applicantId,
-      businessId, 
-      serviceId: application.serviceId,
-      locationId,
+      businessId: business._id,
       applicationId,
       monthlyRevenue,
       monthlyCosts,
@@ -531,8 +595,14 @@ const financialPlanningFreeTrialService  = async (req, res) => {
       const applicantId = req.params.applicantid;
       const applicationId = req.params.applicationid;
 
+      const application = await VerifyApplication(applicantId, applicationId);
+ 
+      if (!application) {
+        return res.status(404).json({ success: false, message: "Application not found" });
+      }
+
       const serviceExist = await FinancialPlanning.findOne({applicantId: applicantId, applicationId: applicationId});
-      console.log(serviceExist)
+
       if (!serviceExist) {
         return res.status(404).json({ success: false, message: "No service was found" });
       }  
@@ -549,33 +619,38 @@ const financialPlanningFreeTrialService  = async (req, res) => {
       return res.status(500).json({ message: 'Internal server error', error: error.message });
     }
 };
- 
+
 const financialPlanningPremiumService  = async (req, res) => { 
-    try {  
-        const applicantId = req.params.applicantid;
-        const applicationId = req.params.applicationid;
+  try {  
+      const applicantId = req.params.applicantid;
+      const applicationId = req.params.applicationid;
 
-        const application = await Application.findOne({ _id: applicationId, applicantId: applicantId });
+      const application = await VerifyApplication(applicantId, applicationId);
+ 
+      if (!application || !application.paymentStatus) { 
+          return res.status(400).json({success: false, message: "User has not completed payment for the service."});
+      }     
+      const serviceExist = await FinancialPlanning.findOne({applicantId: applicantId, applicationId: applicationId}); 
+   
+      if (!serviceExist) {
+        return res.status(404).json({ success: false, message: "No service was found" });
+      }  
+      const serviceData = serviceExist.toObject ? serviceExist.toObject() : { ...serviceExist };
 
-        console.log(application)
-        if (!application || !application.paymentStatus) { 
-            return res.status(400).json({success: false, message: "User has not completed payment for the service."});
-        }     
-        const serviceExist = await FinancialPlanning.findOne({applicantId: applicantId, applicationId: applicationId}); 
-     
-        if (!serviceExist) {
-          return res.status(404).json({ success: false, message: "No service was found" });
-        }  
-        
-        return res.status(200).json({ success: true, 
-            data :{
-                ...serviceExist
-            }
-         });
-    
-      } catch (error) {
-        return res.status(500).json({ message: 'Internal server error', error: error.message });
-      }
+      delete serviceData.chartImage;
+      delete serviceData.chartImageType;
+
+      return res.status(200).json({ 
+        success: true,
+        data: {
+          ...serviceData,
+          graphImage: `data:${serviceExist.chartImageType};base64,${serviceExist.chartImage.toString('base64')}`
+        }
+      }); 
+  
+    } catch (error) {
+      return res.status(500).json({ message: 'Internal server error', error: error.message });
+    }
 };
  
 const seedDataToConsultant  = async (req, res) => {
@@ -597,11 +672,26 @@ const seedDataToConsultant  = async (req, res) => {
       const applicantId = req.params.applicantid;
       const applicationId = req.params.applicationid;
 
-      const application = await Application.findOne({_id: applicationId, applicantId: applicantId});
-      const user = await User.findOne({ _id: applicantId });
+      const application = await VerifyApplication(applicantId, applicationId);
+ 
+      if (!application) {
+        return res.status(404).json({ success: false, message: "Application not found" });
+      }
+  
+      const service = await VerifyService(process.env.CONSULTANCY, application.serviceId);
+   
+      if (!service) {
+        return res.status(404).json({ success: false, message: "Service was not found" });
+      }
+  
+      const serviceFullfilled = await Consultancy.find({applicationId, applicantId}); 
+   
+      if (serviceFullfilled) {
+        return res.status(400).json({ success: false, message: "Service is already exists with this application" });
+      }      const user = await User.findOne({ _id: applicantId });
 
-      if (!application || !user) { 
-          return res.status(404).json({success: false, message: "Application or user was not found "});
+      if (!user) { 
+          return res.status(404).json({success: false, message: "User was not found "});
       }   
 
       const consultant = await Consultant.findOne({ _id: consultantId });
@@ -619,7 +709,6 @@ const seedDataToConsultant  = async (req, res) => {
           monthlyBudget,
           mainGoal
       });  
- 
 
       if (!newConsultancyService || !newConsultancyService._id) { 
           return res.status(400).json({ success: false, message: 'Failed to create new Service' });
@@ -663,12 +752,17 @@ const consultancyService  = async (req, res) => {
         const applicantId = req.params.applicantid;
         const applicationId = req.params.applicationid;
 
-        const application = await Application.findOne({_id: applicationId, applicantId: applicantId});
-        const user = await User.findOne({ _id: applicantId });
-  
-        if (!application || !user) { 
-            return res.status(404).json({success: false, message: "Application or user was not found "});
-        }  
+        const application = await VerifyApplication(applicantId, applicationId);
+ 
+        if (!application) {
+          return res.status(404).json({ success: false, message: "Application not found" });
+        }
+
+        const serviceFullfilled = await Consultancy.find({applicationId, applicantId}); 
+     
+        if (!serviceFullfilled) {
+          return res.status(400).json({ success: false, message: "Service does not exist with this application" });
+        }
 
         const consultancyService = await Consultancy.findById(consultencyId);
 
@@ -706,7 +800,6 @@ const consultancyService  = async (req, res) => {
 }; 
 
 const getApplicationStatus = async (req, res) => {
-  
     try {
       const applicationid = req.params.id;
    
