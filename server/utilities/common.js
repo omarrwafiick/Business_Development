@@ -1,4 +1,6 @@
 const User = require('../models/user.model'); 
+const Application = require('../models/application.model'); 
+const Service = require('../models/service.model'); 
 const Consultant = require("../models/consultant.model");  
 const bcrypt = require('bcryptjs');
 const Role = require('../models/role.model'); 
@@ -44,5 +46,9 @@ const createConsultant = async ({ salary, bonus, userId, qualificationsIds, expe
 
     return newConsultant;
 }; 
+ 
+const VerifyApplication = async (applicantId, applicationId) => await Application.findOne({applicationId, applicantId});
+ 
+const VerifyService = async (serviceName, serviceId) => await Service.findById(serviceId).name === serviceName;
 
-module.exports = {createUser, createConsultant}
+module.exports = {createUser, createConsultant, VerifyApplication, VerifyService}
