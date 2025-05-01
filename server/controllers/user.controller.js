@@ -48,9 +48,9 @@ const Login = async (req, res) =>{
         }
         const role = await Role.findById(user.rolesId);
 
-        SetUpTokenToCookies(res, user._id, role);
+        const token = SetUpTokenToCookies(res, user._id, role);
 
-        res.status(200).json({success: true, message: "User is logged in successfully", user: {...user._doc, password: undefined}});
+        res.status(200).json({success: true, token, message: "User is logged in successfully", user: {...user._doc, password: undefined}});
 
     } catch (error) {
         return res.status(400).json({success : false, message : error.message});

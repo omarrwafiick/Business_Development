@@ -1,17 +1,18 @@
-import { BrowserRouter } from 'react-router-dom'
 import RoutesConfig from './routes';
 import Header from './components/header';
 import Footer from './components/footer';
+import { useLocation } from "react-router-dom";
 
-function App() {   
+function App() {    
+  const location = useLocation();
+  
   return (
-    <BrowserRouter>
-      <Header />
+    <div className='font-gelasio'> 
+      {location.pathname === '/' && <Header />}
       <RoutesConfig />
-      <Footer />
-    </BrowserRouter>
-  )
+      {location.pathname === '/' && <Footer />}
+    </div>
+  );
 }
 
-export default App
-   
+export default App;

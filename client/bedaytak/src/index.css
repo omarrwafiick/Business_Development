@@ -27,12 +27,19 @@ a {
 }
 .text-primary{
   color: #15A0DC;
-}
+}  
 .bg-primary{
   background-color: #15A0DC;
 }
 .text-secondary{
   color: #F66A35;
+}
+.svg-secondary{
+  fill: #F66A35;
+} 
+.border-secondary{
+  border: 12px;
+  border-color: #F66A35;
 }
 .bg-secondary{
   background-color: #F66A35;
@@ -42,23 +49,10 @@ a {
 }
 .bg-dark{
   background-color: #2E2E2E;
-}
-.text-light{
-  color: #9A9A9A;
-}
-.bg-light{
-  background-color: #9A9A9A;
-}
-@font-face {
-  font-family: 'Gelasio';
-  src: url('./assets/fonts/Gelasio/Gelasio-Regular.ttf') format('truetype');
-  font-weight: normal;
-  font-style: normal;
-}
-
-@font-face {
-  font-family: 'Inter';
-  src: url('./assets/fonts/Inter/Inter_18pt-Regular.ttf') format('truetype');
-  font-weight: normal;
-  font-style: normal;
-}
+}  
+.font-gelasio {
+  font-family: 'Gelasio', serif;
+} 
+.font-inter {
+  font-family: 'Inter', sans-serif;
+} 
