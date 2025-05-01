@@ -3,7 +3,9 @@ import create from 'zustand';
 const useStore = create((set) => ({
   applicationId:null,
   applicantId:null,
-  service:null,
+  services:[],
+  chosenService:null,
+  categories:[],
   user:null,
   token:null,
   isAuthenticated:false,

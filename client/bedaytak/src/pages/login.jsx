@@ -9,7 +9,7 @@ import PasswordInput from '../components/password-input'
 
 export default function Login() {
     const loginSubmit = () => {
-  
+        //in success get gategories and services data to store
     };
     return (
       <div  className='flex justify-center items-center flex-col w-full h-dvh '>
