@@ -10,18 +10,27 @@ const extractRole = (token)=>{
 
 const AppStore = create((set) => ({
   applicationId:null,
+  setApplicationId:(data) => set({ applicationId: data }),
   applicantId:null,
+  setApplicantId:(data) => set({ applicantId: data }),
   consultandId:null,
+  setConsultandId:(data) => set({ consultandId: data }),
   services:[],
+  setServices: (data) => set({ services: data }),
   serviceName:null,
   setServiceName: (name) => set({ serviceName: name }),
   chosenService:null,
+  setchosenService: (name) => set({ chosenService: name }),
   categories:[],
+  setCategories: (data) => set({ categories: data }),
   user:null,
+  setUser: (data) => set({ user: data }),
   token:'',
+  setToken: (data) => set({ token: data }),
   isAuthenticated:false,
-  error:null,
+  setIsAuthenticated: (data) => set({ isAuthenticated: data }),
   isLoading:false,  
+  setIsLoading: (data) => set({ isLoading: data }),
   role: null,
   setToken: (newToken) => {
     const userRole = extractRole(newToken);

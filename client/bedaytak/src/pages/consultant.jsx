@@ -21,7 +21,7 @@ export default function Consultant() {
     }
   };
   return (
-    <div className='flex justify-center items-center flex-col w-full h-dvh mt-24'>
+    <div className='flex justify-center items-center flex-col w-full'>
         <motion.div
             initial={{opacity: 0, y:20}}
             animate={{opacity: 1, y:0}}
@@ -33,7 +33,7 @@ export default function Consultant() {
             </span>
             <h4 className='capitalize mb-2! text-3xl font-bold font-gelasio'>Consultation</h4>
             <p className='text-sm mt-2! opacity-80 text-center'>Consulting with business experts offers valuable insights to improve decision-making, optimize strategies, and address challenges for business growth.</p>
-            <Review data={''} />
+            <Review isPart={true} data={[['idea', 'bla bla'], ['stage', 'bla 1']]} />
             <form onSubmit={serviceSubmit} className='w-full flex mt-3'>   
               <div className='w-6/12 flex flex-col justify-start items-center p-6'>   
                 <CustomeTextarea name={"Business Overview"} type={2}/> 

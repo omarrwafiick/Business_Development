@@ -28,7 +28,7 @@ export default function Home() {
   const messageSubmit = () =>{
 
   };  
-  const setServiceName = AppStore((state) => state.setServiceName); 
+  const setServiceName = AppStore.getState().setchosenService;
   const heroRef = useRef(null); 
   const contactRef = useRef(null); 
   const serviceRef = useRef(null); 

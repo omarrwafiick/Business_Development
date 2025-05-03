@@ -1,9 +1,9 @@
 import React from 'react'
-import { useStore } from './store';
+import  AppStore  from '../store/store';
 import { Navigate } from 'react-router-dom';
 
-export default BusinessOwnerRoute = ({ children }) => {
-  const isAuthenticated = useStore((state) => state.isAuthenticated);
+const BusinessOwnerRoute = ({ children }) => {
+  const isAuthenticated = AppStore((state) => state.isAuthenticated);
   const role = useStore((state) => state.role);
   if (!isAuthenticated) {
     return <Navigate to="/login" />;
@@ -14,3 +14,5 @@ export default BusinessOwnerRoute = ({ children }) => {
 
   return children;
 };
+
+export default BusinessOwnerRoute;

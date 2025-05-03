@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { PackagePlus } from 'lucide-react';
 import { motion } from 'framer-motion';
 import CustomeButton from '../components/custome_button'
@@ -7,21 +7,41 @@ import PasswordInput from '../components/password-input'
 import { Link } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
 import toaster from 'react-hot-toast'
+import { register } from '../services/auth-service';
+import AppStore from '../store/store';
 
-export default function Signup() {
+export default function Signup() {   
+  const form = useRef();  
+  const [email, SetEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [phone, setPhone] = useState(''); 
+  const [fullname, setFullname] = useState('');
+  const [role, setRole] = useState('');
+
+  const setUser = AppStore.getState().setUser;
   const navigate = useNavigate();
   const signupSubmit = async (e) => {
-    e.preventDefault(); 
+    e.preventDefault();  
     try {
-      //request
-      navigate("");
-      toaster.success("Successfully");
+      if(password!==confirmPassword){
+        toaster.error("Passwords doesn't match");
+        return;
+      }
+      const response = await register({fullname, email, password, phone, role});
+      setUser(response.user);
+      toaster.success("Signed up successfully");
+      if(role === 'BusinessOwner'){  
+        navigate("/business");
+      }
+      navigate("/login");
     } catch (error) {
       toaster.error(`Error : ${error}`);
+      form.current.reset();
     }
   };
   return (
-    <div  className='flex justify-center items-center flex-col w-full h-dvh font-gelasio mt-12 mb-12'>
+    <div className='flex justify-center items-center flex-col w-full h-dvh font-gelasio mt-12 mb-12'>
         <motion.div
             initial={{opacity: 0, y:20}}
             animate={{opacity: 1, y:0}}
@@ -34,19 +54,33 @@ export default function Signup() {
             <h4 className='capitalize mb-2! text-2xl font-bold'>welcome to bedaytak inc.</h4>
             <p className='opacity-80'>Already have an account?{" "}<Link className='underline underline-offset-2 font-medium cursor-pointer' to="/login">login</Link></p>
 
-            <form onSubmit={signupSubmit} className='w-full mt-3'>
-                <CustomeInput name={"fullname"} type={"text"}/>
-                <CustomeInput name={"email"} type={"email"}/>
-                <CustomeInput name={"phone"} type={"text"}/> 
-                <PasswordInput name={"password"} />
-                <PasswordInput name={"confirm password"} />
+            <form ref={form} onSubmit={signupSubmit} className='w-full mt-3'>
+                <CustomeInput value={fullname} onClick={(e)=> setFullname(e.target.value)} name={"fullname"} type={"text"}/>
+                <CustomeInput value={email} onClick={(e)=> SetEmail(e.target.value)} name={"email"} type={"email"}/>
+                <CustomeInput value={phone} onClick={(e)=> setPhone(e.target.value)} name={"phone"} type={"text"}/> 
+                <PasswordInput value={password} onClick={(e)=> setPassword(e.target.value)} name={"password"} />
+                <PasswordInput value={confirmPassword} onClick={(e)=> setConfirmPassword(e.target.value)} name={"confirm password"} />
                 <div className='w-full flex pt-2 pb-3'> 
                   <div class="flex items-center me-6">
-                      <input id="default-radio-1" type="radio" value="" name="default-radio" className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600" />
+                      <input 
+                      id="default-radio-1" 
+                      type="radio" 
+                      name="default-radio1" 
+                      value="Entrepreneur" 
+                      checked={role === 'Entrepreneur'}
+                      onChange={(e) => setRole(e.target.value)}
+                      className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600" />
                       <label htmlFor="default-radio-1" className="ms-2 text-md font-medium text-gray-900 dark:text-gray-300 capitalize">entrepreneur</label>
                   </div>
                   <div class="flex items-center">
-                      <input id="default-radio-2" type="radio" value="" name="default-radio" className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600" />
+                      <input 
+                      id="default-radio-2" 
+                      type="radio" 
+                      value="BusinessOwner"
+                      name="default-radio2"
+                      checked={role === 'BusinessOwner'}
+                      onChange={(e) => setRole(e.target.value)} 
+                      className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600" />
                       <label htmlFor="default-radio-2" className="ms-2 text-md font-medium text-gray-900 dark:text-gray-300 capitalize">business owner</label>
                   </div>  
                 </div>

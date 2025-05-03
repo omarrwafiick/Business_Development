@@ -1,20 +1,36 @@
 import { TowerControlIcon } from 'lucide-react'
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { useNavigate } from 'react-router-dom';
 import toaster from 'react-hot-toast';
+import { getUsers, deleteUser, addAdmin, addConsultant } from '../services/admin' ;
+import toaster from 'react-hot-toast'
+import CustomeInput from '../components/custome_input'
+import CustomeButton from '../components/custome_button'
+import PasswordInput from '../components/password-input'
 
 export default function Admin() {
-  const navigate = useNavigate(); 
-  useEffect(()=>{
+  const [showAdminPopup, setShowAdminPopup] = useState(false);
+  const [showConsultantPopup, setShowConsultantPopup] = useState(false);
+
+  const allUsers = [];
+  useEffect(async ()=>{
     try {
-        //request
-        navigate("");
-        toaster.success("Successfully");
+        allUsers.push(await getUsers()); 
         } catch (error) {
         toaster.error(`Error : ${error}`);
         }
   },[]);
+
+  const deleteUserByAdmin = async (id)=>{
+    try {
+         await deleteUser(id);
+         toaster.success("User is deleted successfully");
+         allUsers = allUsers.filter(x => x._id !== id)
+        } catch (error) {
+        toaster.error(`Error : ${error}`);
+        }
+  }; 
+
   return (
     <div className='w-full h-dvh flex flex-col justify-start items-center mt-12'>  
       <div className="relative flex flex-col justify-center items-center shadow-md sm:rounded-lg">
@@ -45,26 +61,53 @@ export default function Admin() {
                   </tr>
               </thead>
               <tbody className='text-lg font-inter'> 
-                  <tr className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 border-gray-200">
-                      <th scope="row" className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                          omar
-                      </th>
-                      <td className="px-6 py-4">
-                          012913913133
-                      </td>
-                      <td className="px-6 py-4">
-                          omar@gmail.com
-                      </td>
-                      <td className="px-6 py-4">
-                          14-01-2002
-                      </td>
-                      <td className="px-6 py-4 flex text-right">
-                          <Link to="/" className="font-medium text-blue-600 dark:text-blue-500 hover:underline me-3">delete</Link>
-                          <Link to="/" className="font-medium text-blue-600 dark:text-blue-500 hover:underline">Edit</Link>
-                      </td>
-                  </tr> 
+                {
+                    allUsers?.map((user,index)=>( 
+                        <tr className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 border-gray-200">
+                        <th scope="row" className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                            {user.fullName}
+                        </th>
+                        <td className="px-6 py-4">
+                            {user.phoneNumber}
+                        </td>
+                        <td className="px-6 py-4">
+                            {user.email}
+                        </td>
+                        <td className="px-6 py-4">
+                            {user.createdAt}
+                        </td>
+                        <td className="px-6 py-4 flex text-right">
+                            <Link to="/" onClick={ async ()=> await deleteUserByAdmin(user._id)} className="font-medium text-blue-600 dark:text-blue-500 hover:underline me-3">delete</Link>
+                        </td>
+                    </tr> 
+                    ))
+                }
               </tbody>
           </table>
+          {/* add admin popup */}
+          {showAdminPopup && !showConsultantPopup && (
+            <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+                <form className="bg-white p-6 rounded-lg shadow-lg w-96">
+                    <h2 className="text-xl font-bold mb-4 capitalize">add new admin</h2> 
+
+                    <button onClick={() => setShowAdminPopup(false)} className="bg-red-500 text-white px-4 py-2 rounded">
+                        Close
+                    </button>
+                </form>
+            </div>
+           )}
+           {/* add consultant popup */}
+           {!showAdminPopup && showConsultantPopup && (
+            <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+                <form className="bg-white p-6 rounded-lg shadow-lg w-96">
+                    <h2 className="text-xl font-bold mb-4 capitalize">add new consultant</h2>
+                    
+                    <button onClick={() => setShowConsultantPopup(false)} className="bg-red-500 text-white px-4 py-2 rounded">
+                        Close
+                    </button>
+                </form>
+            </div>
+           )}
       </div> 
     </div>
   )

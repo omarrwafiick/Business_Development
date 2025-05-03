@@ -1,9 +1,9 @@
 import React from 'react'
-import { useStore } from './store';
+import  AppStore  from '../store/store';
 import { Navigate } from 'react-router-dom';
 
-export default ProtectedRoute = ({ children }) => {
-  const isAuthenticated = useStore((state) => state.isAuthenticated);
+const ProtectedRoute = ({ children }) => {
+  const isAuthenticated = AppStore((state) => state.isAuthenticated);
 
   if (!isAuthenticated) {
     return <Navigate to="/login" />;
@@ -11,3 +11,5 @@ export default ProtectedRoute = ({ children }) => {
 
   return children;
 };
+
+export default ProtectedRoute;
