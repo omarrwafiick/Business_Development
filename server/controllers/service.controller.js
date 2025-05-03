@@ -799,6 +799,34 @@ const consultancyService  = async (req, res) => {
     }
 }; 
 
+const getConsultancyResult = async (req, res) => { 
+  try {  
+     const applicantId = req.params.applicantid;
+     const applicationId = req.params.applicationid;
+
+     const application = await VerifyApplication(applicantId, applicationId);
+
+     if (!application) {
+       return res.status(404).json({ success: false, message: "Application not found" });
+     }
+
+     const serviceExist = await Consultancy.findOne({applicantId: applicantId, applicationId: applicationId});
+
+     if (!serviceExist) {
+       return res.status(404).json({ success: false, message: "No service was found" });
+     }  
+     
+     return res.status(200).json({ success: true, 
+         data :{
+             ...serviceExist
+         }
+      });
+ 
+   } catch (error) {
+     return res.status(500).json({ message: 'Internal server error', error: error.message });
+   }
+};
+
 const getApplicationStatus = async (req, res) => {
     try {
       const applicationid = req.params.id;
@@ -952,5 +980,6 @@ module.exports = {
     salesRevenueOptimizationService, salesRevenueOptimizationFreeTrialService, salesRevenueOptimizationPremiumService,
     financialPlanningService, financialPlanningFreeTrialService,financialPlanningPremiumService, consultancyService,
     getApplicationStatus, updateApplication, updatePaymentStatus, addServiceApplication, getUserApplications, 
-    getConsultantApplications, getAllConsultants, getAllServices, seedDataToConsultant, businessGuideService
+    getConsultantApplications, getAllConsultants, getAllServices, seedDataToConsultant, businessGuideService, 
+    getConsultancyResult
 }; 

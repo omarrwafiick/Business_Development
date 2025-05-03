@@ -9,7 +9,7 @@ export default function Card2({title, content, icon, color, style, mode}) {
         </div>
         <div className='flex flex-col justify-center items-start mt-4 w-9/12'> 
             <h1 className='text-2xl capitalize font-bold mb-2!'>{title}</h1>
-            <p className='capitalize text-xs opacity-55 leading-5 text-start'>{content}</p>
+            <p className='font-inter capitalize text-xs opacity-55 leading-5 text-start'>{content}</p>
         </div>
     </div>
   )

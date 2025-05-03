@@ -1,8 +1,20 @@
 import { TowerControlIcon } from 'lucide-react'
-import React from 'react'
+import React, { useEffect } from 'react'
 import { Link } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom';
+import toaster from 'react-hot-toast';
 
 export default function Admin() {
+  const navigate = useNavigate(); 
+  useEffect(()=>{
+    try {
+        //request
+        navigate("");
+        toaster.success("Successfully");
+        } catch (error) {
+        toaster.error(`Error : ${error}`);
+        }
+  },[]);
   return (
     <div className='w-full h-dvh flex flex-col justify-start items-center mt-12'>  
       <div className="relative flex flex-col justify-center items-center shadow-md sm:rounded-lg">
@@ -32,7 +44,7 @@ export default function Admin() {
                       </th>
                   </tr>
               </thead>
-              <tbody className='text-lg'> 
+              <tbody className='text-lg font-inter'> 
                   <tr className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 border-gray-200">
                       <th scope="row" className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
                           omar

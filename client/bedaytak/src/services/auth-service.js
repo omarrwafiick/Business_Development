@@ -1,13 +1,14 @@
 import api from './api';
+const domain = "/auth";
 
-export const login = (credentials) => api.post('/auth/login', credentials);
+export const login = async (credentials) => api.post(domain+'/login', credentials);
 
-export const register = (userData) => api.post('/auth/register', userData);
+export const register = async (userData) => api.post(domain+'/register', userData);
 
-export const forgetPassword = () =>  api.post('/auth/forget-password/'+token);
+export const forgetPassword = async () =>  api.post(domain+'/forget-password/'+token);
 
-export const resetPassword = () =>  api.post('/auth/reset-password/', password);
+export const resetPassword = async () =>  api.post(domain+'/reset-password/', password);
 
-export const logout = () =>  api.post('/auth/logout');
+export const logout = async () =>  api.post(domain+'/logout');
 
-export const checkAuth = () =>  api.post('/auth/check-auth');
+export const checkAuth = async () =>  api.post(domain+'/check-auth');

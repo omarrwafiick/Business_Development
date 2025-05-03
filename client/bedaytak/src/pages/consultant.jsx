@@ -4,10 +4,22 @@ import CustomeButton from '../components/custome_button'
 import CustomeTextarea from '../components/custome_textarea' 
 import { Link } from 'react-router-dom'; 
 import { HeartHandshake } from 'lucide-react'; 
+import { useNavigate } from 'react-router-dom';
+import toaster from 'react-hot-toast';
+import Review from '../pages/review' 
 
 export default function Consultant() {
-  const serviceSubmit = () => { 
-  }; 
+  const navigate = useNavigate();
+  const serviceSubmit = async (e) => {   
+    e.preventDefault(); 
+    try {
+    //request
+    navigate("");
+    toaster.success("Successfully");
+    } catch (error) {
+    toaster.error(`Error : ${error}`);
+    }
+  };
   return (
     <div className='flex justify-center items-center flex-col w-full h-dvh mt-24'>
         <motion.div
@@ -21,7 +33,7 @@ export default function Consultant() {
             </span>
             <h4 className='capitalize mb-2! text-3xl font-bold font-gelasio'>Consultation</h4>
             <p className='text-sm mt-2! opacity-80 text-center'>Consulting with business experts offers valuable insights to improve decision-making, optimize strategies, and address challenges for business growth.</p>
-  
+            <Review data={''} />
             <form onSubmit={serviceSubmit} className='w-full flex mt-3'>   
               <div className='w-6/12 flex flex-col justify-start items-center p-6'>   
                 <CustomeTextarea name={"Business Overview"} type={2}/> 

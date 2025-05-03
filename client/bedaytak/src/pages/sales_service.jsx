@@ -4,9 +4,20 @@ import CustomeButton from '../components/custome_button'
 import CustomeInput from '../components/custome_input'
 import { Link } from 'react-router-dom'; 
 import { BanknoteArrowUp } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import toaster from 'react-hot-toast';
 
 export default function SalesService() {
-  const serviceSubmit = () => { 
+  const navigate = useNavigate();
+  const serviceSubmit = async (e) => {   
+    e.preventDefault(); 
+    try {
+    //request
+    navigate("");
+    toaster.success("Successfully");
+    } catch (error) {
+    toaster.error(`Error : ${error}`);
+    }
   };
   return (
     <div className='flex justify-center items-center flex-col w-full h-dvh mb-2'>

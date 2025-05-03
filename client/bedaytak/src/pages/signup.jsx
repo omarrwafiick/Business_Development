@@ -5,10 +5,20 @@ import CustomeButton from '../components/custome_button'
 import CustomeInput from '../components/custome_input'
 import PasswordInput from '../components/password-input'
 import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
+import toaster from 'react-hot-toast'
 
 export default function Signup() {
-  const signupSubmit = () => {
-
+  const navigate = useNavigate();
+  const signupSubmit = async (e) => {
+    e.preventDefault(); 
+    try {
+      //request
+      navigate("");
+      toaster.success("Successfully");
+    } catch (error) {
+      toaster.error(`Error : ${error}`);
+    }
   };
   return (
     <div  className='flex justify-center items-center flex-col w-full h-dvh font-gelasio mt-12 mb-12'>

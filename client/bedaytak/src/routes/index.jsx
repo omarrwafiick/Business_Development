@@ -18,6 +18,11 @@ import Payment from '../pages/payment';
 import Review from '../pages/review';
 import SalesService from '../pages/sales_service';
 import ChooseConsultant from '../pages/choose-consultant'; 
+import ConsultantApplications from '../pages/consultant-applications';
+import AdminRoute from '../components/admin-route';
+import ConsultantRoute from '../components/consultant-route';
+import ProtectedRoute from '../components/protected-route';
+import BusinessOwnerRoute from '../components/business-owner-route';
  
 const RoutesConfig  = () => ( 
   <Routes>
@@ -33,6 +38,7 @@ const RoutesConfig  = () => (
     <Route path="/sales-service" element={<SalesService />} />
     <Route path="/consultant-service" element={<ConsultantService />} />
     <Route path="/consultant-select" element={<ChooseConsultant />} />
+    <Route path="/consultant-applications" element={<ConsultantApplications />} />
     <Route path="/guidance-service" element={<GuidanceService />} />
     <Route path="/feasibility-service" element={<FeasibilityService />} />
     <Route path="/location-service" element={<LocationService />} />
@@ -44,3 +50,19 @@ const RoutesConfig  = () => (
 );
 export default RoutesConfig;
 
+{/* <ProtectedRoute>
+  //component
+</ProtectedRoute>
+
+<AdminRoute>
+  //component
+</AdminRoute>
+
+<ConsultantRoute>
+  //component
+</ConsultantRoute> 
+
+<BusinessOwnerRoute>
+  //component
+</BusinessOwnerRoute> 
+*/}

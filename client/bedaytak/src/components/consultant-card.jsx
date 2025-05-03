@@ -1,9 +1,18 @@
-import { Handshake } from 'lucide-react'
 import React from 'react'
 import CustomeButton from '../components/custome_button'
+import { useNavigate } from 'react-router-dom';
+import toaster from 'react-hot-toast';
 
 export default function ConsultantCard({name, experienceYears, qualifications}) {
+    const navigate = useNavigate();
     const serviceSubmit = () => { 
+        e.preventDefault(); 
+        try {
+        //request
+        navigate("");  
+        } catch (error) {
+        toaster.error(`Error : ${error}`);
+        }
     };
     return (
         <div className='flex justify-center flex-col items-center border-2 border-black/10 rounded-xl overflow-hidden transition-colors delay-50 cursor-pointer'>

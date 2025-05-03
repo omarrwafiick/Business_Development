@@ -6,9 +6,20 @@ import CustomeSelect from '../components/custome-select'
 import CustomeTextarea from '../components/custome_textarea' 
 import { Link } from 'react-router-dom'; 
 import { HeartHandshake } from 'lucide-react'; 
+import { useNavigate } from 'react-router-dom';
+import toaster from 'react-hot-toast';
 
 export default function ConsultantService() {
-  const serviceSubmit = () => { 
+  const navigate = useNavigate();
+  const serviceSubmit = async (e) => {   
+    e.preventDefault(); 
+    try {
+    //request
+    navigate("");
+    toaster.success("Successfully");
+    } catch (error) {
+    toaster.error(`Error : ${error}`);
+    }
   };
   const Stage1 = "Just an idea";
   const Stage2 = "Started but early";

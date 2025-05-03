@@ -5,11 +5,21 @@ import CustomeButton from '../components/custome_button'
 import CustomeInput from '../components/custome_input'
 import { Link } from 'react-router-dom';
 import PasswordInput from '../components/password-input'
+import { useNavigate } from 'react-router-dom';
+import toaster from 'react-hot-toast';
 
-
-export default function Login() {
-    const loginSubmit = () => {
-        //in success get gategories and services data to store
+export default function Login() { 
+    const navigate = useNavigate();
+    const loginSubmit = async (e) => {   
+    e.preventDefault(); 
+    try {
+    //request
+    navigate("");
+    toaster.success("Successfully");
+    //in success get gategories and services data to store
+    } catch (error) {
+    toaster.error(`Error : ${error}`);
+    }
     };
     return (
       <div className='flex justify-center items-center flex-col w-full h-dvh '>

@@ -1,26 +1,34 @@
-import create from 'zustand';
+import { create } from 'zustand';
 
-const useStore = create((set) => ({
+
+const extractRole = (token)=>{
+  const payloadBase64 = token.split('.')[1];
+  const payloadJson = atob(payloadBase64);  
+  const payload = JSON.parse(payloadJson);  
+  return payload.userRole;
+}
+
+const AppStore = create((set) => ({
   applicationId:null,
   applicantId:null,
   consultandId:null,
   services:[],
+  serviceName:null,
+  setServiceName: (name) => set({ serviceName: name }),
   chosenService:null,
   categories:[],
   user:null,
-  token:null,
+  token:'',
   isAuthenticated:false,
   error:null,
   isLoading:false,  
-  role : extractRole(token),
+  role: null,
+  setToken: (newToken) => {
+    const userRole = extractRole(newToken);
+    set({ token: newToken, role: userRole, isAuthenticated: true });
+  },
 }));
- 
-export default useStore;
 
-const extractRole = (token)=>{
-    const payloadBase64 = token.split('.')[1];
-    const payloadJson = atob(payloadBase64);  
-    const payload = JSON.parse(payloadJson);  
-    return payload.userRole;
-}
+export default AppStore;
+
 //  const { count, increment, decrement, reset } = useStore(); // Access the store state and actions

@@ -1,12 +1,23 @@
 import React from 'react'
 import { Key } from 'lucide-react';
 import { motion } from 'framer-motion';
-import CustomeButton from '../components/custome_button'
-import PasswordInput from '../components/password-input'
+import CustomeButton from '../components/custome_button';
+import PasswordInput from '../components/password-input';
+import { useNavigate } from 'react-router-dom';
+import toaster from 'react-hot-toast';
+
 
 export default function ResetPassword() {
-  const resetPasswordSubmit = () => {
-
+  const navigate = useNavigate();
+  const resetPasswordSubmit = async (e) => {
+    e.preventDefault(); 
+    try {
+      //request
+      navigate("");
+      toaster.success("Successfully");
+    } catch (error) {
+      toaster.error(`Error : ${error}`);
+    }
   };
   return (
     <div  className='flex justify-center items-center flex-col w-full h-dvh font-gelasio'>

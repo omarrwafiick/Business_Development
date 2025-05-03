@@ -5,11 +5,12 @@ export default {
     './src/**/*.{js,ts,jsx,tsx}', 
   ],
   theme: {
-    extend: {
-      fontFamily: {
-        gelasio: ['Gelasio', 'serif'],
-        inter: ['Inter', 'sans-serif'],
-      },
+    extend: { 
+      screens: {
+        tablet: '640px',    
+        laptop: '1024px',
+        desktop: '1280px',
+      }
     } 
   },
   plugins: [],

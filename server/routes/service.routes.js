@@ -4,7 +4,7 @@ const {
     salesRevenueOptimizationPremiumService, financialPlanningService, financialPlanningFreeTrialService,financialPlanningPremiumService,
     locationMarkrtAnalysisFreeTrialService, locationMarkrtAnalysisPremiumService,consultancyService, getApplicationStatus, 
     updateApplication, updatePaymentStatus, addServiceApplication, getUserApplications, getConsultantApplications, getAllConsultants, 
-    getAllServices, seedDataToConsultant, businessGuideService
+    getAllServices, seedDataToConsultant, businessGuideService, getConsultancyResult
 } = require('../controllers/service.controller');
 const router = express.Router(); 
 const { VerifyToken } = require('../middlewares/verifyToken');  
@@ -29,7 +29,7 @@ router.get('/sales-revenue-optimization-free-trial-service/:applicantid/:applica
 
 router.get('/sales-revenue-optimization-premium-service/:applicantid/:applicationid', salesRevenueOptimizationPremiumService);
 
-router.post('/location-markrt-analysis/:applicantid/:applicationid', locationMarkrtAnalysisService);
+router.post('/location-markrt-analysis-service/:applicantid/:applicationid', locationMarkrtAnalysisService);
 
 router.get('/location-markrt-analysis-free-trial-service/:applicantid/:applicationid', locationMarkrtAnalysisFreeTrialService);
 
@@ -47,7 +47,7 @@ router.get('/get-services', getAllServices);
 
 router.get('/user/:applicantId', getUserApplications);
 
-router.get('/consultant', getConsultantApplications);
+router.get('/consultant-applications', getConsultantApplications);
 
 router.get('/getstatus/:id', getApplicationStatus);
 
@@ -56,6 +56,8 @@ router.put('/update/:id', validateInputs(updateApplicationSchema), updateApplica
 router.put('/update/paymentstatus/:id', validateInputs(paymentStatusSchema), updatePaymentStatus);
 
 router.post('/seed-consultant/:applicantid/:applicationid', validateInputs(seedConsultantSchema), seedDataToConsultant);
+
+router.get('/consultancy/:applicantid/:applicationid', getConsultancyResult);
 
 router.use(VerifyTokenByRole(String(process.env.CONSULTANT)));
 

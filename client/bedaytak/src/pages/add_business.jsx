@@ -5,16 +5,24 @@ import CustomeButton from '../components/custome_button'
 import CustomeInput from '../components/custome_input'
 import CustomeTextarea from '../components/custome_textarea'
 import CustomeSelect from '../components/custome-select'
+import { useNavigate } from 'react-router-dom';
+import toaster from 'react-hot-toast';
 
-
-export default function AddBusiness() {
-
+export default function AddBusiness() { 
+    const navigate = useNavigate();
+    const businessSubmit = async (e) => {   
+        e.preventDefault(); 
+        try {
+        //request
+        navigate("");
+        toaster.success("Successfully");
+        } catch (error) {
+        toaster.error(`Error : ${error}`);
+        }
+      };
     useEffect(()=>{
         //get categories and locations
-    },[])
-    const businessSubmit = () => {
-  
-    };
+    },[]) 
     return (
       <div  className='flex justify-center items-center flex-col w-full h-dvh font-gelasio'>
           <motion.div

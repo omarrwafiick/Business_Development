@@ -3,10 +3,21 @@ import { motion } from 'framer-motion';
 import CustomeButton from '../components/custome_button' 
 import { Link } from 'react-router-dom'; 
 import { LocationEditIcon } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import toaster from 'react-hot-toast';
 
-export default function LocationService() {
-  const serviceSubmit = () => { 
-  };
+export default function LocationService() { 
+    const navigate = useNavigate();
+    const serviceSubmit = async (e) => {   
+      e.preventDefault(); 
+        try {
+        //request
+            navigate("");
+            toaster.success("Successfully");
+        } catch (error) {
+            toaster.error(`Error : ${error}`);
+    }
+    };
   return (
     <div className='flex justify-center items-center flex-col w-full h-dvh'>
         <motion.div
