@@ -1,4 +1,4 @@
-import React from 'react' 
+import React, { useEffect } from 'react' 
 import { LucideBriefcaseBusiness } from 'lucide-react';
 import { motion } from 'framer-motion';
 import CustomeButton from '../components/custome_button'
@@ -8,6 +8,10 @@ import CustomeSelect from '../components/custome-select'
 
 
 export default function AddBusiness() {
+
+    useEffect(()=>{
+        //get categories and locations
+    },[])
     const businessSubmit = () => {
   
     };
@@ -20,7 +24,7 @@ export default function AddBusiness() {
               className='flex justify-center items-center flex-col w-4/12'>
   
               <span className='m-2'>
-                  <LucideBriefcaseBusiness size={55} color="#15A0DC" /> 
+                  <LucideBriefcaseBusiness size={55} color="#15A0DC" />  
               </span>
               <h4 className='capitalize mb-2! text-2xl font-bold'>add your business.</h4>
               <p className='opacity-80'>Getting to know your value better</p>
@@ -28,8 +32,8 @@ export default function AddBusiness() {
               <form onSubmit={businessSubmit} className='w-full mt-3'>
                   <CustomeInput name={"name"} type={"text"}/>
                   <CustomeTextarea rowNum={3} name={"description"} placeHolder={"What is your business about..."}/>
-                  <CustomeSelect name={"category"} data={["option1","option12"]}/>
-                  <CustomeSelect name={"location"} data={["option1","option12"]}/>
+                  <CustomeSelect name={"category"} data={[["option1",0],["option12",1]]}/>
+                  <CustomeSelect name={"location"} data={[["option1",0],["option12",1]]}/>
                   <CustomeButton name={"submit"} />
               </form>
           </motion.div>

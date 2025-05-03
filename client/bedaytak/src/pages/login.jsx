@@ -12,7 +12,7 @@ export default function Login() {
         //in success get gategories and services data to store
     };
     return (
-      <div  className='flex justify-center items-center flex-col w-full h-dvh '>
+      <div className='flex justify-center items-center flex-col w-full h-dvh '>
           <motion.div
               initial={{opacity: 0, y:20}}
               animate={{opacity: 1, y:0}}
@@ -39,8 +39,7 @@ export default function Login() {
               </form>
               <p className='capitalize mt-3!'>don't have an account? <Link className='underline underline-offset-2 font-medium cursor-pointer' to="/signup">signup</Link></p>
           </motion.div>
-      </div>
-      
+      </div> 
     )
   }
   
