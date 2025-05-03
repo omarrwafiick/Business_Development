@@ -27,12 +27,16 @@ a {
 }
 .text-primary{
   color: #15A0DC;
-}
+}  
 .bg-primary{
   background-color: #15A0DC;
 }
 .text-secondary{
   color: #F66A35;
+} 
+.border-secondary{
+  border: 12px;
+  border-color: #F66A35;
 }
 .bg-secondary{
   background-color: #F66A35;
@@ -42,23 +46,38 @@ a {
 }
 .bg-dark{
   background-color: #2E2E2E;
+}  
+.font-gelasio {
+  font-family: 'Gelasio', serif;
+} 
+.font-inter {
+  font-family: 'Inter', sans-serif;
+} 
+.loader {
+  width: 50px;
+  aspect-ratio: 1;
+  display: grid;
 }
-.text-light{
-  color: #9A9A9A;
+.loader::before,
+.loader::after {    
+  content:"";
+  grid-area: 1/1;
+  --c:no-repeat radial-gradient(farthest-side,#25b09b 92%,#0000);
+  background: 
+    var(--c) 50%  0, 
+    var(--c) 50%  100%, 
+    var(--c) 100% 50%, 
+    var(--c) 0    50%;
+  background-size: 12px 12px;
+  animation: l12 1s infinite;
 }
-.bg-light{
-  background-color: #9A9A9A;
-}
-@font-face {
-  font-family: 'Gelasio';
-  src: url('./assets/fonts/Gelasio/Gelasio-Regular.ttf') format('truetype');
-  font-weight: normal;
-  font-style: normal;
+.loader::before {
+  margin: 4px;
+  filter: hue-rotate(45deg);
+  background-size: 8px 8px;
+  animation-timing-function: linear
 }
 
-@font-face {
-  font-family: 'Inter';
-  src: url('./assets/fonts/Inter/Inter_18pt-Regular.ttf') format('truetype');
-  font-weight: normal;
-  font-style: normal;
+@keyframes l12 { 
+  100%{transform: rotate(.5turn)}
 }
