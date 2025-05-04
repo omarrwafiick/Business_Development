@@ -28,7 +28,12 @@ export default function Signup() {
         toaster.error("Passwords doesn't match");
         return;
       }
-      const response = await register({fullname, email, password, phone, role});
+      const response = await register({
+        fullName: fullname, 
+        email, 
+        password, 
+        phoneNumber: phone, 
+        role});
       setUser(response.user);
       toaster.success("Signed up successfully");
       if(role === 'BusinessOwner'){  

@@ -22,22 +22,22 @@ export default function Login() {
     const setToken = AppStore.getState().setToken;
     const navigate = useNavigate();
     const loginSubmit = async (e) => {   
-    e.preventDefault();  
-    try { 
-        const response = await login({email, password});
-        const categories = await getAllCategories();
-        const service = await getAllServices();
-        setUser(response.user);
-        setToken(response.token);
-        setCategories(categories);
-        setServices(service);
-        navigate("/");
-        await toaster.success("Logged in successfully");
-        } 
-    catch (error) {
-        toaster.error(`Error : ${error.message}`);
-        form.current.reset();
-    }
+        e.preventDefault();  
+        try { 
+            const response = await login({email, password});
+            const categories = await getAllCategories();
+            const service = await getAllServices();
+            setUser(response.user);
+            setToken(response.token);
+            setCategories(categories);
+            setServices(service);
+            navigate("/");
+            await toaster.success("Logged in successfully");
+            } 
+        catch (error) {
+            toaster.error(`Error : ${error.message}`);
+            form.current.reset();
+        }
     };
     return (
       <div className='flex justify-center items-center flex-col w-full h-dvh '>
