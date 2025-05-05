@@ -25,7 +25,7 @@ function App() {
   return (
     <div className='font-gelasio'> 
       {location.pathname === '/' && <Header />}
-      <HeadProvider> 
+      <HeadProvider>  
         <RoutesConfig />
       </HeadProvider>
       {location.pathname === '/' && <Footer />}

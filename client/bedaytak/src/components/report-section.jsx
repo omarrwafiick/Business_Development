@@ -1,5 +1,5 @@
 import React from 'react'  ;
-import Review from '../pages/review' ;
+import Review from '../components/review' ;
 
 export default function ReportSection({type, icon, data, style}) {
   return (

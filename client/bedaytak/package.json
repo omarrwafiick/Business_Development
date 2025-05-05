@@ -11,6 +11,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@paypal/react-paypal-js": "^8.8.3",
     "@tailwindcss/vite": "^4.1.4",
     "axios": "^1.8.4",
     "framer-motion": "^12.9.1",
@@ -20,6 +21,7 @@
     "react-head": "^3.4.2",
     "react-hot-toast": "^2.5.2",
     "react-intersection-observer": "^9.16.0",
+    "react-paypal-js": "^0.0.1-security",
     "react-router-dom": "^7.5.2",
     "recharts": "^2.15.3",
     "zustand": "^5.0.3"

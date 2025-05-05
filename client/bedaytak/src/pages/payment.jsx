@@ -1,4 +1,4 @@
-import React from 'react' 
+import React, { useEffect, useState } from 'react' 
 import { motion } from 'framer-motion';
 import CustomeButton from '../components/custome_button'  
 import { Link } from 'react-router-dom'; 
@@ -9,18 +9,25 @@ import AppStore from '../store/store';
 import { getFinancialPlanningServiceFree, getSalesOptimizationServiceFree, getLocationMarkrtAnalysisServiceFree,
          getFinancialPlanningServicePremium, getLocationMarkrtAnalysisServicePremium, getSalesOptimizationServicePremium,
          updatePaymentStatusService        
-} from '../services/service'; 
+} from '../services/service';  
+import PaypalPayment from '../components/paypal';
 
 export default function Payment() {
-    const { setReviewData, applicationId, applicantId, serviceName } = AppStore();
+    const { setReviewData, applicationId, applicantId, serviceName, services } = AppStore();
+    useEffect(()=>{
+        let service = services.filter(x => x.name.toLowerCase().include(serviceName.substring(0,4)));
+        setServiceprice(service.amount);
+    }, []);
+    
+    const [serviceprice, setServiceprice] = useState(0);
+    const [paypalPaymentStatus, setPaypalPaymentStatus] = useState(false);
     const navigate = useNavigate();
     const serviceSubmit = async (paymentState) => {   
       try { 
         let response = '';
         if(paymentState){ 
-          //payment gateway
-          const payed = true;
-          if(payed){
+          //payment gateway  
+          if(paypalPaymentStatus){ 
             //update payment status
             await updatePaymentStatusService(applicationId, true);
             if(serviceName.toLowerCase().includes('financial')){
@@ -68,8 +75,14 @@ export default function Payment() {
             <p className='text-md mt-4! mb-4! leading-7 opacity-80 text-center'>By pressing "Pay," you’ll unlock the full version of the service with complete, personalized recommendations. If you prefer not to pay, you can still access a limited version of the service free of charge.</p>
   
             <form className='w-full mt-3'>  
-                <CustomeButton onClick={() => serviceSubmit(true)} name={"pay"} styles={'bg-primary'}/>
-                <CustomeButton onClick={() => serviceSubmit(false)} name={"free trial"} styles={'bg-secondary'} />
+                <CustomeButton onClick={() => serviceSubmit(false)} name={"free trial"} styles={'bg-primary'}/> 
+                <PaypalPayment
+                  onClick={() => serviceSubmit(true)}
+                  price={serviceprice}
+                  onSuccess={()=>setPaypalPaymentStatus(true)}
+                  onCancel={()=>setPaypalPaymentStatus(false)}
+                  onError={()=>setPaypalPaymentStatus(false)}
+                />
             </form>
             <p className='capitalize mt-3!'>back{"  "}<Link className='underline underline-offset-2 font-medium cursor-pointer' to="/">home?</Link></p>
         </motion.div>
