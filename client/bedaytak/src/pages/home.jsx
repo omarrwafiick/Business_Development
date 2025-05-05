@@ -1,6 +1,6 @@
 import React, { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import cover from '../assets/images/cover.png'; 
-import contact from '../assets/images/contact.jpg'; 
+import contactImg from '../assets/images/contact.jpg'; 
 import SmallButton from '../components/small-button'
 import Card from '../components/card';
 import Card2 from '../components/card2';
@@ -97,7 +97,7 @@ export default function Home() {
   };
 
   return ( 
-    <div className='mt-16 w-full flex flex-col justify-center items-center'>
+    <div className='w-full flex flex-col justify-center items-center'>
         <Title>Bedaytak - Home</Title>
         <Meta name="description" content="My app description" />
         <motion.div ref={heroRef} id="hero"
@@ -109,10 +109,10 @@ export default function Home() {
           animate="visible"
           transition={{duration:0.5, delay:0.25}}
           className='w-10/12 h-screen flex justify-center items-center'>
-            <div className='w-6/12 flex flex-col justify-center items-center'>
-              <div className='flex flex-col justify-start items-start'>
+            <div className='w-6/12 h-full flex flex-col justify-center items-center mt-20'>
+              <div className='flex flex-col items-start'>
                 <h1 className='capitalize font-bold text-6xl'>smooth business</h1>
-                <h1 className='capitalize leading-18 font-bold text-6xl'>starts with good</h1>
+                <h1 className='capitalize leading-20 font-bold text-6xl'>starts with good</h1>
                 <a className="flex capitalize font-bold text-6xl text-secondary">
                   <span className='me-3'>consultation</span> 
                   <BriefcaseBusiness size={55} color="#F66A35" />
@@ -129,13 +129,13 @@ export default function Home() {
                     <SmallButton name="Get Started" style={'bg-primary text-white!'} to="signup"/>
                     <SmallButton name="Apply Now" style={'bg-secondary text-white! ms-3!'} to="application"/>
                 </div>
-                <div className='flex justify-start items-center w-full mt-8'>
+                <div className='flex justify-start items-center w-6/12 mt-10'>
                   <SocialMediaBar style={'fill-black'} />
                 </div>
               </div> 
             </div>
-            <div className='w-6/12 flex justify-end items-center'>
-                <img src={cover} className="rounded-2xl w-full" alt="bedaytak cover" />
+            <div className='w-6/12 h-full flex justify-end items-center'>
+                <img src={cover} className="rounded-2xl w-full mt-5" alt="bedaytak cover" />
             </div>
         </motion.div>
          
@@ -150,17 +150,17 @@ export default function Home() {
                   icon={ <BriefcaseBusiness size={55} color="#FFFFFF" /> }
                   color={"bg-orange-400"}
                   title="business ideas"
-                  content="Lorem ipsum dolor sit amet consectetur adipisicing elit. In, similique veniam quo temporibus nam iste vitae voluptate? Autem iste vero deleniti impedit quaerat. Praesentium distinctio ad impedit amet ducimus quam."/> 
+                  content="Unlock powerful business ideas that spark growth and innovation. Our team analyzes trends and market needs to help you launch ideas with impact—turning your vision into a practical, scalable solution ready for today’s business landscape."/> 
               <Card 
                   icon={ <User size={55} color="#FFFFFF" /> } 
                   color={"bg-blue-400"}
                   title="customer strategy"
-                  content="Lorem ipsum dolor sit amet consectetur adipisicing elit. In, similique veniam quo temporibus nam iste vitae voluptate? Autem iste vero deleniti impedit quaerat. Praesentium distinctio ad impedit amet ducimus quam."/> 
+                  content="Build a customer strategy that drives loyalty and results. We help you understand your audience, optimize touchpoints, and deliver consistent value—creating meaningful relationships that fuel retention, referrals, and revenue growth."/> 
               <Card 
                   icon={ <Clock size={55} color="#FFFFFF " /> }
                   color={"bg-green-400"}
                   title="get success"
-                  content="Lorem ipsum dolor sit amet consectetur adipisicing elit. In, similique veniam quo temporibus nam iste vitae voluptate? Autem iste vero deleniti impedit quaerat. Praesentium distinctio ad impedit amet ducimus quam."/> 
+                  content="Achieve success through smart planning, expert support, and actionable goals. We guide you through every step with proven tools and insights, turning challenges into wins and helping your business reach its highest potential with clarity."/> 
           </div> 
         </motion.div>
 
@@ -175,7 +175,7 @@ export default function Home() {
             <h1 className='capitalize font-bold text-4xl'>we are trusted consulting</h1>
             <h1 className='capitalize font-bold text-4xl leading-16'>company, with <a className='text-secondary'>+20 years</a></h1>
             <h1 className='capitalize font-bold text-4xl'>of experience.</h1>
-            <p className='opacity-50 font-inter text-sm w-10/12 text-center mt-8! leading-7 capitalize mb-6!'>Lorem ipsum dolor sit amet consectetur adipisicing elit. Unde itaque voluptatum officia. Voluptates corrupti nemo, blanditiis amet reprehenderit veritatis iure? Minima quibusdam sit doloribus ex voluptas beatae esse fuga exercitationem.</p>
+            <p className='opacity-50 font-inter text-sm w-10/12 text-center mt-8! leading-7 capitalize mb-6!'>With over 20 years of proven experience, we’ve built a reputation as a trusted consulting company that delivers real results. Our long-term clients value our integrity, insight, and commitment to helping their businesses thrive.</p>
             <SmallButton name="More About Us" style={'bg-primary text-white!'} to="#about"/>
           </div>
         </motion.div>
@@ -192,26 +192,26 @@ export default function Home() {
                   icon={ <Users size={45} color="#FFFFFF" /> }
                   color={"bg-orange-400"}
                   title="professional staff"
-                  content="Lorem ipsum dolor sit amet consectetur adipisicing elit. In, similique veniam quo temporibus nam iste vitae voluptate? Autem iste vero deleniti impedit quaerat. Praesentium distinctio ad impedit amet ducimus quam."/> 
+                  content="Our professional staff is committed to delivering excellence in every interaction. With diverse industry backgrounds and a passion for innovation, they provide personalized support and strategies to help your business grow with confidence."/> 
               <Card2
                   mode={true} 
                   icon={ <Heart size={45} color="#FFFFFF" /> } 
                   color={"bg-blue-400"}
                   title="100% statisfactions"
-                  content="Lorem ipsum dolor sit amet consectetur adipisicing elit. In, similique veniam quo temporibus nam iste vitae voluptate? Autem iste vero deleniti impedit quaerat. Praesentium distinctio ad impedit amet ducimus quam."/> 
+                  content="We stand by our commitment to 100% satisfaction by offering reliable service, open communication, and results-driven solutions. Your success is our top priority, and we continually adapt to exceed expectations at every stage of your journey."/> 
               <Card2 
                   mode={true}
                   icon={ <MessageSquare size={45} color="#FFFFFF " /> }
                   color={"bg-green-400"}
                   title="expert advise"
-                  content="Lorem ipsum dolor sit amet consectetur adipisicing elit. In, similique veniam quo temporibus nam iste vitae voluptate? Autem iste vero deleniti impedit quaerat. Praesentium distinctio ad impedit amet ducimus quam."/> 
+                  content="Receive expert advice tailored to your unique business challenges and goals. Our consultants use data-driven insights and proven methods to guide your decisions, helping you achieve smarter growth, increased efficiency, and long-term success."/> 
           </div> 
         </motion.div>
 
         <motion.div 
           ref={aboutRef} id="about" className='w-full flex flex-col justify-evenly items-center pt-16 pb-16'>
           <h1 className='capitalize font-bold text-5xl'>meet our perfect advisors</h1>
-          <p className='font-inter opacity-50 text-sm w-8/12 text-center mt-8! leading-6 capitalize mb-10!'>Lorem ipsum dolor sit amet consectetur adipisicing elit. Quae voluptatibus vel expedita culpa voluptate voluptatum nostrum esse sequi et veniam qui, dignissimos animi, ea, ducimus deserunt repellendus vitae aliquid ut!</p>
+          <p className='font-inter opacity-50 text-sm w-8/12 text-center mt-8! leading-6 capitalize mb-10!'>Seasoned professionals with deep industry knowledge and a passion for helping businesses succeed. They offer clear, actionable guidance tailored to your goals, ensuring every step you take leads to progress.</p>
           <div className='w-10/12 grid grid-cols-3 gap-8'> 
               <Team  
                   imageUrl={Person1}
@@ -230,7 +230,7 @@ export default function Home() {
 
         <motion.div ref={serviceRef} id="services" className='w-full bg-dark flex flex-col justify-evenly items-center pt-32 pb-32'>
           <h1 className='text-white capitalize font-bold text-5xl'>what we do to serve your best</h1>
-          <p className='font-inter text-white opacity-70 text-sm w-8/12 text-center mt-8! leading-6 capitalize mb-10!'>Lorem ipsum dolor sit amet consectetur adipisicing elit. Quae voluptatibus vel expedita culpa voluptate voluptatum nostrum esse sequi et veniam qui, dignissimos animi, ea, ducimus deserunt repellendus vitae aliquid ut!</p>
+          <p className='font-inter text-white opacity-70 text-sm w-8/12 text-center mt-8! leading-6 capitalize mb-10!'>We provide tailored solutions designed to match your business needs. From strategic planning to hands-on support, every service we offer is focused on delivering maximum value, helping you operate smarter and achieve lasting success.</p>
           
           <div className='w-10/12 grid grid-cols-3 gap-8 mt-6'>
                 <Link to="/guidance-service"><Card2 
@@ -239,7 +239,7 @@ export default function Home() {
                   icon={ <NotebookIcon size={45} color="#FFFFFF" /> }
                   color={"bg-orange-400"}
                   title="Business guide"
-                  content="Lorem ipsum dolor sit amet consectetur adipisicing elit. In, similique veniam quo temporibus nam iste vitae voluptate? Autem iste vero deleniti impedit quaerat. Praesentium distinctio ad impedit amet ducimus quam."/> 
+                  content="Our Business Guide service helps you map out a clear path to success. From startup essentials to scaling strategies, we offer expert direction and resources that support informed decisions."/> 
                 </Link>
                 <Link to="/application" onClick={()=>{ setServiceName("Financial Planning") }}><Card2
                   style='text-white'
@@ -247,7 +247,7 @@ export default function Home() {
                   icon={ <CircleDollarSign size={45} color="#FFFFFF" /> } 
                   color={"bg-blue-400"}
                   title="Financial Planning"
-                  content="Lorem ipsum dolor sit amet consectetur adipisicing elit. In, similique veniam quo temporibus nam iste vitae voluptate? Autem iste vero deleniti impedit quaerat. Praesentium distinctio ad impedit amet ducimus quam."/> 
+                  content="Plan your finances with confidence. We analyze your revenue, costs, and growth goals to create a practical financial roadmap ensuring stability, smart investment, and long-term profitability for your business journey."/> 
                 </Link>
                 <Link to="/application" onClick={()=>{ setServiceName("Sales and revenue optimization") }}><Card2 
                   style='text-white'
@@ -255,7 +255,7 @@ export default function Home() {
                   icon={ <BanknoteArrowUp size={45} color="#FFFFFF " /> }
                   color={"bg-green-400"}
                   title="Sales optimization"
-                  content="Lorem ipsum dolor sit amet consectetur adipisicing elit. In, similique veniam quo temporibus nam iste vitae voluptate? Autem iste vero deleniti impedit quaerat. Praesentium distinctio ad impedit amet ducimus quam."/>
+                  content="Boost your revenue with targeted Sales Optimization. We evaluate your sales process, identify gaps, and implement strategies that increase conversion, enhance team performance, and improve customer retention."/>
                 </Link>
                 <Link to="/application" onClick={()=>{ setServiceName("Consultation") }}><Card2 
                   style='text-white'
@@ -263,7 +263,7 @@ export default function Home() {
                   icon={ <HeartHandshake size={45} color="#FFFFFF" /> }
                   color={"bg-yellow-400"}
                   title="Consultation"
-                  content="Lorem ipsum dolor sit amet consectetur adipisicing elit. In, similique veniam quo temporibus nam iste vitae voluptate? Autem iste vero deleniti impedit quaerat. Praesentium distinctio ad impedit amet ducimus quam."/> 
+                  content="Our Consultation service gives you access to expert insights tailored to your business challenges. From strategy to execution, we help you solve problems, generate ideas, seize opportunities, and stay ahead in a fast-changing market."/> 
                 </Link>
                 <Link to="/application" onClick={()=>{ setServiceName("Location and markrt analysis") }}><Card2
                   style='text-white'
@@ -271,7 +271,7 @@ export default function Home() {
                   icon={ <LocationEdit size={45} color="#FFFFFF" /> } 
                   color={"bg-red-400"}
                   title="Location analysis"
-                  content="Lorem ipsum dolor sit amet consectetur adipisicing elit. In, similique veniam quo temporibus nam iste vitae voluptate? Autem iste vero deleniti impedit quaerat. Praesentium distinctio ad impedit amet ducimus quam."/> 
+                  content="Choose the best place to grow. Our Location Analysis studies customer demographics, market demand, and competition to help you select optimal locations for expansion and ensure maximum business visibility and performance."/> 
                 </Link>
                 <Link to="/application" onClick={()=>{ setServiceName("Location and markrt analysis") }}><Card2 
                   style='text-white'
@@ -279,37 +279,37 @@ export default function Home() {
                   icon={ <IdCard size={45} color="#FFFFFF " /> }
                   color={"bg-pink-400"}
                   title="markrt analysis"
-                  content="Lorem ipsum dolor sit amet consectetur adipisicing elit. In, similique veniam quo temporibus nam iste vitae voluptate? Autem iste vero deleniti impedit quaerat. Praesentium distinctio ad impedit amet ducimus quam."/>  
+                  content="Stay ahead with in-depth Market Analysis. We explore trends, consumer behavior, and competitor activity to uncover opportunities and guide your strategy—ensuring your business moves with confidence in any environment."/>  
                 </Link>
           </div> 
         </motion.div> 
 
         <motion.div ref={pricingRef} id="pricing" className='w-full bg-secondary flex flex-col justify-evenly items-center pt-16 pb-16'>
           <h1 className='text-white capitalize font-bold text-5xl'>our prices!</h1>
-          <p className='font-inter text-white opacity-90 text-sm w-8/12 text-center mt-8! leading-6 capitalize mb-10!'>Lorem ipsum dolor sit amet consectetur adipisicing elit. Quae voluptatibus vel expedita culpa voluptate voluptatum nostrum esse sequi et veniam qui, dignissimos animi, ea, ducimus deserunt repellendus vitae aliquid ut!</p>
+          <p className='font-inter text-white opacity-90 text-sm w-8/12 text-center mt-8! leading-6 capitalize mb-10!'>Our pricing is simple, transparent, and designed to fit every stage of your business journey. Whether you're starting out or scaling up, our plans offer real value—packed with expert services to help you grow smarter at every step.</p>
           <SmallButton name="Apply Now" style={'bg-primary text-white! ms-3!'} to="#services"/>
           <div className='w-10/12 grid grid-cols-3 gap-8 mt-12'>
               <PriceCard 
                   style=''  
                   price="29,99"
                   type="basic plan"
-                  details="Lorem ipsum dolor sit amet consectetur adipisicing elit. In, similique veniam quo temporibus nam iste vitae voluptate? Autem iste vero deleniti impedit quaerat. Praesentium distinctio ad impedit amet ducimus quam."/> 
+                  details="Our Basic Plan at just 29.99 offers powerful tools to kickstart your growth. Get access to essential business guidance, expert tips, and foundational planning support—perfect for startups or small teams ready to build with confidence."/> 
               <PriceCard
                   style='' 
                   price="49,99"
                   type="basic plan"
-                  details="Lorem ipsum dolor sit amet consectetur adipisicing elit. In, similique veniam quo temporibus nam iste vitae voluptate? Autem iste vero deleniti impedit quaerat. Praesentium distinctio ad impedit amet ducimus quam."/> 
+                  details="Our Basic Plan at just 49.99 offers powerful tools to kickstart your growth. Get access to essential business guidance, expert tips, and foundational planning support—perfect for startups or small teams ready to build with confidence."/> 
               <PriceCard 
                   style='' 
                   price="79,99"
                   type="basic plan"
-                  details="Lorem ipsum dolor sit amet consectetur adipisicing elit. In, similique veniam quo temporibus nam iste vitae voluptate? Autem iste vero deleniti impedit quaerat. Praesentium distinctio ad impedit amet ducimus quam."/>
+                  details="Our Basic Plan at just 79.99 offers powerful tools to kickstart your growth. Get access to essential business guidance, expert tips, and foundational planning support—perfect for startups or small teams ready to build with confidence."/>
           </div> 
         </motion.div> 
 
         <motion.div ref={contactRef} id="contact" className='w-full flex flex-col justify-center items-center pt-16 pb-32'>
-          <h1 className='capitalize font-bold text-6xl'>contact us!</h1>
-          <p className='font-inter opacity-70 text-sm w-8/12 text-center mt-8! leading-6 capitalize mb-10!'>Lorem ipsum dolor sit amet consectetur adipisicing elit. Quae voluptatibus vel expedita culpa voluptate voluptatum nostrum esse sequi et veniam qui, dignissimos animi, ea, ducimus deserunt repellendus vitae aliquid ut!</p>
+          <h1 className='capitalize font-bold text-6xl'>contact us</h1>
+          <p className='font-inter opacity-70 text-sm w-8/12 text-center mt-8! leading-6 capitalize mb-10!'>Have questions or need support? Our team is here to help! Reach out to us for personalized assistance, expert advice, or to learn more about our services. We're ready to guide you toward your business goals—contact us today!</p>
           <div className='flex justify-evenly items-center  w-10/12'>
             <form ref={form} onSubmit={messageSubmit} className='w-6/12 flex flex-col justify-between items-evenly mt-3 pe-6'> 
                 <span className='w-full flex justify-center'><CodesandboxIcon size={115} color="#F66A35" /></span>
@@ -318,7 +318,7 @@ export default function Home() {
                 <CustomeButton name={"contact"} /> 
             </form> 
             <div className='w-6/12'>
-              <img className='rounded-2xl' src={contact} alt="contact image" />
+              <img className='rounded-2xl' src={contactImg} alt="contact image" />
             </div>
           </div>
         </motion.div>

@@ -15,7 +15,7 @@ import GuidanceService from '../pages/guidance_service';
 import FeasibilityService from '../pages/feasibility_service';
 import LocationService from '../pages/location_service';
 import Payment from '../pages/payment';
-import Review from '../pages/review';
+import ServiceResult from '../pages/service-result';
 import SalesService from '../pages/sales_service';
 import ChooseConsultant from '../pages/choose-consultant'; 
 import IntegratedReport from '../pages/integrated-report';
@@ -32,7 +32,7 @@ const RoutesConfig  = () => (
     <Route path="/signup" element={<Signup />} />
     <Route path="/business" element={<AddBusiness />} />
     <Route path="/forget-password" element={<ForgetPassword />} />
-    <Route path="/reset-password" element={<ResetPassword />} />
+    <Route path="/reset-password/:token" element={<ResetPassword />} />
     <Route path="/admin" element={<Admin />} />
     <Route path="/application" element={<Application />} />
     <Route path="/consultant" element={<Consultant />} />
@@ -46,7 +46,7 @@ const RoutesConfig  = () => (
     <Route path="/payment" element={<Payment />} />
     <Route path="/sales-service" element={<SalesService />} />
     <Route path="/report" element={<IntegratedReport />} />
-    <Route path="/review" element={<Review />} />
+    <Route path="/service-result" element={<ServiceResult />} />
     <Route path="*" element={<NotFound />} />
   </Routes>
 );

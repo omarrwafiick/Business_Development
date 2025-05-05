@@ -25,7 +25,7 @@ export default function FeasibilityService() {
       };
       await financialPlanningService(applicantId, applicationId, data);
       toaster.success("Service request was sent successfully");
-      navigate("/review"); 
+      navigate("/payment"); 
     } catch (error) {
     toaster.error(`Error : ${error}`);
     }

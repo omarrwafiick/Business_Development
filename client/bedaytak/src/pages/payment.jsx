@@ -5,17 +5,52 @@ import { Link } from 'react-router-dom';
 import { DollarSign } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import toaster from 'react-hot-toast'
- 
+import AppStore from '../store/store';
+import { getFinancialPlanningServiceFree, getSalesOptimizationServiceFree, getLocationMarkrtAnalysisServiceFree,
+         getFinancialPlanningServicePremium, getLocationMarkrtAnalysisServicePremium, getSalesOptimizationServicePremium,
+         updatePaymentStatusService        
+} from '../services/service'; 
+
 export default function Payment() {
+    const { setReviewData, applicationId, applicantId, serviceName } = AppStore();
     const navigate = useNavigate();
-    const serviceSubmit = async (e) => {   
-      e.preventDefault(); 
-      try {
-      //request
-      navigate("");
-      toaster.success("Successfully");
+    const serviceSubmit = async (paymentState) => {   
+      try { 
+        let response = '';
+        if(paymentState){ 
+          //payment gateway
+          const payed = true;
+          if(payed){
+            //update payment status
+            await updatePaymentStatusService(applicationId, true);
+            if(serviceName.toLowerCase().includes('financial')){
+              response = await getFinancialPlanningServicePremium(applicantId, applicationId);
+            } 
+            else if(serviceName.toLowerCase().includes('sales')){
+              response = await getSalesOptimizationServicePremium(applicantId, applicationId)
+            }
+            else{
+              response = await getLocationMarkrtAnalysisServicePremium(applicantId, applicationId)
+            }
+          } 
+        }
+        else{
+          if(serviceName.toLowerCase().includes('financial')){
+            response = await getFinancialPlanningServiceFree(applicantId, applicationId);
+          } 
+          else if(serviceName.toLowerCase().includes('sales')){
+            response = await getSalesOptimizationServiceFree(applicantId, applicationId)
+          }
+          else{
+            response = await getLocationMarkrtAnalysisServiceFree(applicantId, applicationId)
+          } 
+        };
+
+        setReviewData(response);
+        toaster.success("Request was sent successfully");
+        navigate("/service-result");
       } catch (error) {
-      toaster.error(`Error : ${error}`);
+        toaster.error(`Error : ${error}`);
       }
     };
   return (
@@ -32,9 +67,9 @@ export default function Payment() {
             <h4 className='capitalize mb-2! text-4xl font-bold font-gelasio'>payment</h4>
             <p className='text-md mt-4! mb-4! leading-7 opacity-80 text-center'>By pressing "Pay," you’ll unlock the full version of the service with complete, personalized recommendations. If you prefer not to pay, you can still access a limited version of the service free of charge.</p>
   
-            <form onSubmit={serviceSubmit} className='w-full mt-3'>  
-                <CustomeButton name={"pay"} styles={'bg-primary'}/>
-                <CustomeButton name={"free trial"} styles={'bg-secondary'} />
+            <form className='w-full mt-3'>  
+                <CustomeButton onClick={() => serviceSubmit(true)} name={"pay"} styles={'bg-primary'}/>
+                <CustomeButton onClick={() => serviceSubmit(false)} name={"free trial"} styles={'bg-secondary'} />
             </form>
             <p className='capitalize mt-3!'>back{"  "}<Link className='underline underline-offset-2 font-medium cursor-pointer' to="/">home?</Link></p>
         </motion.div>

@@ -17,7 +17,7 @@ const AppStore = create((set) => ({
   services:[],
   setServices: (data) => set({ services: data }),
   serviceName:null,
-  setServiceName: (name) => set({ serviceName: name }),
+  setServiceName: (name) => set({ serviceName: name }), 
   chosenService:null,
   setchosenService: (name) => set({ chosenService: name }),
   categories:[],

@@ -7,7 +7,7 @@ import {
     Pie,
     Cell,
     Bar, 
-    XAxis,
+    XAxis, 
     YAxis, 
     Tooltip, 
     CartesianGrid, 
@@ -16,65 +16,64 @@ import {
     Line,
 } from 'recharts';
 
-export const BarChartGraph = ({data}) => {
+//data must be array of objects
+
+export const BarChartGraph = ({data, dataKey, xAxisName, color='#8884d8'}) => {
   return (
     <ResponsiveContainer width="100%" height={300}>
       <BarChart data={data}>
         <CartesianGrid strokeDasharray="3 3" />
-        <XAxis dataKey="name" />
+        <XAxis dataKey={xAxisName} />
         <YAxis />
         <Tooltip />
-        <Bar dataKey="revenue" fill="#8884d8" />
+        <Bar dataKey={dataKey} fill={color} />
       </BarChart>
     </ResponsiveContainer>
   )
 }
 
-export const LineChartGraph  = ({data}) => {
+export const LineChartGraph  = ({data, dataKey, xAxisName, type='monotone'}) => {
     return (
       <ResponsiveContainer width="100%" height={300}>
         <LineChart data={data}>
             <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey="name" />
+            <XAxis dataKey={xAxisName} />
             <YAxis />
             <Tooltip />
-            <Line type="monotone" dataKey="revenue" stroke="#82ca9d" />
+            <Line type={type} dataKey={dataKey} stroke="#82ca9d" />
         </LineChart>
       </ResponsiveContainer>
     )
 }
 
-export const AreaChartGraph  = ({data}) => {
+export const AreaChartGraph  = ({data, type='monotone', dataKey, xAxisName, color='#8884d8'}) => {
     return (
         <ResponsiveContainer width="100%" height={300}>
         <AreaChart data={data}>
           <CartesianGrid strokeDasharray="3 3" />
-          <XAxis dataKey="name" />
+          <XAxis dataKey={xAxisName} />
           <YAxis />
           <Tooltip />
-          <Area type="monotone" dataKey="revenue" stroke="#8884d8" fill="#8884d8" />
+          <Area type={type} dataKey={dataKey} stroke="#8884d8" fill={color} />
         </AreaChart>
       </ResponsiveContainer>
     )
 }
 
-export const PieChartGraph  = ({data}) => {
+export const PieChartGraph  = ({data, dataKey, name, color='#8884d8'}) => {
     return (
         <ResponsiveContainer width="100%" height={300}>
             <PieChart>
-                <Pie
-                data={pieData}
-                dataKey="value"
-                nameKey="name"
+                <Pie 
+                data={data}
+                dataKey={dataKey}
+                nameKey={name}
                 cx="50%"
                 cy="50%"
                 outerRadius={100}
-                fill="#8884d8"
+                fill={color}
                 label
-                >
-                {pieData.map((_, index) => (
-                    <Cell key={index} fill={COLORS[index % COLORS.length]} />
-                ))}
+                > 
                 </Pie>
                 <Tooltip />
             </PieChart>

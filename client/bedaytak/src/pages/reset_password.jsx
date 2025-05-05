@@ -3,7 +3,7 @@ import { Key } from 'lucide-react';
 import { motion } from 'framer-motion';
 import CustomeButton from '../components/custome_button';
 import PasswordInput from '../components/password-input';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import toaster from 'react-hot-toast';
 import { resetPassword } from '../services/auth-service';
 

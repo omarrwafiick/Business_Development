@@ -16,7 +16,7 @@ export default function LocationService() {
         try {
             await locationMarkrtAnalysisService(applicantId, applicationId);
             toaster.success("Service request was sent successfully");
-            navigate("/review");
+            navigate("/payment");
         } catch (error) { 
             toaster.error(`Error : ${error}`);
         }

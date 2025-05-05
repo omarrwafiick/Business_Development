@@ -1,6 +1,5 @@
 const { default: mongoose } = require('mongoose');
 const Application = require('../models/application.model');
-const { generateChart } = require('../services/generateGraph.service');
 const Consultancy = require('../models/consultancy.model'); 
 const Service = require('../models/service.model'); 
 const Consultant = require('../models/consultant.model');  
@@ -10,6 +9,7 @@ const LocationMarketAnalysis = require('../models/locationMarkrtAnalysis.model')
 const SalesRevenueOptimization = require('../models/salesRevenueOptimization.model'); 
 const User = require('../models/user.model'); 
 const { VerifyApplication, VerifyService } = require('../utilities/common');
+const Mailing = require('../services/mailing.service');
 
 const addServiceApplication = async (req, res) => {  
     try {  
@@ -217,16 +217,6 @@ const locationMarkrtAnalysisService = async (req, res) => {
  
     const totalNearbyBusinesses = await Location.find({name: businessLocation.name});
 
-    const imageBuffer = await generateChart({
-      labels: ['Same Category Nearby', 'Total Near by Businesses'],
-      data: [
-        sameCategoryNearby, 
-        totalNearbyBusinesses.count
-      ],
-      colors: ['#FF6384', '#36A2EB'],
-      title: 'Location Analysis'
-    });
-
     const analysisData = {
       applicantId,
       businessId: business._id,
@@ -237,9 +227,7 @@ const locationMarkrtAnalysisService = async (req, res) => {
       totalNearbyBusinesses: totalNearbyBusinesses.count, 
       competitionLevel,
       marketingStrategies,
-      finalLocationAdvice,
-      chartImage: imageBuffer,
-      chartImageType: 'image/png'
+      finalLocationAdvice
     };
 
     const newLocation = await LocationMarketAnalysis.create(analysisData);
@@ -372,19 +360,7 @@ const salesRevenueOptimizationService = async (req, res) => {
     //todos :make it dynamic
     if (numberOfEmployees < 2) revenueRiskFactors.push("Low staffing may limit service capacity");
     if (averagePrice < 10) revenueRiskFactors.push("Low product pricing reduces margin buffer");
-    if (estimatedRevenue < 10000) revenueRiskFactors.push("Revenue below sustainability threshold");
-
-    const imageBuffer = await generateChart({
-      labels: ['Avg Price (USD)', 'Expected Daily Sales', 'Working Days/Month', 'Est. Monthly Revenue (USD)'],
-      data: [
-        averagePrice,
-        expectedDailySales,
-        workingDays,
-        estimatedRevenue
-      ],
-      colors: ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0'],
-      title: `Sales Revenue Insight for ${business.name || 'Your Business'}`
-    });    
+    if (estimatedRevenue < 10000) revenueRiskFactors.push("Revenue below sustainability threshold");  
 
     const salesData = {
       applicantId,
@@ -400,9 +376,7 @@ const salesRevenueOptimizationService = async (req, res) => {
       upsellOpportunities,
       revenueBoostIdeas,
       revenueRiskFactors, 
-      finalOptimizationAdvice,
-      chartImage: imageBuffer,
-      chartImageType: 'image/png'
+      finalOptimizationAdvice
     };
 
     const newSales = await SalesRevenueOptimization.create(salesData);
@@ -551,15 +525,8 @@ const financialPlanningService = async (req, res) => {
     } else {
       competitiveInsight = 'Low competition';
       suggestedStrategy = 'Capitalize on first-mover advantage';
-    }
-     
-    const chartImage = await generateChart({
-      labels: ['Startup Cost', 'Monthly Costs', 'Monthly Revenue', '6-Month ROI'],
-      data: [startupCost, monthlyCosts, monthlyRevenue, roi6Months],
-      colors: ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0'],
-      title: 'Business Financial Summary'
-    });
-    
+    } 
+
     const financialPlan = await FinancialPlanning.create({
       applicantId,
       businessId: business._id,
@@ -573,9 +540,7 @@ const financialPlanningService = async (req, res) => {
       financialHealthIndex,
       locationMarketScore,
       competitiveInsight,
-      suggestedStrategy,
-      chartImage,
-      chartImageType: 'image/png'
+      suggestedStrategy
     });
     
     application.status = 'Approved';
@@ -610,8 +575,7 @@ const financialPlanningFreeTrialService  = async (req, res) => {
       return res.status(200).json({ success: true, 
           data :{
               breakEvenMonths: serviceExist.breakEvenMonths,
-              financialHealthIndex: serviceExist.financialHealthIndex, 
-              graphImage: `data:${serviceExist.chartImageType};base64,${serviceExist.chartImage.toString('base64')}`
+              financialHealthIndex: serviceExist.financialHealthIndex
           }
        });
   
@@ -634,17 +598,12 @@ const financialPlanningPremiumService  = async (req, res) => {
    
       if (!serviceExist) {
         return res.status(404).json({ success: false, message: "No service was found" });
-      }  
-      const serviceData = serviceExist.toObject ? serviceExist.toObject() : { ...serviceExist };
-
-      delete serviceData.chartImage;
-      delete serviceData.chartImageType;
-
+      }   
+ 
       return res.status(200).json({ 
         success: true,
         data: {
-          ...serviceData,
-          graphImage: `data:${serviceExist.chartImageType};base64,${serviceExist.chartImage.toString('base64')}`
+          ...serviceExist
         }
       }); 
   
@@ -739,7 +698,7 @@ const consultancyService  = async (req, res) => {
             growthStrategy,
             commonPitfalls,
             summaryRecommendation
-            } = req.body;
+        } = req.body;
 
         if(!businessOverview || !industryAnalysis || !competitorInsights || !locationRecommendation 
            || !targetAudienceDefinition || !marketingSuggestions || !operationsAdvice || !legalConsiderations ||
@@ -790,6 +749,26 @@ const consultancyService  = async (req, res) => {
 
         application.status = 'Approved';
         await application.save();
+
+        const user = await User.findById(applicantId);
+        await Mailing(
+          user.email,
+          'Consultancy Service Response',
+          `
+            <p>This is your consultancy results as you applied for - all fields corresponds to your business data you provided</p>  
+            <p>Business Overview : ${businessOverview}}</p>
+            <p>Industry Analysis : ${industryAnalysis}}</p>
+            <p>Competitor Insights: ${competitorInsights}}</p>
+            <p>Location Recommendation : ${locationRecommendation}}</p>
+            <p>Target Audience Definition : ${targetAudienceDefinition}}</p>
+            <p>Marketing Suggestions : ${marketingSuggestions}}</p>
+            <p>Operations Advice : ${operationsAdvice}}</p>
+            <p>Legal Considerations : ${legalConsiderations}}</p>
+            <p>Growth Strategy : ${growthStrategy}}</p>
+            <p>Common Pit falls : ${commonPitfalls}}</p>
+            <p>Summary Recommendation : ${summaryRecommendation}}</p>
+          `
+        );
 
         return res.status(201).json({ success: true, consultsncyId : consultancyServiceResult._id });
 

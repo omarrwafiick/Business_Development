@@ -30,7 +30,7 @@ export default function SalesService() {
       };
       await salesOptimizationService(applicantId, applicationId, data);
       toaster.success("Service request was sent successfully");
-      navigate("/review");
+      navigate("/payment");
     } catch (error) {
       toaster.error(`Error : ${error}`);
     }

@@ -13,15 +13,15 @@ export const getSalesOptimizationServicePremium= async (applicantid, application
 
 export const locationMarkrtAnalysisService = async (applicantid, applicationid) => api.post(domain+`/location-markrt-analysis-service/${applicantid}/${applicationid}`);
 
-export const locationMarkrtAnalysisServiceFree = async (applicantid, applicationid) => api.get(domain+`/location-markrt-analysis-free-trial-service/${applicantid}/${applicationid}`);
+export const getLocationMarkrtAnalysisServiceFree = async (applicantid, applicationid) => api.get(domain+`/location-markrt-analysis-free-trial-service/${applicantid}/${applicationid}`);
 
-export const locationMarkrtAnalysisServicePremium= async (applicantid, applicationid) => api.get(domain+`/location-markrt-analysis-premium-service/${applicantid}/${applicationid}`);
+export const getLocationMarkrtAnalysisServicePremium= async (applicantid, applicationid) => api.get(domain+`/location-markrt-analysis-premium-service/${applicantid}/${applicationid}`);
 
 export const financialPlanningService = async (applicantid, applicationid, data) => api.post(domain+`/financial-planning-service/${applicantid}/${applicationid}`, data);
 
-export const financialPlanningServiceFree = async (applicantid, applicationid) => api.get(domain+`/financial-planning-free-trial-service/${applicantid}/${applicationid}`);
+export const getFinancialPlanningServiceFree = async (applicantid, applicationid) => api.get(domain+`/financial-planning-free-trial-service/${applicantid}/${applicationid}`);
 
-export const financialPlanningServicePremium= async (applicantid, applicationid) => api.get(domain+`/financial-planning-premium-service/${applicantid}/${applicationid}`);
+export const getFinancialPlanningServicePremium= async (applicantid, applicationid) => api.get(domain+`/financial-planning-premium-service/${applicantid}/${applicationid}`);
 
 export const getConsultantApplications= async (id) => api.get(domain+`/consultant-applications/${id}`);
 

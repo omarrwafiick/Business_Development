@@ -6,7 +6,7 @@ import { Link } from 'react-router-dom';
 import { HeartHandshake } from 'lucide-react'; 
 import { useNavigate } from 'react-router-dom';
 import toaster from 'react-hot-toast';
-import Review from '../pages/review' 
+import Review from '../components/review' 
 import { consultancyService } from '../services/service'; 
 import AppStore from '../store/store';
 

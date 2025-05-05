@@ -1,7 +1,6 @@
 import { ListCheckIcon } from 'lucide-react'
 import React from 'react' 
-import { Link } from 'react-router-dom'
-import { BarChartGraph  } from '../components/graph'
+import { Link } from 'react-router-dom' 
 
 export default function Review({data, isPart=false}) {
   return (
@@ -42,12 +41,6 @@ export default function Review({data, isPart=false}) {
                       }
               </tbody>
           </table>
-          <BarChartGraph data={ [
-                        { name: 'Jan', revenue: 4000 },
-                        { name: 'Feb', revenue: 3000 },
-                        { name: 'Mar', revenue: 2000 },
-                        { name: 'Apr', revenue: 2780 },
-                        ]} />
       </div>
      { isPart ? <></> :
      <p className='capitalize mt-3!'>back{"  "}<Link className='underline underline-offset-2 font-medium cursor-pointer' to="/">home?</Link></p>} 

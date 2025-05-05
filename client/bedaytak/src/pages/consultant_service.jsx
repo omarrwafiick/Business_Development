@@ -32,7 +32,7 @@ export default function ConsultantService() {
       }; 
       await seedConsultantService(applicantId, applicationId, data);
       navigate("/");
-      toaster.success("Consultation data was sent successfully, wait for consultant response");
+      toaster.success("Consultation data was sent successfully, wait for consultant response via your email address");
     } catch (error) {
     toaster.error(`Error : ${error}`);
     }
