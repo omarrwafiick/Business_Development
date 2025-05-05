@@ -5,6 +5,6 @@ const { VerifyTokenByRole } = require('../middlewares/verifyByRole');
 
 router.use(VerifyTokenByRole(String(process.env.BUSINESS_OWNER)));
     
-router.get('/get', getAllLocation);  
+router.get('/getall', getAllLocation);  
 
 module.exports = router;

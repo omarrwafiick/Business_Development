@@ -1,6 +1,7 @@
 const Consultant = require("../models/consultant.model");  
 const User = require("../models/user.model");  
 const Qualifications = require("../models/qualification.model");  
+const Qualification = require("../models/qualification.model");
 
 const getAllConsultants = async (req, res) => {
     try {       
@@ -95,4 +96,18 @@ const deleteConsultant = async (req, res) => {
     }
 }; 
   
-module.exports = { getAllConsultants, getConsultantById, updateConsultant, deleteConsultant }; 
+const getQualifications = async (req, res) => {
+    try {       
+        const qualifications = await Qualification.find();
+            
+        if(qualifications.length === 0){
+            return res.status(404).json({ success: false, message: "No qualification was found"}); 
+        };  
+    
+        return res.status(200).json({ success: true, qualifications });    
+    
+        } catch (error) {
+            return res.status(500).json({ message: 'Internal server error' });
+        } 
+};   
+module.exports = { getAllConsultants, getConsultantById, updateConsultant, deleteConsultant, getQualifications }; 

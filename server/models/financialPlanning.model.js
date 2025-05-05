@@ -15,11 +15,8 @@ const financialPlanningSchema = new mongoose.Schema({
   locationMarketScore: { type: Number }, 
   competitiveInsight: { type: String },
   suggestedStrategy: { type: String },
-  chartImage: { type: Buffer },
-  chartImageType: { type: String },
   reportPublishedAt: { type: Date, default: Date.now }
 });
-
 
 const FinancialPlanning = mongoose.model('FinancialPlanning', financialPlanningSchema);
   

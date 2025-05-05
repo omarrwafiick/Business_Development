@@ -3,9 +3,9 @@ const Categories = require("../models/category.model");
 
 const addBusiness = async (req, res) => {
     try {   
-        const { name, description, ownerId, categoryId } = req.body;
+        const { name, description, ownerId, categoryId, locationName } = req.body;
  
-        if(!name || !description || !ownerId || !categoryId){
+        if(!name || !description || !ownerId || !categoryId || !locationName){
             throw new Error("All fields are required!");
         }  
         
@@ -19,7 +19,8 @@ const addBusiness = async (req, res) => {
             name, 
             description, 
             ownerId, 
-            categoryId
+            categoryId,
+            locationName
         });   
 
         if (!newBusiness || !newBusiness._id) { 

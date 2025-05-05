@@ -9,23 +9,26 @@ const ContactUs = require('../models/contact.model');
    
 const SignUp = async (req, res) => {  
     try {
-        const { fullName, email, password, phoneNumber } = req.body;
-
-        if (!fullName || !email || !password || !phoneNumber) {
+        const { fullName, email, password, phoneNumber, role } = req.body;
+        
+        if(role.toLowerCase() !== process.env.ENTREPRENEUR.toLowerCase() || role.toLowerCase() !== process.env.BUSINESS_OWNER.toLowerCase() )
+        {
+            return res.status(400).json({ success: false, message: "You can not modify role" });
+        }
+        if (!fullName || !email || !password || !phoneNumber || !role) {
             return res.status(400).json({ success: false, message: "All fields are required!" });
         }
-        const result = await createUser({fullName, email, password, phoneNumber, roleName: String(process.env.ENTREPRENEUR)});
+        const result = await createUser({fullName, email, password, phoneNumber, roleName: role});
 
         SetUpTokenToCookies(res, result._id);  
 
         res.status(201).json({
             success: true,
-            message: "User is created successfully",
-            user: { ...result._doc, password: undefined }
+            message: "User is created successfully"
         });
 
     } catch (error) {
-        return res.status(400).json({ success: false, message: error.message });
+        return res.status(400).json({ success: false, user: {...result._doc, password: undefined} });
     }
 }; 
 
@@ -133,7 +136,7 @@ const CheckAuth = async (req, res) =>{
         if(!user){
             return res.status(404).json({success : false, message : "User was not found"});
         }
-        res.status(200).json({success: true,  user: {...user._doc, password: undefined}});
+        res.status(200).json({success: true,  message: "User is authenticated"});
     } catch (error) {
         return res.status(400).json({success : false, message : error.message});
     }

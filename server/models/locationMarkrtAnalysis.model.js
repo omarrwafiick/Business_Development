@@ -10,14 +10,6 @@ const locationMarketAnalysisSchema = new mongoose.Schema({
     totalNearbyBusinesses: { type: Number, required: true },
     marketingStrategies: { type: [String], required: true },
     finalLocationAdvice: { type: String, required: true }, 
-    chartImage: {
-        type: Buffer, 
-        required: false  
-      },
-    chartImageType: {
-        type: String, 
-        required: false
-      },
     reportGeneratedAt: { type: Date, default: Date.now }
 }); 
     

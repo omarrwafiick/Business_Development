@@ -41,6 +41,9 @@ a {
 .bg-secondary{
   background-color: #F66A35;
 }
+.svg-secondary{
+  fill:#F66A35 !important;
+}
 .text-dark{
   color: #2E2E2E;
 }

@@ -8,7 +8,7 @@ export default function Team({name, role, imageUrl, style}) {
         </div>
         <div className='flex flex-col justify-center items-center mt-4 w-9/12'> 
             <h1 className='text-2xl capitalize font-bold mb-2!'>{name}</h1>
-            <h3 className='capitalize text-md opacity-55 leading-5 text-start'>{role}</h3>
+            <h3 className='font-inter capitalize text-md opacity-55 leading-5 text-start'>{role}</h3>
         </div>
     </div>
   )

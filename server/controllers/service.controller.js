@@ -1,6 +1,5 @@
 const { default: mongoose } = require('mongoose');
 const Application = require('../models/application.model');
-const { generateChart } = require('../services/generateGraph.service');
 const Consultancy = require('../models/consultancy.model'); 
 const Service = require('../models/service.model'); 
 const Consultant = require('../models/consultant.model');  
@@ -10,6 +9,7 @@ const LocationMarketAnalysis = require('../models/locationMarkrtAnalysis.model')
 const SalesRevenueOptimization = require('../models/salesRevenueOptimization.model'); 
 const User = require('../models/user.model'); 
 const { VerifyApplication, VerifyService } = require('../utilities/common');
+const Mailing = require('../services/mailing.service');
 
 const addServiceApplication = async (req, res) => {  
     try {  
@@ -217,16 +217,6 @@ const locationMarkrtAnalysisService = async (req, res) => {
  
     const totalNearbyBusinesses = await Location.find({name: businessLocation.name});
 
-    const imageBuffer = await generateChart({
-      labels: ['Same Category Nearby', 'Total Near by Businesses'],
-      data: [
-        sameCategoryNearby, 
-        totalNearbyBusinesses.count
-      ],
-      colors: ['#FF6384', '#36A2EB'],
-      title: 'Location Analysis'
-    });
-
     const analysisData = {
       applicantId,
       businessId: business._id,
@@ -237,9 +227,7 @@ const locationMarkrtAnalysisService = async (req, res) => {
       totalNearbyBusinesses: totalNearbyBusinesses.count, 
       competitionLevel,
       marketingStrategies,
-      finalLocationAdvice,
-      chartImage: imageBuffer,
-      chartImageType: 'image/png'
+      finalLocationAdvice
     };
 
     const newLocation = await LocationMarketAnalysis.create(analysisData);
@@ -372,19 +360,7 @@ const salesRevenueOptimizationService = async (req, res) => {
     //todos :make it dynamic
     if (numberOfEmployees < 2) revenueRiskFactors.push("Low staffing may limit service capacity");
     if (averagePrice < 10) revenueRiskFactors.push("Low product pricing reduces margin buffer");
-    if (estimatedRevenue < 10000) revenueRiskFactors.push("Revenue below sustainability threshold");
-
-    const imageBuffer = await generateChart({
-      labels: ['Avg Price (USD)', 'Expected Daily Sales', 'Working Days/Month', 'Est. Monthly Revenue (USD)'],
-      data: [
-        averagePrice,
-        expectedDailySales,
-        workingDays,
-        estimatedRevenue
-      ],
-      colors: ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0'],
-      title: `Sales Revenue Insight for ${business.name || 'Your Business'}`
-    });    
+    if (estimatedRevenue < 10000) revenueRiskFactors.push("Revenue below sustainability threshold");  
 
     const salesData = {
       applicantId,
@@ -400,9 +376,7 @@ const salesRevenueOptimizationService = async (req, res) => {
       upsellOpportunities,
       revenueBoostIdeas,
       revenueRiskFactors, 
-      finalOptimizationAdvice,
-      chartImage: imageBuffer,
-      chartImageType: 'image/png'
+      finalOptimizationAdvice
     };
 
     const newSales = await SalesRevenueOptimization.create(salesData);
@@ -551,15 +525,8 @@ const financialPlanningService = async (req, res) => {
     } else {
       competitiveInsight = 'Low competition';
       suggestedStrategy = 'Capitalize on first-mover advantage';
-    }
-     
-    const chartImage = await generateChart({
-      labels: ['Startup Cost', 'Monthly Costs', 'Monthly Revenue', '6-Month ROI'],
-      data: [startupCost, monthlyCosts, monthlyRevenue, roi6Months],
-      colors: ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0'],
-      title: 'Business Financial Summary'
-    });
-    
+    } 
+
     const financialPlan = await FinancialPlanning.create({
       applicantId,
       businessId: business._id,
@@ -573,9 +540,7 @@ const financialPlanningService = async (req, res) => {
       financialHealthIndex,
       locationMarketScore,
       competitiveInsight,
-      suggestedStrategy,
-      chartImage,
-      chartImageType: 'image/png'
+      suggestedStrategy
     });
     
     application.status = 'Approved';
@@ -610,8 +575,7 @@ const financialPlanningFreeTrialService  = async (req, res) => {
       return res.status(200).json({ success: true, 
           data :{
               breakEvenMonths: serviceExist.breakEvenMonths,
-              financialHealthIndex: serviceExist.financialHealthIndex, 
-              graphImage: `data:${serviceExist.chartImageType};base64,${serviceExist.chartImage.toString('base64')}`
+              financialHealthIndex: serviceExist.financialHealthIndex
           }
        });
   
@@ -634,17 +598,12 @@ const financialPlanningPremiumService  = async (req, res) => {
    
       if (!serviceExist) {
         return res.status(404).json({ success: false, message: "No service was found" });
-      }  
-      const serviceData = serviceExist.toObject ? serviceExist.toObject() : { ...serviceExist };
-
-      delete serviceData.chartImage;
-      delete serviceData.chartImageType;
-
+      }   
+ 
       return res.status(200).json({ 
         success: true,
         data: {
-          ...serviceData,
-          graphImage: `data:${serviceExist.chartImageType};base64,${serviceExist.chartImage.toString('base64')}`
+          ...serviceExist
         }
       }); 
   
@@ -658,7 +617,7 @@ const seedDataToConsultant  = async (req, res) => {
       const { 
           consultantId,  
           businessIdea,
-          stageOfBusiness,
+          stageOfBusiness, 
           targetMarket,
           monthlyBudget,
           mainGoal
@@ -739,7 +698,7 @@ const consultancyService  = async (req, res) => {
             growthStrategy,
             commonPitfalls,
             summaryRecommendation
-            } = req.body;
+        } = req.body;
 
         if(!businessOverview || !industryAnalysis || !competitorInsights || !locationRecommendation 
            || !targetAudienceDefinition || !marketingSuggestions || !operationsAdvice || !legalConsiderations ||
@@ -791,6 +750,26 @@ const consultancyService  = async (req, res) => {
         application.status = 'Approved';
         await application.save();
 
+        const user = await User.findById(applicantId);
+        await Mailing(
+          user.email,
+          'Consultancy Service Response',
+          `
+            <p>This is your consultancy results as you applied for - all fields corresponds to your business data you provided</p>  
+            <p>Business Overview : ${businessOverview}}</p>
+            <p>Industry Analysis : ${industryAnalysis}}</p>
+            <p>Competitor Insights: ${competitorInsights}}</p>
+            <p>Location Recommendation : ${locationRecommendation}}</p>
+            <p>Target Audience Definition : ${targetAudienceDefinition}}</p>
+            <p>Marketing Suggestions : ${marketingSuggestions}}</p>
+            <p>Operations Advice : ${operationsAdvice}}</p>
+            <p>Legal Considerations : ${legalConsiderations}}</p>
+            <p>Growth Strategy : ${growthStrategy}}</p>
+            <p>Common Pit falls : ${commonPitfalls}}</p>
+            <p>Summary Recommendation : ${summaryRecommendation}}</p>
+          `
+        );
+
         return res.status(201).json({ success: true, consultsncyId : consultancyServiceResult._id });
 
     } catch (error) {
@@ -798,6 +777,34 @@ const consultancyService  = async (req, res) => {
         return res.status(500).json({ message: 'Internal server error', error: error.message });
     }
 }; 
+
+const getConsultancyResult = async (req, res) => { 
+  try {  
+     const applicantId = req.params.applicantid;
+     const applicationId = req.params.applicationid;
+
+     const application = await VerifyApplication(applicantId, applicationId);
+
+     if (!application) {
+       return res.status(404).json({ success: false, message: "Application not found" });
+     }
+
+     const serviceExist = await Consultancy.findOne({applicantId: applicantId, applicationId: applicationId});
+
+     if (!serviceExist) {
+       return res.status(404).json({ success: false, message: "No service was found" });
+     }  
+     
+     return res.status(200).json({ success: true, 
+         data :{
+             ...serviceExist
+         }
+      });
+ 
+   } catch (error) {
+     return res.status(500).json({ message: 'Internal server error', error: error.message });
+   }
+};
 
 const getApplicationStatus = async (req, res) => {
     try {
@@ -838,15 +845,16 @@ const getUserApplications = async (req, res) => {
 };
 
 const getConsultantApplications = async (req, res) => {
-  try {
-    //if status is pending mean consultant can respond to application 
-    const applications = await Application.find({status: "Pending"}).limit(10); 
+  try { 
+    const consultantId = req.params.consultantid;
 
-    if (!applications) {  
-      return res.status(404).json({ success: false, message: "No application was found" });
-    } 
+    const consultations = await Consultancy.findById(consultantId).limit(10); 
 
-    return res.status(200).json({ success: true, data: applications });
+    if (!consultations) {  
+      return res.status(404).json({ success: false, message: "No consultation was found" });
+    }  
+
+    return res.status(200).json({ success: true, data: consultations });
 
   } catch (error) {
     return res.status(500).json({ message: 'Internal server error', error });
@@ -947,10 +955,50 @@ const updatePaymentStatus = async (req, res) => {
         } 
 };
 
+const integratedReport = async (req, res) => {
+  try {     
+    const applicantId = req.params.applicantid; 
+
+    const user = await User.findById(applicantId);
+
+    if (!user) { 
+        return res.status(400).json({success: false, message: "No service result was found"});
+    }  
+    const consultancyResult = await Consultancy.find({applicantId}).populate('applicationId');
+    const financialPlannigResult = await FinancialPlanning.find({applicantId}).populate('applicationId');
+    const locationAnalysisResult = await LocationMarketAnalysis.find({applicantId}).populate('applicationId');
+    const salesOptimizationResult = await SalesRevenueOptimization.find({applicantId}).populate('applicationId');
+
+    consultancyResult = consultancyResult[consultancyResult.length-1];
+    financialPlannigResult = financialPlannigResult[financialPlannigResult.length-1];
+    locationAnalysisResult = locationAnalysisResult[locationAnalysisResult.length-1];
+    salesOptimizationResult = salesOptimizationResult[salesOptimizationResult.length-1];
+    
+    if(
+      !consultancyResult.applicantId.paymentStatus ||
+      !financialPlannigResult.applicantId.paymentStatus ||
+      !locationAnalysisResult.applicantId.paymentStatus ||
+      !salesOptimizationResult.applicantId.paymentStatus
+    ){
+      return res.status(400).json({success: false, message: "Service is not paid"});
+    }
+    return res.status(200).json({ success: true, servicesResult : {
+      consultancyResult,
+      financialPlannigResult,
+      locationAnalysisResult,
+      salesOptimizationResult
+    }});    
+  
+    }catch (error) {
+        return res.status(500).json({ message: 'Internal server error', error });
+    } 
+};
+
 module.exports = { 
     locationMarkrtAnalysisService, locationMarkrtAnalysisFreeTrialService, locationMarkrtAnalysisPremiumService,
     salesRevenueOptimizationService, salesRevenueOptimizationFreeTrialService, salesRevenueOptimizationPremiumService,
     financialPlanningService, financialPlanningFreeTrialService,financialPlanningPremiumService, consultancyService,
     getApplicationStatus, updateApplication, updatePaymentStatus, addServiceApplication, getUserApplications, 
-    getConsultantApplications, getAllConsultants, getAllServices, seedDataToConsultant, businessGuideService
+    getConsultantApplications, getAllConsultants, getAllServices, seedDataToConsultant, businessGuideService, 
+    getConsultancyResult, integratedReport
 }; 
