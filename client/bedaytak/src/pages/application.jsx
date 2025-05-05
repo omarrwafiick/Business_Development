@@ -4,16 +4,34 @@ import CustomeButton from '../components/custome_button'
 import { Link } from 'react-router-dom'; 
 import { ClipboardList } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import toaster from 'react-hot-toast';
+import toaster from 'react-hot-toast'; 
+import AppStore from '../store/store';
+import { addApplicationForService } from '../services/service'; 
+import AppStore from '../store/store';
 
 export default function Application() {
+  const { serviceName, services, applicationId } = AppStore();
+  const serviceRoutes = [
+    ['Financial Planning','/feasibility-service'],
+    ['Sales and revenue optimization', '/sales-service'],
+    ['Consultation', '/consultant-select'],
+    ['Location and markrt analysis', '/location-service']
+  ]
   const navigate = useNavigate();
   const serviceSubmit = async (e) => {   
     e.preventDefault(); 
-    try {
-    //request
-    navigate("");
-    toaster.success("Successfully");
+    try { 
+      let serviceId = services.filter(x => x.name.toLocaleLowerCase() === serviceName.toLocaleLowerCase())._id;
+      await addApplicationForService(applicationId,
+        {
+          serviceId,
+          status:'Approved',
+          paymentStatus: false,
+        }
+      );
+      let route = serviceRoutes.filter(x => x[0].toLocaleLowerCase() === serviceName.toLocaleLowerCase());
+      navigate(route[1]);
+      toaster.success("application was sent successfully");
     } catch (error) {
     toaster.error(`Error : ${error}`);
     }

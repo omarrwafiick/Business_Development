@@ -1,12 +1,11 @@
 import { create } from 'zustand';
 
-
 const extractRole = (token)=>{
   const payloadBase64 = token.split('.')[1];
   const payloadJson = atob(payloadBase64);  
   const payload = JSON.parse(payloadJson);  
   return payload.userRole;
-}
+};
 
 const AppStore = create((set) => ({
   applicationId:null,
@@ -35,7 +34,11 @@ const AppStore = create((set) => ({
   setToken: (newToken) => {
     const userRole = extractRole(newToken);
     set({ token: newToken, role: userRole, isAuthenticated: true });
-  },
+  }, 
+  consultationData:null,
+  setconsultationData:(data) => set({ consultationData: data }),
+  reviewData:null,
+  setReviewData:(data) => set({ reviewData: data }),
 }));
 
 export default AppStore;

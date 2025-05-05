@@ -1,16 +1,19 @@
 import React from 'react'
 import CustomeButton from '../components/custome_button'
 import { useNavigate } from 'react-router-dom';
-import toaster from 'react-hot-toast';
+import toaster from 'react-hot-toast'; 
+import AppStore from '../store/store'; 
 
-export default function ConsultantCard({name, experienceYears, qualifications}) {
-    const navigate = useNavigate();
-    const serviceSubmit = () => { 
+export default function ConsultantCard({id, name, experienceYears, qualifications}) {
+   const setConsultant = AppStore.getState().setConsultandId;
+   const navigate = useNavigate(); 
+
+   const serviceSubmit = () => { 
         e.preventDefault(); 
-        try {
-        //request
-        navigate("");  
-        } catch (error) {
+        try { 
+        setConsultant(id);
+        navigate("/consultant-applications");  
+        } catch (error) { 
         toaster.error(`Error : ${error}`);
         }
     };
@@ -23,7 +26,7 @@ export default function ConsultantCard({name, experienceYears, qualifications}) 
                 <h1 className='text-xl opacity-90 mt-3! mb-3!'><a className='font-bold'>Qualifications list :</a></h1>
                 {
                     qualifications?.map((item, index) => ( 
-                        <p className='capitalize text-md opacity-90 leading-7'>{item}</p>
+                        <p className='capitalize text-md opacity-90 leading-7'>{item.title}</p>
                     ))
                 } 
                  <form onSubmit={serviceSubmit} className='w-full mt-3'>   

@@ -11,7 +11,7 @@ export const getSalesOptimizationServiceFree = async (applicantid, applicationid
 
 export const getSalesOptimizationServicePremium= async (applicantid, applicationid) => api.get(domain+`/sales-revenue-optimization-premium-service/${applicantid}/${applicationid}`);
 
-export const locationMarkrtAnalysisService = async (applicantid, applicationid, data) => api.post(domain+`/location-markrt-analysis-service/${applicantid}/${applicationid}`, data);
+export const locationMarkrtAnalysisService = async (applicantid, applicationid) => api.post(domain+`/location-markrt-analysis-service/${applicantid}/${applicationid}`);
 
 export const locationMarkrtAnalysisServiceFree = async (applicantid, applicationid) => api.get(domain+`/location-markrt-analysis-free-trial-service/${applicantid}/${applicationid}`);
 
@@ -23,7 +23,7 @@ export const financialPlanningServiceFree = async (applicantid, applicationid) =
 
 export const financialPlanningServicePremium= async (applicantid, applicationid) => api.get(domain+`/financial-planning-premium-service/${applicantid}/${applicationid}`);
 
-export const getConsultantApplications= async () => api.get(domain+'/consultant-applications');
+export const getConsultantApplications= async (id) => api.get(domain+`/consultant-applications/${id}`);
 
 export const getApplicationStatus = async ( applicationid ) => api.get(domain+`/getstatus/${applicationid}`);
 
@@ -38,3 +38,5 @@ export const consultancyService = async (applicantid, applicationid, consultency
 export const getConsultancyServiceResult = async (applicantid, applicationid) => api.get(domain+`/consultancy/${applicantid}/${applicationid}`);
 
 export const getAllServices= async () => api.get(domain+"/get-services");
+
+export const getIntegratedReport = async (applicantid) => api.get(domain+`/report/${applicantid}`);

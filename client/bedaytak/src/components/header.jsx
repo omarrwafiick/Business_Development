@@ -40,7 +40,7 @@ export default function Header() {
             </div>    
 
             <div className="items-center justify-end hidden w-full md:flex md:w-auto md:order-1 relative" id="navbar-user">
-                <Bell onClick={() => setNotificationState(!notificationState)} className='cursor-pointer' size={30} color="#15A0DC" />
+                <Bell onClick={() => setNotificationState(!notificationState)} className='rounded-full cursor-pointer hover:scale-115 ease-in-out duration-300 hover:bg-zinc-400 hover:filter:drop-shadow(0 4px 3px rgb(59, 59, 255 / 0.1))' size={30} color="#15A0DC" />
                 <div className={`h-96 top-12 -right-12 w-72 bg-white absolute rounded-3xl border-2 border-black/30 p-3 scroll-auto overflow-auto
                 ${notificationState ? 'visible' : 'hidden'}`}>
                     <h1>application#</h1>

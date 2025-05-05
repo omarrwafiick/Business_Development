@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useRef, useState } from 'react'
 import { Home } from 'lucide-react';
 import { motion } from 'framer-motion';
 import CustomeButton from '../components/custome_button'
@@ -57,9 +57,9 @@ export default function Login() {
                   <CustomeInput value={email} onChange={ (e) => setEmail(e.target.value) } name={"email"} type={"email"}/> 
                   <PasswordInput value={password} onChange={ (e) => setPassword(e.target.value) } name={"password"} />
                   <div className='w-full flex justify-between mb-2'>
-                    <div class="flex items-center">
-                        <input id="checked-checkbox" type="checkbox" value="" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded-sm focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600" />
-                        <label for="checked-checkbox" class="ms-2 text-sm font-medium capitalize text-gray-900 dark:text-gray-300">remeber me?</label>
+                    <div className="flex items-center">
+                        <input id="checked-checkbox" type="checkbox" value="" className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded-sm focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600" />
+                        <label htmlFor="checked-checkbox" className="ms-2 text-sm font-medium capitalize text-gray-900 dark:text-gray-300">remeber me?</label>
                     </div>
                     <Link className='capitalize cursor-pointer' to="/forget-password">forget password</Link>
                   </div>

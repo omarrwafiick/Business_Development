@@ -1,4 +1,4 @@
-import React, { useEffect, useLayoutEffect, useRef } from 'react'
+import React, { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import cover from '../assets/images/cover.png'; 
 import contact from '../assets/images/contact.jpg'; 
 import SmallButton from '../components/small-button'
@@ -6,7 +6,7 @@ import Card from '../components/card';
 import Card2 from '../components/card2';
 import { BriefcaseBusiness, User, Clock, MessageSquare, Users, Heart, CircleDollarSign, 
         NotebookIcon, BanknoteArrowUp, HeartHandshake, IdCard, LocationEdit, CodesandboxIcon, 
-        Facebook, Instagram, Linkedin, Youtube } from 'lucide-react';
+} from 'lucide-react';
 import Team from '../components/team';
 import CustomeInput from '../components/custome_input';
 import CustomeButton from '../components/custome_button';
@@ -20,13 +20,27 @@ import Person2 from '../assets/images/person2.png';
 import Person3 from '../assets/images/person3.png'; 
 import PriceCard from '../components/price-card';
 import { motion, useAnimation } from "framer-motion";  
-import { useInView } from "react-intersection-observer";
-import CustomeIcon from '../components/custome-icon'; 
+import { useInView } from "react-intersection-observer"; 
 import AppStore from '../store/store';
+import { Title, Meta } from 'react-head';
+import SocialMediaBar from '../components/socialmedia-bar';
+import { contact } from '../services/contact'; 
+import toaster from 'react-hot-toast';
 
 export default function Home() {
-  const messageSubmit = () =>{
+  const form = useRef(); 
+  const { user } = AppStore();
+  const [message, setMessage] = useState('');
+  const [subject, setSubject] = useState('');
 
+  const messageSubmit = async (e) =>{
+    try { 
+      await businessGuideService(user._id, {subject, message}); 
+      toaster.success("Message was sent successfully");
+    } catch (error) {
+      toaster.error(`Error : ${error}`);
+    }
+    form.current.reset();
   };  
   const setServiceName = AppStore.getState().setchosenService;
   const heroRef = useRef(null); 
@@ -83,7 +97,9 @@ export default function Home() {
   };
 
   return ( 
-    <div className='mt-16 w-full flex flex-col justify-center items-center '>
+    <div className='mt-16 w-full flex flex-col justify-center items-center'>
+        <Title>Bedaytak - Home</Title>
+        <Meta name="description" content="My app description" />
         <motion.div ref={heroRef} id="hero"
           variants={{
             hidden:{opacity:0, y:75},
@@ -114,10 +130,7 @@ export default function Home() {
                     <SmallButton name="Apply Now" style={'bg-secondary text-white! ms-3!'} to="application"/>
                 </div>
                 <div className='flex justify-start items-center w-full mt-8'>
-                  <CustomeIcon icon={<Facebook className='p-2' size={50} color="#F66A35"/>} />
-                  <CustomeIcon icon={<Instagram className='p-2' size={50} color="#F66A35"/>} />
-                  <CustomeIcon icon={<Linkedin className='p-2' size={50} color="#F66A35"/>} />
-                  <CustomeIcon icon={<Youtube className='p-2' size={50} color="#F66A35"/>} />   
+                  <SocialMediaBar style={'fill-black'} />
                 </div>
               </div> 
             </div>
@@ -220,7 +233,7 @@ export default function Home() {
           <p className='font-inter text-white opacity-70 text-sm w-8/12 text-center mt-8! leading-6 capitalize mb-10!'>Lorem ipsum dolor sit amet consectetur adipisicing elit. Quae voluptatibus vel expedita culpa voluptate voluptatum nostrum esse sequi et veniam qui, dignissimos animi, ea, ducimus deserunt repellendus vitae aliquid ut!</p>
           
           <div className='w-10/12 grid grid-cols-3 gap-8 mt-6'>
-                <Link to="/application" onClick={()=>{ setServiceName("Business guide") }}><Card2 
+                <Link to="/guidance-service"><Card2 
                   style='text-white'
                   mode={false} 
                   icon={ <NotebookIcon size={45} color="#FFFFFF" /> }
@@ -298,10 +311,10 @@ export default function Home() {
           <h1 className='capitalize font-bold text-6xl'>contact us!</h1>
           <p className='font-inter opacity-70 text-sm w-8/12 text-center mt-8! leading-6 capitalize mb-10!'>Lorem ipsum dolor sit amet consectetur adipisicing elit. Quae voluptatibus vel expedita culpa voluptate voluptatum nostrum esse sequi et veniam qui, dignissimos animi, ea, ducimus deserunt repellendus vitae aliquid ut!</p>
           <div className='flex justify-evenly items-center  w-10/12'>
-            <form onSubmit={messageSubmit} className='w-6/12 flex flex-col justify-between items-evenly mt-3 pe-6'> 
+            <form ref={form} onSubmit={messageSubmit} className='w-6/12 flex flex-col justify-between items-evenly mt-3 pe-6'> 
                 <span className='w-full flex justify-center'><CodesandboxIcon size={115} color="#F66A35" /></span>
-                <CustomeInput name={"message"} type={"text"}/> 
-                <CustomeTextarea name={"subject"} rowNum="5" type={"text"}/>   
+                <CustomeInput value={message} onChange={(e)=> setMessage(e.target.value)} name={"message"} type={"text"}/> 
+                <CustomeTextarea value={subject} onChange={(e)=> setSubject(e.target.value)} name={"subject"} rowNum="5" type={"text"}/>   
                 <CustomeButton name={"contact"} /> 
             </form> 
             <div className='w-6/12'>

@@ -4,7 +4,7 @@ const {
     salesRevenueOptimizationPremiumService, financialPlanningService, financialPlanningFreeTrialService,financialPlanningPremiumService,
     locationMarkrtAnalysisFreeTrialService, locationMarkrtAnalysisPremiumService,consultancyService, getApplicationStatus, 
     updateApplication, updatePaymentStatus, addServiceApplication, getUserApplications, getConsultantApplications, getAllConsultants, 
-    getAllServices, seedDataToConsultant, businessGuideService, getConsultancyResult
+    getAllServices, seedDataToConsultant, businessGuideService, getConsultancyResult, integratedReport
 } = require('../controllers/service.controller');
 const router = express.Router(); 
 const { VerifyToken } = require('../middlewares/verifyToken');  
@@ -47,7 +47,7 @@ router.get('/get-services', getAllServices);
 
 router.get('/user/:applicantId', getUserApplications);
 
-router.get('/consultant-applications', getConsultantApplications);
+router.get('/consultant-applications/:consultantid', getConsultantApplications);
 
 router.get('/getstatus/:id', getApplicationStatus);
 
@@ -58,6 +58,8 @@ router.put('/update/paymentstatus/:id', validateInputs(paymentStatusSchema), upd
 router.post('/seed-consultant/:applicantid/:applicationid', validateInputs(seedConsultantSchema), seedDataToConsultant);
 
 router.get('/consultancy/:applicantid/:applicationid', getConsultancyResult);
+
+router.get('/report/:applicantid', integratedReport);
 
 router.use(VerifyTokenByRole(String(process.env.CONSULTANT)));
 

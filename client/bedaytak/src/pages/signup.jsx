@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useRef, useState } from 'react'
 import { PackagePlus } from 'lucide-react';
 import { motion } from 'framer-motion';
 import CustomeButton from '../components/custome_button'
@@ -60,11 +60,11 @@ export default function Signup() {
             <p className='opacity-80'>Already have an account?{" "}<Link className='underline underline-offset-2 font-medium cursor-pointer' to="/login">login</Link></p>
 
             <form ref={form} onSubmit={signupSubmit} className='w-full mt-3'>
-                <CustomeInput value={fullname} onClick={(e)=> setFullname(e.target.value)} name={"fullname"} type={"text"}/>
-                <CustomeInput value={email} onClick={(e)=> SetEmail(e.target.value)} name={"email"} type={"email"}/>
-                <CustomeInput value={phone} onClick={(e)=> setPhone(e.target.value)} name={"phone"} type={"text"}/> 
-                <PasswordInput value={password} onClick={(e)=> setPassword(e.target.value)} name={"password"} />
-                <PasswordInput value={confirmPassword} onClick={(e)=> setConfirmPassword(e.target.value)} name={"confirm password"} />
+                <CustomeInput value={fullname} onChange={(e)=> setFullname(e.target.value)} name={"fullname"} type={"text"}/>
+                <CustomeInput value={email} onChange={(e)=> SetEmail(e.target.value)} name={"email"} type={"email"}/>
+                <CustomeInput value={phone} onChange={(e)=> setPhone(e.target.value)} name={"phone"} type={"text"}/> 
+                <PasswordInput value={password} onChange={(e)=> setPassword(e.target.value)} name={"password"} />
+                <PasswordInput value={confirmPassword} onChange={(e)=> setConfirmPassword(e.target.value)} name={"confirm password"} />
                 <div className='w-full flex pt-2 pb-3'> 
                   <div class="flex items-center me-6">
                       <input 

@@ -18,6 +18,7 @@ import Payment from '../pages/payment';
 import Review from '../pages/review';
 import SalesService from '../pages/sales_service';
 import ChooseConsultant from '../pages/choose-consultant'; 
+import IntegratedReport from '../pages/integrated-report';
 import ConsultantApplications from '../pages/consultant-applications';
 import AdminRoute from '../components/admin-route';
 import ConsultantRoute from '../components/consultant-route';
@@ -44,6 +45,7 @@ const RoutesConfig  = () => (
     <Route path="/location-service" element={<LocationService />} />
     <Route path="/payment" element={<Payment />} />
     <Route path="/sales-service" element={<SalesService />} />
+    <Route path="/report" element={<IntegratedReport />} />
     <Route path="/review" element={<Review />} />
     <Route path="*" element={<NotFound />} />
   </Routes>

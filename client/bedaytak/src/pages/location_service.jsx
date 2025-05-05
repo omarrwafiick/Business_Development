@@ -5,18 +5,21 @@ import { Link } from 'react-router-dom';
 import { LocationEditIcon } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import toaster from 'react-hot-toast';
+import { locationMarkrtAnalysisService } from '../services/service'; 
+import AppStore from '../store/store';
 
 export default function LocationService() { 
-    const navigate = useNavigate();
+    const navigate = useNavigate(); 
+    const { applicationId, applicantId } = AppStore();
     const serviceSubmit = async (e) => {   
       e.preventDefault(); 
         try {
-        //request
-            navigate("");
-            toaster.success("Successfully");
-        } catch (error) {
+            await locationMarkrtAnalysisService(applicantId, applicationId);
+            toaster.success("Service request was sent successfully");
+            navigate("/review");
+        } catch (error) { 
             toaster.error(`Error : ${error}`);
-    }
+        }
     };
   return (
     <div className='flex justify-center items-center flex-col w-full h-dvh'>

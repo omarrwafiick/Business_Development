@@ -1,4 +1,4 @@
-import React from 'react' 
+import React, { useState } from 'react' 
 import { motion } from 'framer-motion';
 import CustomeButton from '../components/custome_button'
 import CustomeInput from '../components/custome_input'
@@ -6,15 +6,26 @@ import { Link } from 'react-router-dom';
 import { CircleDollarSign } from 'lucide-react'; 
 import { useNavigate } from 'react-router-dom';
 import toaster from 'react-hot-toast';
+import { financialPlanningService } from '../services/service'; 
+import AppStore from '../store/store';
 
 export default function FeasibilityService() {
+  const [revenue, setRevenue] = useState(0);
+  const [mCost, setMCost] = useState(0);
+  const [sCost, setSCost] = useState(0);
   const navigate = useNavigate();
+  const { applicationId, applicantId } = AppStore();
   const serviceSubmit = async (e) => {   
     e.preventDefault(); 
-    try {
-    //request
-    navigate("");
-    toaster.success("Successfully");
+    try { 
+      const data = {
+        monthlyRevenue: revenue, 
+        monthlyCosts: mCost, 
+        startupCost: sCost
+      };
+      await financialPlanningService(applicantId, applicationId, data);
+      toaster.success("Service request was sent successfully");
+      navigate("/review"); 
     } catch (error) {
     toaster.error(`Error : ${error}`);
     }
@@ -34,9 +45,9 @@ export default function FeasibilityService() {
             <p className='text-sm mt-2! opacity-80 text-center'>Plan smarter with budgeting tools and financial strategies tailored to your business goals.</p>
   
             <form onSubmit={serviceSubmit} className='w-full mt-3'> 
-                <CustomeInput name={"Monthly Revenue"} type={"number"}/> 
-                <CustomeInput name={"Monthly Costs"} type={"number"}/> 
-                <CustomeInput name={"Startup Cost"} type={"number"}/>  
+                <CustomeInput value={revenue} onChange={(e)=> { setRevenue(e.target.value)}} name={"Monthly Revenue"} type={"number"}/> 
+                <CustomeInput value={mCost} onChange={(e)=> { setMCost(e.target.value)}} name={"Monthly Costs"} type={"number"}/> 
+                <CustomeInput value={sCost} onChange={(e)=> { setSCost(e.target.value)}} name={"Startup Cost"} type={"number"}/>  
                 <CustomeButton name={"submit"} />
             </form>
             <p className='capitalize mt-3!'>back{"  "}<Link className='underline underline-offset-2 font-medium cursor-pointer' to="/">home?</Link></p>

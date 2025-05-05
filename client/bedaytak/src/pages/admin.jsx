@@ -1,13 +1,13 @@
-import { TowerControlIcon, X } from 'lucide-react'
-import React, { useEffect, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { TowerControlIcon, X } from 'lucide-react';
+import React, { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import toaster from 'react-hot-toast';
 import { getUsers, deleteUser, addAdmin, addConsultant } from '../services/admin';
 import { getQualifications } from '../services/consultant'; 
-import CustomeInput from '../components/custome_input'
-import CustomeButton from '../components/custome_button'
-import PasswordInput from '../components/password-input'
-import CustomeMultipleSelect from '../components/custome-select-multiple'
+import CustomeInput from '../components/custome_input';
+import CustomeButton from '../components/custome_button';
+import PasswordInput from '../components/password-input';
+import CustomeMultipleSelect from '../components/custome-select-multiple';
  
 export default function Admin() {
   const [showAdminPopup, setShowAdminPopup] = useState(false);
@@ -24,12 +24,18 @@ export default function Admin() {
   const [password, setPassword] = useState(''); 
   const [phone, setPhone] = useState(''); 
   const [fullname, setFullname] = useState('');
-  useEffect(async ()=>{
+
+  const popStyle = "relative h-9/12 overflow-auto scroll-auto bg-white p-6 rounded-lg shadow-lg";
+  const popWrapperStyle = "fixed inset-0 bg-black/50 bg-opacity-50 flex justify-center items-center z-50";
+  useEffect( ()=>{
     try {
-        qualifications.push(await getQualifications());
-        allUsers.push(await getUsers()); 
+        const fetchData = async()=>{ 
+            //qualifications.push(await getQualifications());
+            //allUsers.push(await getUsers()); 
+        }
+        fetchData(); 
         } catch (error) {
-        toaster.error(`Error : ${error}`);
+            //toaster.error(`Error : ${error}`);
         }
   },[]);
 
@@ -79,7 +85,7 @@ export default function Admin() {
 
   return (
     <div className='w-full h-dvh flex flex-col justify-start items-center mt-12'>  
-      <div className="relative w-10/12  flex flex-col justify-center items-center">
+      <div className="relative w-10/12 flex flex-col justify-center items-center">
           <span className='m-4'>
                 <TowerControlIcon size={55} color="#F66A35" /> 
           </span>
@@ -136,28 +142,28 @@ export default function Admin() {
           </table>
           {/* add admin popup */}
           {showAdminPopup && !showConsultantPopup && (
-            <div onClick={() => setShowAdminPopup(false)} className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-                <form onSubmit={(e) => submit(e, "admin")} onClick={(e) => e.stopPropagation()} className="relative bg-white p-6 rounded-lg shadow-lg w-96">
+            <div onClick={() => setShowAdminPopup(false)} className={popWrapperStyle}>
+                <form onSubmit={(e) => submit(e, "admin")} onClick={(e) => e.stopPropagation()} className={popStyle+'flex flex-col justify-center items-evenly  w-6/12'}>
                     <X size={55} color="#FF0000" onClick={() => setShowAdminPopup(false)} className="cursor-pointer absolute top-0 right-0 px-4 py-2 rounded"></X>
-                    <h2 className="text-xl font-bold mb-4 capitalize">add new admin</h2> 
-                    <CustomeInput value={fullname} onClick={(e)=> setFullname(e.target.value)} name={"fullname"} type={"text"}/>
-                    <CustomeInput value={email} onClick={(e)=> SetEmail(e.target.value)} name={"email"} type={"email"}/>
-                    <CustomeInput value={phone} onClick={(e)=> setPhone(e.target.value)} name={"phone"} type={"text"}/> 
-                    <PasswordInput value={password} onClick={(e)=> setPassword(e.target.value)} name={"password"} />
+                    <h2 className="text-2xl font-bold mb-4! capitalize">add new admin</h2> 
+                    <CustomeInput value={fullname} onChange={(e)=> setFullname(e.target.value)} name={"fullname"} type={"text"}/>
+                    <CustomeInput value={email} onChange={(e)=> SetEmail(e.target.value)} name={"email"} type={"email"}/>
+                    <CustomeInput value={phone} onChange={(e)=> setPhone(e.target.value)} name={"phone"} type={"text"}/> 
+                    <PasswordInput value={password} onChange={(e)=> setPassword(e.target.value)} name={"password"} />
                     <CustomeButton name={"submit"} />
                 </form>
             </div>
            )}
            {/* add consultant popup */}
            {!showAdminPopup && showConsultantPopup && (
-            <div onClick={() => setShowConsultantPopup(false)} className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-                <form onSubmit={(e) => submit(e, "consultant")} onClick={(e) => e.stopPropagation()} className="relative bg-white p-6 rounded-lg shadow-lg w-96">
+            <div onClick={() => setShowConsultantPopup(false)} className={popWrapperStyle}>
+                <form onSubmit={(e) => submit(e, "consultant")} onClick={(e) => e.stopPropagation()} className={popStyle+'flex w-6/12'}>
                     <X size={55} color="#FF0000" onClick={() => setShowConsultantPopup(false)} className="cursor-pointer absolute top-0 right-0 px-4 py-2 rounded"></X>
-                    <h2 className="text-xl font-bold mb-4 capitalize">add new consultant</h2>
-                    <CustomeInput value={fullname} onClick={(e)=> setFullname(e.target.value)} name={"fullname"} type={"text"}/>
-                    <CustomeInput value={email} onClick={(e)=> SetEmail(e.target.value)} name={"email"} type={"email"}/>
-                    <CustomeInput value={phone} onClick={(e)=> setPhone(e.target.value)} name={"phone"} type={"text"}/> 
-                    <PasswordInput value={password} onClick={(e)=> setPassword(e.target.value)} name={"password"} />
+                    <h2 className="text-2xl font-bold mb-4! capitalize">add new consultant</h2>
+                    <CustomeInput value={fullname} onChange={(e)=> setFullname(e.target.value)} name={"fullname"} type={"text"}/>
+                    <CustomeInput value={email} onChange={(e)=> SetEmail(e.target.value)} name={"email"} type={"email"}/>
+                    <CustomeInput value={phone} onChange={(e)=> setPhone(e.target.value)} name={"phone"} type={"text"}/> 
+                    <PasswordInput value={password} onChange={(e)=> setPassword(e.target.value)} name={"password"} />
                     <CustomeInput value={salary} onChange={ (e) => setSalary(e.target.value) } name={"salary"} type={"text"}/> 
                     <CustomeInput value={bonus} onChange={ (e) => setBonus(e.target.value) } name={"bonus"} type={"text"}/> 
                     <CustomeInput value={experience} onChange={ (e) => setExperience(e.target.value) } name={"experience years"} type={"number"}/> 

@@ -1,4 +1,4 @@
-import React from 'react' 
+import React, { useState } from 'react' 
 import { motion } from 'framer-motion';
 import CustomeButton from '../components/custome_button'
 import CustomeInput from '../components/custome_input'
@@ -6,17 +6,33 @@ import { Link } from 'react-router-dom';
 import { BanknoteArrowUp } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import toaster from 'react-hot-toast';
+import { salesOptimizationService } from '../services/service'; 
+import AppStore from '../store/store';
 
 export default function SalesService() {
   const navigate = useNavigate();
+  const [employees, setEmployees] = useState(0);
+  const [price, setPrice] = useState(0);
+  const [sales, setSales] = useState(0);
+  const [days, setDays] = useState(0);
+  const [revenue, setRevenue] = useState(0);
+
+  const { applicationId, applicantId } = AppStore();
   const serviceSubmit = async (e) => {   
     e.preventDefault(); 
-    try {
-    //request
-    navigate("");
-    toaster.success("Successfully");
+    try { 
+      const data = {
+        numberOfEmployees: employees, 
+        averagePrice: price,
+        expectedDailySales: sales, 
+        workingDays: days, 
+        estimatedRevenue: revenue
+      };
+      await salesOptimizationService(applicantId, applicationId, data);
+      toaster.success("Service request was sent successfully");
+      navigate("/review");
     } catch (error) {
-    toaster.error(`Error : ${error}`);
+      toaster.error(`Error : ${error}`);
     }
   };
   return (
@@ -34,11 +50,12 @@ export default function SalesService() {
             <p className='text-sm mt-2! opacity-80 text-center'>Boost sales and increase revenue with data-driven business insights and smart recommendations.</p>
   
             <form onSubmit={serviceSubmit} className='w-full mt-3'> 
-                <CustomeInput name={"Number Of Employees"} type={"number"}/> 
-                <CustomeInput name={"Average Price"} type={"number"}/> 
-                <CustomeInput name={"Expected Daily Sales"} type={"number"}/> 
-                <CustomeInput name={"Working Days"} type={"number"}/> 
-                <CustomeInput name={"Estimated Revenue"} type={"number"}/> 
+                <CustomeInput value={employees} onChange={(e)=> setEmployees(e.target.value)} name={"Number Of Employees"} type={"number"}/> 
+                <CustomeInput value={price} onChange={(e)=> setPrice(e.target.value)} name={"Average Price"} type={"number"}/> 
+                <CustomeInput value={sales} onChange={(e)=> setSales(e.target.value)} name={"Expected Daily Sales"} type={"number"}/> 
+                <CustomeInput value={days} onChange={(e)=> setDays(e.target.value)} name={"Working Days"} type={"number"}/> 
+                <CustomeInput value={revenue} onChange={(e)=> setRevenue(e.target.value)} name={"Estimated Revenue"} type={"number"}/> 
+                
                 <CustomeButton name={"submit"} />
             </form>
             <p className='capitalize mt-3!'>back{"  "}<Link className='underline underline-offset-2 font-medium cursor-pointer' to="/">home?</Link></p>

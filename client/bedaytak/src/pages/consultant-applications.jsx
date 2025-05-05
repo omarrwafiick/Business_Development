@@ -1,16 +1,19 @@
-import React, { useEffect } from 'react'
-import { useNavigate } from 'react-router-dom';
+import React, { useEffect } from 'react' 
 import toaster from 'react-hot-toast';
 import { ListCollapseIcon } from 'lucide-react';
 import SeededApplication from '../components/seeded-application';
+import { getConsultantApplications } from '../services/service'; 
+import AppStore from '../store/store';
 
 export default function ConsultantApplications() {
-  const navigate = useNavigate(); 
+  var applications = [];
+  const { consultandId } = AppStore();  
+  const req = async () => {
+    await getConsultantApplications(consultandId);
+  };  
   useEffect(()=>{
     try {
-        //request
-        navigate("");
-        toaster.success("Successfully");
+          applications.push(req());  
         } catch (error) {
         toaster.error(`Error : ${error}`);
         }
@@ -24,7 +27,10 @@ export default function ConsultantApplications() {
           <h4 className='capitalize mb-2! text-3xl font-bold font-gelasio'>consultant applications</h4>
           <p className='text-md leading-7 mt-3! mb-12! w-8/12 opacity-80 text-center'>As a consultant, you can view and respond to any submitted application at your convenience. Each application comes pre-filled with detailed information provided by the user, allowing you to review, analyze, and offer tailored insights or services based on the user's input.</p>
           <div className='w-10/12 grid grid-cols-3 gap-8'>
-            <SeededApplication businessIdea={"bla bla bla"} stage={'bla 1'} /> 
+            {
+                applications?.map((app, index)=>(<SeededApplication  data = {app}/> ))
+            }
+            
           </div>
       </div>
     </div>
