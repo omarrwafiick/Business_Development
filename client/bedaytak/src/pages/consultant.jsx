@@ -24,8 +24,10 @@ export default function Consultant() {
   const [growth, setGrowth] = useState('');
   const [cpf, setCpf] = useState('');
   const [summary, setSummary] = useState('');
+  const [disable, setDisable] = useState(false);
 
   const serviceSubmit = async (e) => {   
+    setDisable(true);
     e.preventDefault(); 
     try {
       const data = {
@@ -53,6 +55,7 @@ export default function Consultant() {
     } catch (error) { 
     toaster.error(`Error : ${error}`);
     }
+    setDisable(false);
   };
   return (
     <div className='flex justify-center items-center flex-col w-full'>
@@ -83,7 +86,7 @@ export default function Consultant() {
                 <CustomeTextarea value={growth} onChange={(e)=> setGrowth(e.target.value)} name={"Growth Strategy"} type={2}/> 
                 <CustomeTextarea value={cpf} onChange={(e)=> setCpf(e.target.value)} name={"Common Pit falls"} type={2}/> 
                 <CustomeTextarea value={summary} onChange={(e)=> setSummary(e.target.value)} name={"Summary Recommendation"} type={2}/> 
-                <CustomeButton styles={'mt-10'} name={"submit"} />
+                <CustomeButton disabled={disable} styles={'mt-10'} name={"submit"} />
               </div>
             </form>
             <p className='capitalize mt-3!'>back{"  "}<Link className='underline underline-offset-2 font-medium cursor-pointer' to="/">home?</Link></p>

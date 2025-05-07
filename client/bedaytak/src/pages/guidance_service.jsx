@@ -17,7 +17,9 @@ export default function GuidanceService() {
   const [repeat, setRepeat] = useState(1);
   const [challenge, setChallenge] = useState(1);
   const { applicationId, applicantId } = AppStore();
+  const [disable, setDisable] = useState(false);
   const serviceSubmit = async (e) => {   
+    setDisable(true);
     e.preventDefault();  
     try {
       const data = {
@@ -32,8 +34,9 @@ export default function GuidanceService() {
       toaster.success("Service request was sent successfully");
       navigate("/review");
     } catch (error) {
-    toaster.error(`Error : ${error}`);
+      toaster.error(`Error : ${error}`);
     }
+    setDisable(false);
   };
 return (
   <div className='flex justify-center items-center flex-col w-full h-dvh mt-8 mb-8'>
@@ -56,7 +59,7 @@ return (
               <CustomeSelect value={repeat} onChange={(e)=> setRepeat(e.target.value)} name={"Repeat Customer Level"} data={[["None",0], ["Some",1], ["Regular",2]]}/> 
               <CustomeSelect value={challenge} onChange={(e)=> setChallenge(e.target.value)} name={"Current Challenge"} data={[["Getting customers",0], ["Managing operations",1], ["Marketing",2], ["Not sure",3]]}/> 
             
-              <CustomeButton name={"submit"} />
+              <CustomeButton disabled={disable} name={"submit"} />
           </form>
           <p className='capitalize mt-3!'>back{"  "}<Link className='underline underline-offset-2 font-medium cursor-pointer' to="/">home?</Link></p>
       </motion.div>

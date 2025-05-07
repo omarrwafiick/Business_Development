@@ -22,12 +22,14 @@ export default function AddBusiness() {
     },[]);
 
     const form = useRef(); 
-    const [name, SetName] = useState('');
-    const [description, SetDescription] = useState('');
-    const [category, SetCategory] = useState('');
-    const [location, SetLocation] = useState('');
+    const [name, setName] = useState('');
+    const [description, setDescription] = useState('');
+    const [category, setCategory] = useState('');
+    const [location, setLocation] = useState('');
+    const [disable, setDisable] = useState(false);
     const navigate = useNavigate();
     const businessSubmit = async (e) => {   
+        setDisable(true);
         e.preventDefault();  
         try {
         const locationName = all.map(x=>x._id === location).name;
@@ -40,6 +42,7 @@ export default function AddBusiness() {
         toaster.error(`Error : ${error}`);
         form.current.reset();
         }
+        setDisable(false);
       }; 
     return (
       <div  className='flex justify-center items-center flex-col w-full h-dvh font-gelasio'>
@@ -56,11 +59,11 @@ export default function AddBusiness() {
               <p className='opacity-80'>Getting to know your value better</p>
   
               <form ref={form} onSubmit={businessSubmit} className='w-full mt-3'>
-                  <CustomeInput value={name} onClick={(e)=> SetName(e.target.value)}  name={"name"} type={"text"}/>
-                  <CustomeTextarea value={description} onClick={(e)=> SetDescription(e.target.value)}  rowNum={3} name={"description"} placeHolder={"What is your business about..."}/>
-                  <CustomeSelectAuth value={category} onClick={(e)=> SetCategory(e.target.value)} name={"category"} data={allCategories}/>
-                  <CustomeSelectAuth value={location} onClick={(e)=> SetLocation(e.target.value)} name={"location"} data={allLocations}/>
-                  <CustomeButton name={"submit"} />
+                  <CustomeInput value={name} onClick={(e)=> setName(e.target.value)}  name={"name"} type={"text"}/>
+                  <CustomeTextarea value={description} onClick={(e)=> setDescription(e.target.value)}  rowNum={3} name={"description"} placeHolder={"What is your business about..."}/>
+                  <CustomeSelectAuth value={category} onClick={(e)=> setCategory(e.target.value)} name={"category"} data={allCategories}/>
+                  <CustomeSelectAuth value={location} onClick={(e)=> setLocation(e.target.value)} name={"location"} data={allLocations}/>
+                  <CustomeButton disabled={disable} name={"submit"} />
               </form>
           </motion.div>
       </div>

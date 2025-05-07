@@ -8,7 +8,8 @@ import CustomeInput from '../components/custome_input';
 import CustomeButton from '../components/custome_button';
 import PasswordInput from '../components/password-input';
 import CustomeMultipleSelect from '../components/custome-select-multiple';
- 
+import {passwordRegex} from '../utils/main';
+
 export default function Admin() {
   const [showAdminPopup, setShowAdminPopup] = useState(false);
   const [showConsultantPopup, setShowConsultantPopup] = useState(false);
@@ -19,6 +20,7 @@ export default function Admin() {
   const [bonus, setBonus] = useState(''); 
   const [experience, setExperience] = useState(0); 
   const [qualificationsC, setQualificationsC] = useState('');
+  const [disable, setDisable] = useState(false);
   //user
   const [email, SetEmail] = useState('');
   const [password, setPassword] = useState(''); 
@@ -50,6 +52,7 @@ export default function Admin() {
   }; 
 
   const submit = async (e, type) => {   
+          setDisable(true);
           e.preventDefault();  
           let response = ''; 
           try { 
@@ -68,6 +71,9 @@ export default function Admin() {
                     phoneNumber: phone });
             }
             else{
+                if(!passwordRegex.test(password)){
+                    return toaster.error("Password is not strong");
+                }
                 response = await addAdmin({
                     fullName: fullname, 
                     email, 
@@ -81,6 +87,7 @@ export default function Admin() {
               toaster.error(`Error : ${error.message}`);
               form.current.reset();
           }
+          setDisable(false);
   };
 
   return (
@@ -150,7 +157,7 @@ export default function Admin() {
                     <CustomeInput value={email} onChange={(e)=> SetEmail(e.target.value)} name={"email"} type={"email"}/>
                     <CustomeInput value={phone} onChange={(e)=> setPhone(e.target.value)} name={"phone"} type={"text"}/> 
                     <PasswordInput value={password} onChange={(e)=> setPassword(e.target.value)} name={"password"} />
-                    <CustomeButton name={"submit"} />
+                    <CustomeButton disabled={disable} name={"submit"} />
                 </form>
             </div>
            )}
@@ -168,7 +175,7 @@ export default function Admin() {
                     <CustomeInput value={bonus} onChange={ (e) => setBonus(e.target.value) } name={"bonus"} type={"text"}/> 
                     <CustomeInput value={experience} onChange={ (e) => setExperience(e.target.value) } name={"experience years"} type={"number"}/> 
                     <CustomeMultipleSelect value={qualificationsC} onChange={ (e) => setQualificationsC(e.target.value) } name={"Qualifications"} data={[]}/>  
-                    <CustomeButton name={"submit"} />
+                    <CustomeButton disabled={disable} name={"submit"} />
                 </form>
             </div>
            )}

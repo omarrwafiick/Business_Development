@@ -6,6 +6,7 @@ import PasswordInput from '../components/password-input';
 import { useNavigate, useParams } from 'react-router-dom';
 import toaster from 'react-hot-toast';
 import { resetPassword } from '../services/auth-service';
+import {passwordRegex} from '../utils/main';
 
 export default function ResetPassword() {
   const form = useRef(); 
@@ -13,11 +14,13 @@ export default function ResetPassword() {
   const navigate = useNavigate();
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [disable, setDisable] = useState(false);
   const resetPasswordSubmit = async (e) => {
-    e.preventDefault(); 
+    setDisable(true);
+    e.preventDefault();  
     try {
-      if(password!==confirmPassword){
-        toaster.error("Passwords doesn't match");
+      if(password!==confirmPassword || !passwordRegex.test(password)){
+        toaster.error("Passwords doesn't match or not strong");
         return;
       }
       await resetPassword({password, token});
@@ -27,6 +30,7 @@ export default function ResetPassword() {
       toaster.error(`Error : ${error}`);
       form.current.reset();
     }
+    setDisable(false);
   };
   return (
     <div className='flex justify-center items-center flex-col w-full h-dvh font-gelasio'>
@@ -45,7 +49,7 @@ export default function ResetPassword() {
             <form ref={form} onSubmit={resetPasswordSubmit} className='w-full mt-3'>
                 <PasswordInput value={password} onClick={(e)=> setPassword(e.target.value)} name={"password"} />
                 <PasswordInput value={confirmPassword} onClick={(e)=> setConfirmPassword(e.target.value)} name={"confirm password"} />
-                <CustomeButton name={"submit"} />
+                <CustomeButton disabled={disable} name={"submit"} />
             </form>
         </motion.div>
     </div>

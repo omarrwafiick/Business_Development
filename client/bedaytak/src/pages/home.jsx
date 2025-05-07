@@ -32,8 +32,11 @@ export default function Home() {
   const { user } = AppStore();
   const [message, setMessage] = useState('');
   const [subject, setSubject] = useState('');
+  const [disable, setDisable] = useState(false);
 
   const messageSubmit = async (e) =>{
+    setDisable(true);
+    e.preventDefault();
     try { 
       await businessGuideService(user._id, {subject, message}); 
       toaster.success("Message was sent successfully");
@@ -41,6 +44,7 @@ export default function Home() {
       toaster.error(`Error : ${error}`);
     }
     form.current.reset();
+    setDisable(false);
   };  
   const setServiceName = AppStore.getState().setchosenService;
   const heroRef = useRef(null); 
@@ -96,10 +100,17 @@ export default function Home() {
     visible: { opacity: 1, y: 0, transition: { duration: 0.8 } }
   };
 
+  const pageDescription = `Bedaytak is a business intelligence platform designed to help
+                  entrepreneurs in Alexandria, Egypt, make data-driven decisions when
+                  starting or expanding their businesses. The platform provides insights
+                  on optimal business locations, market competition, financial modeling,
+                  networking, and legal procedures, tailored specifically to the Egyptian
+                  market.`;
+
   return ( 
     <div className='w-full flex flex-col justify-center items-center'>
         <Title>Bedaytak - Home</Title>
-        <Meta name="description" content="My app description" />
+        <Meta name="description" content={pageDescription} />
         <motion.div ref={heroRef} id="hero"
           variants={{
             hidden:{opacity:0, y:75},
@@ -117,13 +128,8 @@ export default function Home() {
                   <span className='me-3'>consultation</span> 
                   <BriefcaseBusiness size={55} color="#F66A35" />
                 </a>
-                <p className='opacity-70 text-sm w-10/12 text-start mt-8! leading-7 capitalize font-inter'>
-                  Bedaytak is a business intelligence platform designed to help
-                  entrepreneurs in Alexandria, Egypt, make data-driven decisions when
-                  starting or expanding their businesses. The platform provides insights
-                  on optimal business locations, market competition, financial modeling,
-                  networking, and legal procedures, tailored specifically to the Egyptian
-                  market.   
+                <p className='opacity-70 text-sm w-10/12 z-10! text-start mt-8! leading-7 capitalize font-inter'>
+                    {pageDescription}
                 </p> 
                 <div className='flex justify-start items-center w-full mt-8'> 
                     <SmallButton name="Get Started" style={'bg-primary text-white!'} to="signup"/>
@@ -144,7 +150,7 @@ export default function Home() {
           variants={variants}
           initial="hidden"
           animate={introControls}
-          className='tablet:w-2/12 w-full bg-dark flex justify-evenly items-center pt-16 pb-16'>
+          className='w-full bg-dark flex justify-evenly items-center pt-16 pb-16'>
           <div className='w-10/12 grid grid-cols-3 gap-8'>
              <Card   
                   icon={ <BriefcaseBusiness size={55} color="#FFFFFF" /> }
@@ -165,7 +171,7 @@ export default function Home() {
         </motion.div>
 
         <motion.div  
-        className='w-10/12 flex justify-center items-center pt-32 pb-16'>
+          className='w-10/12  h-screen flex justify-center items-center pt-20 pb-20'>
           <div className='w-6/12 flex justify-between items-center relative'> 
             <img src={Business1} className="h-80 absolute rounded-tl-2xl rounded-2xl opacity-60" alt="image 1" />
             <img src={Business2} className="h-80 absolute ml-8 -mt-8 rounded-tl-2xl rounded-2xl opacity-80" alt="image 2" />
@@ -185,7 +191,7 @@ export default function Home() {
           variants={variants}
           initial="hidden"
           animate={featureControls}
-          className='w-full flex justify-evenly items-center pt-16 pb-16'>
+          className='w-full flex justify-evenly items-center pb-32'>
           <div className='w-10/12 grid grid-cols-3 gap-8'>
              <Card2 
                   mode={true} 
@@ -209,7 +215,7 @@ export default function Home() {
         </motion.div>
 
         <motion.div 
-          ref={aboutRef} id="about" className='w-full flex flex-col justify-evenly items-center pt-16 pb-16'>
+          ref={aboutRef} id="about" className='w-full  h-screen flex flex-col justify-evenly items-center pt-16 pb-16'>
           <h1 className='capitalize font-bold text-5xl'>meet our perfect advisors</h1>
           <p className='font-inter opacity-50 text-sm w-8/12 text-center mt-8! leading-6 capitalize mb-10!'>Seasoned professionals with deep industry knowledge and a passion for helping businesses succeed. They offer clear, actionable guidance tailored to your goals, ensuring every step you take leads to progress.</p>
           <div className='w-10/12 grid grid-cols-3 gap-8'> 
@@ -228,8 +234,8 @@ export default function Home() {
           </div> 
         </motion.div>
 
-        <motion.div ref={serviceRef} id="services" className='w-full bg-dark flex flex-col justify-evenly items-center pt-32 pb-32'>
-          <h1 className='text-white capitalize font-bold text-5xl'>what we do to serve your best</h1>
+        <motion.div className='w-full bg-dark flex flex-col justify-evenly items-center pt-20 pb-20'>
+          <h1 ref={serviceRef} id="services" className='text-white capitalize font-bold text-5xl'>what we do to serve your best</h1>
           <p className='font-inter text-white opacity-70 text-sm w-8/12 text-center mt-8! leading-6 capitalize mb-10!'>We provide tailored solutions designed to match your business needs. From strategic planning to hands-on support, every service we offer is focused on delivering maximum value, helping you operate smarter and achieve lasting success.</p>
           
           <div className='w-10/12 grid grid-cols-3 gap-8 mt-6'>
@@ -284,7 +290,7 @@ export default function Home() {
           </div> 
         </motion.div> 
 
-        <motion.div ref={pricingRef} id="pricing" className='w-full bg-secondary flex flex-col justify-evenly items-center pt-16 pb-16'>
+        <motion.div ref={pricingRef} id="pricing" className='w-full h-full bg-secondary flex flex-col justify-evenly items-center pt-20 pb-20'>
           <h1 className='text-white capitalize font-bold text-5xl'>our prices!</h1>
           <p className='font-inter text-white opacity-90 text-sm w-8/12 text-center mt-8! leading-6 capitalize mb-10!'>Our pricing is simple, transparent, and designed to fit every stage of your business journey. Whether you're starting out or scaling up, our plans offer real value—packed with expert services to help you grow smarter at every step.</p>
           <SmallButton name="Apply Now" style={'bg-primary text-white! ms-3!'} to="#services"/>
@@ -307,7 +313,7 @@ export default function Home() {
           </div> 
         </motion.div> 
 
-        <motion.div ref={contactRef} id="contact" className='w-full flex flex-col justify-center items-center pt-16 pb-32'>
+        <motion.div ref={contactRef} id="contact" className='w-full h-full flex flex-col justify-center items-center pt-20 pb-20'>
           <h1 className='capitalize font-bold text-6xl'>contact us</h1>
           <p className='font-inter opacity-70 text-sm w-8/12 text-center mt-8! leading-6 capitalize mb-10!'>Have questions or need support? Our team is here to help! Reach out to us for personalized assistance, expert advice, or to learn more about our services. We're ready to guide you toward your business goals—contact us today!</p>
           <div className='flex justify-evenly items-center  w-10/12'>
@@ -315,7 +321,7 @@ export default function Home() {
                 <span className='w-full flex justify-center'><CodesandboxIcon size={115} color="#F66A35" /></span>
                 <CustomeInput value={message} onChange={(e)=> setMessage(e.target.value)} name={"message"} type={"text"}/> 
                 <CustomeTextarea value={subject} onChange={(e)=> setSubject(e.target.value)} name={"subject"} rowNum="5" type={"text"}/>   
-                <CustomeButton name={"contact"} /> 
+                <CustomeButton disabled={disable} name={"contact"} /> 
             </form> 
             <div className='w-6/12'>
               <img className='rounded-2xl' src={contactImg} alt="contact image" />

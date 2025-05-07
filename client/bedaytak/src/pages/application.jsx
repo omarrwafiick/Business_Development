@@ -1,4 +1,4 @@
-import React from 'react' 
+import React, { useState } from 'react' 
 import { motion } from 'framer-motion';
 import CustomeButton from '../components/custome_button'  
 import { Link } from 'react-router-dom'; 
@@ -17,7 +17,9 @@ export default function Application() {
     ['Location and markrt analysis', '/location-service']
   ]
   const navigate = useNavigate();
+  const [disable, setDisable] = useState(false);
   const serviceSubmit = async (e) => {   
+    setDisable(true);
     e.preventDefault(); 
     try { 
       let serviceId = services.filter(x => x.name.toLocaleLowerCase() === serviceName.toLocaleLowerCase())._id;
@@ -34,6 +36,7 @@ export default function Application() {
     } catch (error) {
     toaster.error(`Error : ${error}`);
     }
+    setDisable(false);
   };
   return (
     <div className='flex justify-center items-center flex-col w-full h-dvh'>
@@ -50,7 +53,7 @@ export default function Application() {
             <p className='text-md mt-4! mb-4! leading-7 opacity-80 text-center'>Submit your service application to receive tailored recommendations based on the service you selected. Our system analyzes your input and provides expert insights specific to your business needs, ensuring personalized and actionable results.</p>
   
             <form onSubmit={serviceSubmit} className='w-full mt-3'>  
-                <CustomeButton name={"submit"} />
+                <CustomeButton disabled={disable} name={"submit"} />
             </form>
             <p className='capitalize mt-3!'>back{"  "}<Link className='underline underline-offset-2 font-medium cursor-pointer' to="/">home?</Link></p>
         </motion.div>

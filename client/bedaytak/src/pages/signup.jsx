@@ -9,6 +9,7 @@ import { useNavigate } from 'react-router-dom';
 import toaster from 'react-hot-toast'
 import { register } from '../services/auth-service';
 import AppStore from '../store/store';
+import { passwordRegex } from '../utils/main';
 
 export default function Signup() {   
   const form = useRef();  
@@ -17,15 +18,17 @@ export default function Signup() {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [phone, setPhone] = useState(''); 
   const [fullname, setFullname] = useState('');
-  const [role, setRole] = useState('');
-
+  const [role, setRole] = useState(''); 
   const setUser = AppStore.getState().setUser;
   const navigate = useNavigate();
+  const [disable, setDisable] = useState(false);
+
   const signupSubmit = async (e) => {
+    setDisable(true);
     e.preventDefault();  
     try {
-      if(password!==confirmPassword){
-        toaster.error("Passwords doesn't match");
+      if(password!==confirmPassword || !passwordRegex.test(password)){
+        toaster.error("Passwords doesn't match or not strong");
         return;
       }
       const response = await register({
@@ -44,6 +47,7 @@ export default function Signup() {
       toaster.error(`Error : ${error}`);
       form.current.reset();
     }
+    setDisable(false);
   };
   return (
     <div className='flex justify-center items-center flex-col w-full h-dvh font-gelasio mt-12 mb-12'>
@@ -89,7 +93,7 @@ export default function Signup() {
                       <label htmlFor="default-radio-2" className="ms-2 text-md font-medium text-gray-900 dark:text-gray-300 capitalize">business owner</label>
                   </div>  
                 </div>
-                <CustomeButton name={"signup"} />
+                <CustomeButton disabled={disable} name={"signup"} />
             </form>
             <p className='opacity-80 text-center text-sm w-6/12 leading-6 mt-3!'>By clicking continue, you agree to our Terms of Service and Privacy Policy.</p>
         </motion.div>

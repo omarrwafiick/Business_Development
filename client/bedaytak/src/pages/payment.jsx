@@ -18,11 +18,13 @@ export default function Payment() {
         let service = services.filter(x => x.name.toLowerCase().include(serviceName.substring(0,4)));
         setServiceprice(service.amount);
     }, []);
-    
+    const [disable, setDisable] = useState(false);
     const [serviceprice, setServiceprice] = useState(0);
     const [paypalPaymentStatus, setPaypalPaymentStatus] = useState(false);
     const navigate = useNavigate();
-    const serviceSubmit = async (paymentState) => {   
+    const serviceSubmit = async (e, paymentState) => {   
+      setDisable(true);
+      e.preventDefault(); 
       try { 
         let response = '';
         if(paymentState){ 
@@ -59,6 +61,7 @@ export default function Payment() {
       } catch (error) {
         toaster.error(`Error : ${error}`);
       }
+      setDisable(false);
     };
   return (
     <div className='flex justify-center items-center flex-col w-full h-dvh'>
@@ -75,7 +78,7 @@ export default function Payment() {
             <p className='text-md mt-4! mb-4! leading-7 opacity-80 text-center'>By pressing "Pay," you’ll unlock the full version of the service with complete, personalized recommendations. If you prefer not to pay, you can still access a limited version of the service free of charge.</p>
   
             <form className='w-full mt-3'>  
-                <CustomeButton onClick={() => serviceSubmit(false)} name={"free trial"} styles={'bg-primary'}/> 
+                <CustomeButton disabled={disable} onClick={(e) => serviceSubmit(e, false)} name={"free trial"} styles={'bg-primary'}/> 
                 <PaypalPayment
                   onClick={() => serviceSubmit(true)}
                   price={serviceprice}

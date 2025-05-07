@@ -19,7 +19,9 @@ export default function ConsultantService() {
   const [idea, SetIdea] = useState('');
   const [goal, SetGoal] = useState('');
   const navigate = useNavigate();
-  const serviceSubmit = async (e) => {   
+  const [disable, setDisable] = useState(false);
+  const serviceSubmit = async (e) => { 
+    setDisable(true);  
     e.preventDefault(); 
     try {
       const data = {
@@ -36,6 +38,7 @@ export default function ConsultantService() {
     } catch (error) {
     toaster.error(`Error : ${error}`);
     }
+    setDisable(false);
   }; 
   const Stage1 = "Just an idea";
   const Stage2 = "Started but early";
@@ -66,7 +69,7 @@ export default function ConsultantService() {
                 <CustomeTextarea value={idea} onChange={(e) => SetIdea(e.target.value)} name={"Business Idea"} rowNum={3}/> 
                 <CustomeTextarea value={goal} onChange={(e) => SetGoal(e.target.value)} name={"Main Goal"} rowNum={6}/> 
 
-                <CustomeButton name={"submit"} />
+                <CustomeButton disabled={disable} name={"submit"} />
             </form>
             <p className='capitalize mt-3!'>back{"  "}<Link className='underline underline-offset-2 font-medium cursor-pointer' to="/">home?</Link></p>
         </motion.div>

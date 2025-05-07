@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import CustomeButton from '../components/custome_button'
 import { useNavigate } from 'react-router-dom';
 import toaster from 'react-hot-toast';
@@ -6,7 +6,9 @@ import toaster from 'react-hot-toast';
 export default function SeededApplication({ data }) {
   const navigate = useNavigate(); 
   const { setConsultationData } = AppStore();
-  const submit = async (e) => {   
+  const [disable, setDisable] = useState(false);
+  const submit = async (e) => {    
+        setDisable(true);
         e.preventDefault(); 
         try { 
           setConsultationData(data);
@@ -14,6 +16,7 @@ export default function SeededApplication({ data }) {
         } catch (error) {
         toaster.error(`Error : ${error}`);
         }
+        setDisable(false);
       };
   return (
     <div className='flex justify-center flex-col items-center border-2 border-black/10 rounded-xl overflow-hidden transition-colors delay-50 cursor-pointer'>
@@ -22,7 +25,7 @@ export default function SeededApplication({ data }) {
             <h1 className='text-xl mt-3! capitalize'><a className='font-bold'>business idea :</a>{data.businessIdea}</h1> 
             <h1 className='text-xl opacity-90 mt-3!'><a className='font-bold'>business stage :</a>{data.stage}</h1>         
             <form onSubmit={submit} className='w-full mt-3'>   
-                <CustomeButton name={"apply"} styles={'bg-secondary'} />
+                <CustomeButton disabled={disable} name={"apply"} styles={'bg-secondary'} />
             </form>
         </div>     
     </div>
