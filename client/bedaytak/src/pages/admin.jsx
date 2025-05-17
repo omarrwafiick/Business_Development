@@ -32,8 +32,8 @@ export default function Admin() {
   useEffect( ()=>{
     try {
         const fetchData = async()=>{ 
-            //qualifications.push(await getQualifications());
-            //allUsers.push(await getUsers()); 
+            //qualifications.push(await getQualifications().data);
+            //allUsers.push(await getUsers().data); 
         }
         fetchData(); 
         } catch (error) {
@@ -43,9 +43,12 @@ export default function Admin() {
 
   const deleteUserByAdmin = async (id)=>{
     try {
-         await deleteUser(id);
-         toaster.success("User is deleted successfully");
-         allUsers = allUsers.filter(x => x._id !== id)
+        const response = await deleteUser(id);
+        if(!response.ok()){
+            throw new Error(`Request failed with status ${response.status}`);
+        }
+        toaster.success("User is deleted successfully");
+        allUsers = allUsers.filter(x => x._id !== id)
         } catch (error) {
         toaster.error(`Error : ${error}`);
         }
@@ -81,6 +84,9 @@ export default function Admin() {
                     phoneNumber: phone
                 });
             }
+            if(!response.ok()){
+                throw new Error(`Request failed with status ${response.status}`);
+            }
             await toaster.success("Successfull operation");
         } 
           catch (error) {
@@ -103,8 +109,8 @@ export default function Admin() {
             <button onClick={() => setShowConsultantPopup(true)} className='capitalize hover:bg-gradient-to-br cursor-pointer font-medium rounded-lg text-md px-5 py-2 text-center bg-secondary text-white!'>add consultant</button>
           </div>
 
-          <table className="text-sm w-full text-left rtl:text-right text-gray-500 dark:text-gray-400  shadow-md sm:rounded-lg">     
-              <thead className="text-xl text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+          <table className="text-sm w-full text-left rtl:text-right text-gray-500  shadow-md sm:rounded-lg">     
+              <thead className="text-xl text-gray-700 uppercase bg-gray-50">
                   <tr>
                       <th scope="col" className="px-6 py-3 capitalize">
                           user name
@@ -126,8 +132,8 @@ export default function Admin() {
               <tbody className='text-lg font-inter'> 
                 {
                     allUsers?.map((user,index)=>( 
-                        <tr className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 border-gray-200">
-                        <th scope="row" className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                        <tr className="bg-white border-b border-gray-200">
+                        <th scope="row" className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap ">
                             {user.fullName}
                         </th>
                         <td className="px-6 py-4">
@@ -140,7 +146,7 @@ export default function Admin() {
                             {user.createdAt}
                         </td>
                         <td className="px-6 py-4 flex text-right">
-                            <Link to="/" onClick={ async ()=> await deleteUserByAdmin(user._id)} className="font-medium text-blue-600 dark:text-blue-500 hover:underline me-3">delete</Link>
+                            <Link to="/" onClick={ async ()=> await deleteUserByAdmin(user._id)} className="font-medium text-blue-600 hover:underline me-3">delete</Link>
                         </td>
                     </tr> 
                     ))

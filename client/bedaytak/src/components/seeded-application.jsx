@@ -7,9 +7,10 @@ export default function SeededApplication({ data }) {
   const navigate = useNavigate(); 
   const { setConsultationData } = AppStore();
   const [disable, setDisable] = useState(false);
-  const submit = async (e) => {    
+  
+  const submit = async (e) => {  
+        e.preventDefault();   
         setDisable(true);
-        e.preventDefault(); 
         try { 
           setConsultationData(data);
           navigate("/consultant"); 
@@ -17,7 +18,8 @@ export default function SeededApplication({ data }) {
         toaster.error(`Error : ${error}`);
         }
         setDisable(false);
-      };
+  };
+
   return (
     <div className='flex justify-center flex-col items-center border-2 border-black/10 rounded-xl overflow-hidden transition-colors delay-50 cursor-pointer'>
        <div className='w-full h-20 bg-gradient-to-r from-[#F66A35] via-[#FF8C4D] to-[#fca374]'></div>

@@ -16,6 +16,7 @@ export default function FeasibilityService() {
   const navigate = useNavigate();
   const { applicationId, applicantId } = AppStore();
   const [disable, setDisable] = useState(false);
+
   const serviceSubmit = async (e) => {   
     setDisable(true);
     e.preventDefault(); 
@@ -25,7 +26,10 @@ export default function FeasibilityService() {
         monthlyCosts: mCost, 
         startupCost: sCost
       };
-      await financialPlanningService(applicantId, applicationId, data);
+      const response = await financialPlanningService(applicantId, applicationId, data);
+      if(!response.ok()){
+          throw new Error(`Request failed with status ${response.status}`);
+      }
       toaster.success("Service request was sent successfully");
       navigate("/payment"); 
     } catch (error) {
@@ -33,6 +37,7 @@ export default function FeasibilityService() {
     }
     setDisable(false);
   };
+  
   return (
     <div className='flex justify-center items-center flex-col w-full h-dvh mb-2'>
         <motion.div

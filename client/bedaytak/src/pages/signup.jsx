@@ -11,6 +11,7 @@ import { register } from '../services/auth-service';
 import AppStore from '../store/store';
 import { passwordRegex } from '../utils/main';
 
+
 export default function Signup() {   
   const form = useRef();  
   const [email, SetEmail] = useState('');
@@ -37,6 +38,9 @@ export default function Signup() {
         password, 
         phoneNumber: phone, 
         role});
+      if(!response.ok()){
+        throw new Error(`Request failed with status ${response.status}`);
+      }
       setUser(response.user);
       toaster.success("Signed up successfully");
       if(role === 'BusinessOwner'){  
@@ -49,6 +53,7 @@ export default function Signup() {
     }
     setDisable(false);
   };
+  
   return (
     <div className='flex justify-center items-center flex-col w-full h-dvh font-gelasio mt-12 mb-12'>
         <motion.div
@@ -78,8 +83,8 @@ export default function Signup() {
                       value="Entrepreneur" 
                       checked={role === 'Entrepreneur'}
                       onChange={(e) => setRole(e.target.value)}
-                      className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600" />
-                      <label htmlFor="default-radio-1" className="ms-2 text-md font-medium text-gray-900 dark:text-gray-300 capitalize">entrepreneur</label>
+                      className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 focus:ring-2 " />
+                      <label htmlFor="default-radio-1" className="ms-2 text-md font-medium text-gray-900 capitalize">entrepreneur</label>
                   </div>
                   <div class="flex items-center">
                       <input 
@@ -89,8 +94,8 @@ export default function Signup() {
                       name="default-radio2"
                       checked={role === 'BusinessOwner'}
                       onChange={(e) => setRole(e.target.value)} 
-                      className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600" />
-                      <label htmlFor="default-radio-2" className="ms-2 text-md font-medium text-gray-900 dark:text-gray-300 capitalize">business owner</label>
+                      className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 focus:ring-2" />
+                      <label htmlFor="default-radio-2" className="ms-2 text-md font-medium text-gray-900 capitalize">business owner</label>
                   </div>  
                 </div>
                 <CustomeButton disabled={disable} name={"signup"} />

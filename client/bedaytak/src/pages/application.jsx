@@ -14,7 +14,9 @@ export default function Application() {
     ['Financial Planning','/feasibility-service'],
     ['Sales and revenue optimization', '/sales-service'],
     ['Consultation', '/consultant-select'],
-    ['Location and markrt analysis', '/location-service']
+    ['Location and markrt analysis', '/location-service'],
+    ['Integrated Report', '/report'],
+   
   ]
   const navigate = useNavigate();
   const [disable, setDisable] = useState(false);
@@ -23,13 +25,16 @@ export default function Application() {
     e.preventDefault(); 
     try { 
       let serviceId = services.filter(x => x.name.toLocaleLowerCase() === serviceName.toLocaleLowerCase())._id;
-      await addApplicationForService(applicationId,
+      const response = await addApplicationForService(applicationId,
         {
           serviceId,
           status:'Approved',
           paymentStatus: false,
         }
       );
+      if(!response.ok()){
+          throw new Error(`Request failed with status ${response.status}`);
+      }
       let route = serviceRoutes.filter(x => x[0].toLocaleLowerCase() === serviceName.toLocaleLowerCase());
       navigate(route[1]);
       toaster.success("application was sent successfully");
@@ -38,6 +43,7 @@ export default function Application() {
     }
     setDisable(false);
   };
+  
   return (
     <div className='flex justify-center items-center flex-col w-full h-dvh'>
         <motion.div

@@ -3,7 +3,7 @@ import React from 'react';
 export default function CustomeMultipleSelect({ name, data, value, onChange }) {
   return (
     <div className='w-full mb-4'>
-      <label htmlFor="custome-select" className="block mb-2 text-sm capitalize font-medium text-gray-900 dark:text-white">{name}</label>
+      <label htmlFor="custome-select" className="block mb-2 text-sm capitalize font-medium text-gray-900">{name}</label>
       <select
         multiple
         value={value}

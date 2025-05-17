@@ -15,6 +15,7 @@ export default function ResetPassword() {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [disable, setDisable] = useState(false);
+
   const resetPasswordSubmit = async (e) => {
     setDisable(true);
     e.preventDefault();  
@@ -23,7 +24,10 @@ export default function ResetPassword() {
         toaster.error("Passwords doesn't match or not strong");
         return;
       }
-      await resetPassword({password, token});
+      const response = await resetPassword({password, token});
+      if(!response.ok()){
+          throw new Error(`Request failed with status ${response.status}`);
+      }
       toaster.success("Password was reseted successfully");
       navigate("/login");
     } catch (error) {
@@ -32,6 +36,7 @@ export default function ResetPassword() {
     }
     setDisable(false);
   };
+
   return (
     <div className='flex justify-center items-center flex-col w-full h-dvh font-gelasio'>
         <motion.div

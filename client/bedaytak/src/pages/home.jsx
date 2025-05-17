@@ -5,7 +5,8 @@ import SmallButton from '../components/small-button'
 import Card from '../components/card';
 import Card2 from '../components/card2';
 import { BriefcaseBusiness, User, Clock, MessageSquare, Users, Heart, CircleDollarSign, 
-        NotebookIcon, BanknoteArrowUp, HeartHandshake, IdCard, LocationEdit, CodesandboxIcon, 
+        NotebookIcon, BanknoteArrowUp, HeartHandshake, IdCard, LocationEdit, CodesandboxIcon,
+        Paperclip, 
 } from 'lucide-react';
 import Team from '../components/team';
 import CustomeInput from '../components/custome_input';
@@ -38,7 +39,10 @@ export default function Home() {
     setDisable(true);
     e.preventDefault();
     try { 
-      await businessGuideService(user._id, {subject, message}); 
+      const response = await businessGuideService(user._id, {subject, message}); 
+      if(!response.ok()){
+          throw new Error(`Request failed with status ${response.status}`);
+      }
       toaster.success("Message was sent successfully");
     } catch (error) {
       toaster.error(`Error : ${error}`);
@@ -46,13 +50,14 @@ export default function Home() {
     form.current.reset();
     setDisable(false);
   };  
-  const setServiceName = AppStore.getState().setchosenService;
-  const heroRef = useRef(null); 
+
+  const setServiceName = AppStore.getState().setchosenService; 
   const contactRef = useRef(null); 
   const serviceRef = useRef(null); 
   const pricingRef = useRef(null); 
   const aboutRef = useRef(null); 
   const location = useLocation();
+  
   useLayoutEffect(() => {
     if (location.hash === '#contact') {
       contactRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -65,10 +70,7 @@ export default function Home() {
     }
     else if(location.hash === '#pricing'){
       pricingRef.current?.scrollIntoView({ behavior: 'smooth' });
-    }
-    else if(location.hash === '#hero'){
-      heroRef.current?.scrollIntoView({ behavior: 'smooth' });
-    }
+    } 
   }, [location])
 
   //first section 
@@ -111,7 +113,8 @@ export default function Home() {
     <div className='w-full flex flex-col justify-center items-center'>
         <Title>Bedaytak - Home</Title>
         <Meta name="description" content={pageDescription} />
-        <motion.div ref={heroRef} id="hero"
+
+        <motion.div
           variants={{
             hidden:{opacity:0, y:75},
             visible:{opacity:1, y:0},
@@ -141,7 +144,7 @@ export default function Home() {
               </div> 
             </div>
             <div className='w-6/12 h-full flex justify-end items-center'>
-                <img src={cover} className="rounded-2xl w-full mt-5" alt="bedaytak cover" />
+                <img src={cover} className="rounded-2xl w-full mt-5" alt="bedaytak cover" loading='lazy' />
             </div>
         </motion.div>
          
@@ -173,9 +176,9 @@ export default function Home() {
         <motion.div  
           className='w-10/12  h-screen flex justify-center items-center pt-20 pb-20'>
           <div className='w-6/12 flex justify-between items-center relative'> 
-            <img src={Business1} className="h-80 absolute rounded-tl-2xl rounded-2xl opacity-60" alt="image 1" />
-            <img src={Business2} className="h-80 absolute ml-8 -mt-8 rounded-tl-2xl rounded-2xl opacity-80" alt="image 2" />
-            <img src={Business3} className="h-80 absolute ml-16 -mt-16 rounded-tl-2xl rounded-2xl " alt="image 3" />
+            <img src={Business1} className="h-80 absolute rounded-tl-2xl rounded-2xl opacity-60" alt="image 1" loading='lazy' />
+            <img src={Business2} className="h-80 absolute ml-8 -mt-8 rounded-tl-2xl rounded-2xl opacity-80" alt="image 2" loading='lazy' />
+            <img src={Business3} className="h-80 absolute ml-16 -mt-16 rounded-tl-2xl rounded-2xl " alt="image 3" loading='lazy' />
           </div>
           <div className='w-6/12 flex flex-col justify-center items-center'>
             <h1 className='capitalize font-bold text-4xl'>we are trusted consulting</h1>
@@ -279,13 +282,13 @@ export default function Home() {
                   title="Location analysis"
                   content="Choose the best place to grow. Our Location Analysis studies customer demographics, market demand, and competition to help you select optimal locations for expansion and ensure maximum business visibility and performance."/> 
                 </Link>
-                <Link to="/application" onClick={()=>{ setServiceName("Location and markrt analysis") }}><Card2 
+                <Link to="/integrated-report" onClick={()=>{ setServiceName("Integrated Report") }}><Card2 
                   style='text-white'
                   mode={false}
-                  icon={ <IdCard size={45} color="#FFFFFF " /> }
+                  icon={ <Paperclip size={45} color="#FFFFFF " /> }
                   color={"bg-pink-400"}
-                  title="markrt analysis"
-                  content="Stay ahead with in-depth Market Analysis. We explore trends, consumer behavior, and competitor activity to uncover opportunities and guide your strategy—ensuring your business moves with confidence in any environment."/>  
+                  title="integrated report"
+                  content="After geting a try with our services and tools you can get and visualize your data and analysis an integrated report with all necessary data to make your business better and better, you can download a copy to your local device."/>  
                 </Link>
           </div> 
         </motion.div> 
@@ -324,7 +327,7 @@ export default function Home() {
                 <CustomeButton disabled={disable} name={"contact"} /> 
             </form> 
             <div className='w-6/12'>
-              <img className='rounded-2xl' src={contactImg} alt="contact image" />
+              <img className='rounded-2xl' src={contactImg} alt="contact image" loading='lazy' />
             </div>
           </div>
         </motion.div>

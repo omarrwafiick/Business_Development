@@ -12,11 +12,15 @@ export default function LocationService() {
     const navigate = useNavigate(); 
     const { applicationId, applicantId } = AppStore();
     const [disable, setDisable] = useState(false);
+
     const serviceSubmit = async (e) => {   
         setDisable(true);
         e.preventDefault(); 
         try {
-            await locationMarkrtAnalysisService(applicantId, applicationId);
+            const response = await locationMarkrtAnalysisService(applicantId, applicationId);
+            if(!response.ok()){
+                throw new Error(`Request failed with status ${response.status}`);
+            }  
             toaster.success("Service request was sent successfully");
             navigate("/payment");
         } catch (error) { 
@@ -24,6 +28,7 @@ export default function LocationService() {
         }
         setDisable(false);
     };
+    
   return (
     <div className='flex justify-center items-center flex-col w-full h-dvh'>
         <motion.div

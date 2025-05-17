@@ -27,6 +27,9 @@ export default function Login() {
         e.preventDefault();  
         try { 
             const response = await login({email, password});
+            if(!response.ok()){
+                throw new Error(`Request failed with status ${response.status}`);
+            }
             const categories = await getAllCategories();
             const service = await getAllServices();
             setUser(response.user);
@@ -34,7 +37,6 @@ export default function Login() {
             setCategories(categories);
             setServices(service);
             navigate("/");
-            
             await toaster.success("Logged in successfully");
             } 
         catch (error) {

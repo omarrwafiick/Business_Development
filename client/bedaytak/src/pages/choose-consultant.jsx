@@ -7,7 +7,7 @@ export default function ChooseConsultant() {
   var consultants = [];
 
   const req = async()=>{
-    await getAllConsultants();
+    return (await getAllConsultants()).data;
   }
   useEffect(()=>{
     try {

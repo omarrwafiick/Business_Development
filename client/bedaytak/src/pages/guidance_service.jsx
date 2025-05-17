@@ -18,6 +18,7 @@ export default function GuidanceService() {
   const [challenge, setChallenge] = useState(1);
   const { applicationId, applicantId } = AppStore();
   const [disable, setDisable] = useState(false);
+
   const serviceSubmit = async (e) => {   
     setDisable(true);
     e.preventDefault();  
@@ -29,7 +30,10 @@ export default function GuidanceService() {
         repeatCustomerLevel: repeat,     
         currentChallenge: challenge        
       };
-      await businessGuideService(applicantId, applicationId, data);
+      const response = await businessGuideService(applicantId, applicationId, data);
+      if(!response.ok()){
+          throw new Error(`Request failed with status ${response.status}`);
+      }
       //direct to review = not paid
       toaster.success("Service request was sent successfully");
       navigate("/review");
@@ -38,6 +42,7 @@ export default function GuidanceService() {
     }
     setDisable(false);
   };
+  
 return (
   <div className='flex justify-center items-center flex-col w-full h-dvh mt-8 mb-8'>
       <motion.div

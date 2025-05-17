@@ -24,6 +24,7 @@ import AdminRoute from '../components/admin-route';
 import ConsultantRoute from '../components/consultant-route';
 import ProtectedRoute from '../components/protected-route';
 import BusinessOwnerRoute from '../components/business-owner-route';
+import ConsultantsResponses from '../pages/consultants-responses';
  
 const RoutesConfig  = () => ( 
   <Routes>
@@ -31,7 +32,7 @@ const RoutesConfig  = () => (
     <Route path="/login" element={<Login />} />
     <Route path="/signup" element={<Signup />} />
     <Route path="/business" element={<AddBusiness />} />
-    <Route path="/forget-password" element={<ForgetPassword />} />
+    <Route path="/forget-password" element={<ForgetPassword />} /> 
     <Route path="/reset-password/:token" element={<ResetPassword />} />
     <Route path="/admin" element={<Admin />} />
     <Route path="/application" element={<Application />} />
@@ -46,6 +47,7 @@ const RoutesConfig  = () => (
     <Route path="/payment" element={<Payment />} />
     <Route path="/sales-service" element={<SalesService />} />
     <Route path="/report" element={<IntegratedReport />} />
+    <Route path="/consultants-responses" element={<ConsultantsResponses />} />
     <Route path="/service-result" element={<ServiceResult />} />
     <Route path="*" element={<NotFound />} />
   </Routes>

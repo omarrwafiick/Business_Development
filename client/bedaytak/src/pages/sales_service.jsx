@@ -30,7 +30,10 @@ export default function SalesService() {
         workingDays: days, 
         estimatedRevenue: revenue
       };
-      await salesOptimizationService(applicantId, applicationId, data);
+      const response = await salesOptimizationService(applicantId, applicationId, data);
+      if(!response.ok()){
+          throw new Error(`Request failed with status ${response.status}`);
+      }
       toaster.success("Service request was sent successfully");
       navigate("/payment");
     } catch (error) {
@@ -38,6 +41,7 @@ export default function SalesService() {
     }
     setDisable(false);
   };
+  
   return (
     <div className='flex justify-center items-center flex-col w-full h-dvh mb-2'>
         <motion.div

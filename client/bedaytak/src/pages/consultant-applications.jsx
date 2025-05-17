@@ -8,9 +8,11 @@ import AppStore from '../store/store';
 export default function ConsultantApplications() {
   var applications = [];
   const { consultandId } = AppStore();  
+
   const req = async () => {
-    await getConsultantApplications(consultandId);
+    return (await getConsultantApplications(consultandId)).data;
   };  
+
   useEffect(()=>{
     try {
           applications.push(req());  
@@ -18,6 +20,7 @@ export default function ConsultantApplications() {
         toaster.error(`Error : ${error}`);
         }
   },[]);
+  
   return (
     <div className='w-full h-dvh flex flex-col justify-start items-center mt-8'>  
       <div className="relative flex flex-col justify-center items-center ">

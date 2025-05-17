@@ -44,12 +44,17 @@ export default function Consultant() {
         summaryRecommendation: summary
       };
       
-      await consultancyService({
+      const response = await consultancyService({
         applicantid: consultationData.applicantId,
         applicationid: consultationData.applicationId,
         consultencyid: user._id,
         data
       });
+
+      if(!response.ok()){
+          throw new Error(`Request failed with status ${response.status}`);
+      }
+
       toaster.success("Consultation sent successfully");
       navigate("/");
     } catch (error) { 
@@ -57,6 +62,7 @@ export default function Consultant() {
     }
     setDisable(false);
   };
+  
   return (
     <div className='flex justify-center items-center flex-col w-full'>
         <motion.div

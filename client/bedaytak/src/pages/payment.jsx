@@ -14,14 +14,17 @@ import PaypalPayment from '../components/paypal';
 
 export default function Payment() {
     const { setReviewData, applicationId, applicantId, serviceName, services } = AppStore();
+
     useEffect(()=>{
         let service = services.filter(x => x.name.toLowerCase().include(serviceName.substring(0,4)));
         setServiceprice(service.amount);
     }, []);
+
     const [disable, setDisable] = useState(false);
     const [serviceprice, setServiceprice] = useState(0);
     const [paypalPaymentStatus, setPaypalPaymentStatus] = useState(false);
     const navigate = useNavigate();
+    
     const serviceSubmit = async (e, paymentState) => {   
       setDisable(true);
       e.preventDefault(); 
@@ -54,7 +57,9 @@ export default function Payment() {
             response = await getLocationMarkrtAnalysisServiceFree(applicantId, applicationId)
           } 
         };
-
+        if(!response.ok()){
+          throw new Error(`Request failed with status ${response.status}`);
+        }
         setReviewData(response);
         toaster.success("Request was sent successfully");
         navigate("/service-result");
@@ -63,6 +68,7 @@ export default function Payment() {
       }
       setDisable(false);
     };
+
   return (
     <div className='flex justify-center items-center flex-col w-full h-dvh'>
         <motion.div

@@ -17,8 +17,8 @@ export default function AddBusiness() {
     const allCategories = [];
 
     useEffect(async ()=>{
-        allCategories.push(await getAllCategories());
-        allLocations.push(await getAllLocations());
+        allCategories.push((await getAllCategories()).data);
+        allLocations.push((await getAllLocations()).data);
     },[]);
 
     const form = useRef(); 
@@ -28,6 +28,7 @@ export default function AddBusiness() {
     const [location, setLocation] = useState('');
     const [disable, setDisable] = useState(false);
     const navigate = useNavigate();
+
     const businessSubmit = async (e) => {   
         setDisable(true);
         e.preventDefault();  
@@ -35,7 +36,10 @@ export default function AddBusiness() {
         const locationName = all.map(x=>x._id === location).name;
         const categoryId = allCategories.map(x=>x._id === category)._id;
         const ownerId = user._id;
-        await addBusiness({name, description, ownerId, categoryId, locationName });
+        const response = await addBusiness({name, description, ownerId, categoryId, locationName });
+        if(!response.ok()){
+            throw new Error(`Request failed with status ${response.status}`);
+        }
         toaster.success("Business added successfully");
         navigate("/login");
         } catch (error) {
@@ -43,7 +47,8 @@ export default function AddBusiness() {
         form.current.reset();
         }
         setDisable(false);
-      }; 
+    }; 
+
     return (
       <div  className='flex justify-center items-center flex-col w-full h-dvh font-gelasio'>
           <motion.div

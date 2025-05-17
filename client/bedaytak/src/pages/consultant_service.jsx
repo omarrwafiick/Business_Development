@@ -20,6 +20,7 @@ export default function ConsultantService() {
   const [goal, SetGoal] = useState('');
   const navigate = useNavigate();
   const [disable, setDisable] = useState(false);
+
   const serviceSubmit = async (e) => { 
     setDisable(true);  
     e.preventDefault(); 
@@ -32,7 +33,10 @@ export default function ConsultantService() {
         monthlyBudget: budget,
         mainGoal: goal
       }; 
-      await seedConsultantService(applicantId, applicationId, data);
+      const response = await seedConsultantService(applicantId, applicationId, data);
+      if(!response.ok()){
+          throw new Error(`Request failed with status ${response.status}`);
+      }
       navigate("/");
       toaster.success("Consultation data was sent successfully, wait for consultant response via your email address");
     } catch (error) {
@@ -40,6 +44,7 @@ export default function ConsultantService() {
     }
     setDisable(false);
   }; 
+  
   const Stage1 = "Just an idea";
   const Stage2 = "Started but early";
   const Stage3 = "Running for a while";

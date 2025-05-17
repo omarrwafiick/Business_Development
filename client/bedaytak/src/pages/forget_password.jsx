@@ -12,11 +12,15 @@ export default function ForgetPassword() {
   const [email, SetEmail] = useState('');
   const navigate = useNavigate();
   const [disable, setDisable] = useState(false);
+
   const forgetPasswordSubmit = async (e) => {   
     setDisable(true);
     e.preventDefault(); 
     try { 
-    await forgetPassword({email});
+    const response = await forgetPassword({email});
+    if(!response.ok()){
+       throw new Error(`Request failed with status ${response.status}`);
+    }
     toaster.success("Request sent successfully");
     navigate("/reset-password"); 
     } catch (error) {
@@ -25,6 +29,7 @@ export default function ForgetPassword() {
     }
     setDisable(false);
   };
+  
   return (
     <div  className='flex justify-center items-center flex-col w-full h-dvh font-gelasio'>
         <motion.div
