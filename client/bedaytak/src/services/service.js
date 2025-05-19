@@ -35,7 +35,7 @@ export const seedConsultantService = async (applicantid, applicationid, data) =>
  
 export const consultancyService = async (applicantid, applicationid, consultencyid, data) => api.post(domain+`/consultancy/${applicantid}/${applicationid}/${consultencyid}`, data);
 
-export const getConsultancyServiceResult = async (applicantid, applicationid) => api.get(domain+`/consultancy/${applicantid}/${applicationid}`);
+export const getConsultancyServiceResult = async (applicantid) => api.get(domain+`/consultancy/${applicantid}`);
 
 export const getAllServices= async () => api.get(domain+"/get-services");
 

@@ -16,37 +16,44 @@ export default function IntegratedReport() {
   };
   
   useEffect(()=>{
-    reports(); 
+    //reports(); 
   },[])
+
+  const commonStyle = "w-10/12 flex justify-center items-center shadow-md p-6 rounded-lg mb-10";
  
   return (
     <div className='w-full flex flex-col justify-center items-center mt-10 mb-10'>
-        <div className='w-10/12 flex flex-col justify-center items-center border-b-2 border-b-black/15 pb-12 mb-10'>
+        <div className='w-10/12 flex flex-col justify-center items-center pb-6'>
           <div className='flex flex-col justify-center items-center'>
             <span className='m-4'>
                 <ClipboardList size={65} color="#F66A35" /> 
             </span>
             <h4 className='capitalize mb-2! text-4xl font-bold font-gelasio'>bedaytak integrated report report</h4>
             <p className='text-md mt-4! mb-4! leading-7 opacity-80 text-center'>Choose your own format to get data as you wish.</p>
-            <div className=''>
-              
-                <SmallButton onClick={()=>exportPDF( 
-                    [
-                      { name: "Ali", age: 25, status: "active" },
-                      { name: "Sara", age: 30, status: "inactive" },
-                    ]
-                )} name="Pdf" style={'bg-secondary text-white! ms-3!'}/>
+            <div className=''> 
+                <SmallButton onClick={(e) => {
+                      e.preventDefault();
+                      exportPDF([ 
+                        { name: "Ali", age: 25, status: "active" },
+                        { name: "Sara", age: 30, status: "inactive" },
+                      ]);
+                    }}
+                    name="Pdf" style={'bg-secondary text-white! ms-3!'}/>
 
-                <SmallButton onClick={()=>exportExcel(
-                    [
-                      { name: "Ali", age: 25, status: "active" },
-                      { name: "Sara", age: 30, status: "inactive" },
-                    ]
-                )} name="Excel" style={'bg-secondary text-white! ms-3!'}/>
-
+                <SmallButton onClick={(e)=> {
+                      e.preventDefault();
+                      exportExcel( 
+                      [
+                        { name: "Ali", age: 25, status: "active" },
+                        { name: "Sara", age: 30, status: "inactive" },
+                      ]);
+                    }}
+                  name="Excel" style={'bg-secondary text-white! ms-3!'}/> 
             </div>
           </div>
-  
+        </div>
+
+        <div className={commonStyle}>  
           <div className='flex justify-center items-center w-6/12'> 
             <ReportSection 
               icon={<Users size={55} color="#F66A35" />} 
@@ -62,7 +69,7 @@ export default function IntegratedReport() {
           </div>
         </div>
 
-        <div className='w-10/12 flex justify-center items-center border-b-2 border-b-black/15 pb-12 mb-10'>
+        <div className={commonStyle}>
           <div className='flex justify-center items-center w-6/12'>
             <ReportSection 
               icon={<HelpCircleIcon size={55} color="#F66A35" />} 
@@ -78,7 +85,7 @@ export default function IntegratedReport() {
           </div>
         </div>
 
-        <div className='w-10/12 flex justify-center items-center border-b-2 border-b-black/15 pb-12 mb-10'>
+        <div className={commonStyle}>
           <div className='flex justify-center items-center w-6/12'>
             <ReportSection 
               icon={<BadgeDollarSignIcon size={55} color="#F66A35" />} 
@@ -94,7 +101,7 @@ export default function IntegratedReport() {
           </div>
         </div>
 
-        <div className='w-10/12 flex justify-center items-center'>
+        <div className={commonStyle}>
           <div className='flex justify-center items-center w-6/12'>
             <ReportSection 
               icon={<LocationEditIcon size={55} color="#F66A35" />}

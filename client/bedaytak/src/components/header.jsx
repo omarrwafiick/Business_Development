@@ -111,25 +111,25 @@ const { role, isAuthenticated } = AppStore();
             {showProfile && ( 
                 <div ref={profileRef} onClick={(e) => e.stopPropagation()} className='absolute flex flex-col justify-start items-center right-6 top-16 bg-white max-h-96 overflow-auto scroll-auto p-6 rounded-lg shadow-lg w-2/12'>
                     <X size={55} color="#FF0000" onClick={() => setShowProfile(false)} className="cursor-pointer absolute top-0 right-0 px-4 py-2 rounded" />
-                    <h2 className="text-xl font-bold mt-4! mb-3! capitalize border-b-2 border-black/10 pb-3! w-full">user options</h2>    
+                    <h2 className="text-xl font-bold mt-4! capitalize border-b-2 border-black/10 pb-3! w-full">user options</h2>    
                     {
                         role === 'admin' ? 
-                            <h1 onClick={()=>navigate('/admin')} className='text-lg w-full opacity-85 capitalize mb-2! cursor-pointer hover:text-black/70 duration-200'>
+                            <h1 onClick={()=>navigate('/admin')} className='text-md w-full opacity-85 capitalize mt-4! cursor-pointer hover:text-black/70 duration-200'>
                                 manage users
                             </h1>   
                         :
                         role === 'consultant' ?
                        <>
-                            <h1 onClick={()=>navigate('/consultant-applications')} className='text-lg w-full opacity-85 capitalize mb-2! cursor-pointer hover:text-black/70 duration-200'>
+                            <h1 onClick={()=>navigate('/consultant-applications')} className='text-md w-full opacity-85 capitalize mt-4! cursor-pointer hover:text-black/70 duration-200'>
                                 applications
                             </h1> 
                         </>
                         : 
-                        <h1 onClick={()=>navigate('/consultants-responses')} className='text-lg w-full opacity-85 capitalize mb-2! cursor-pointer hover:text-black/70 duration-200'>
+                        <h1 onClick={()=>navigate('/consultants-responses')} className='text-md w-full opacity-85 capitalize mt-4! cursor-pointer hover:text-black/70 duration-200'>
                             consultants responses
                         </h1>
                     }
-                    <h1 onClick={()=>logoutUser()} className='text-lg w-full opacity-85 capitalize mb-2! cursor-pointer hover:text-black/70 duration-200'>
+                    <h1 onClick={()=>logoutUser()} className='text-md w-full opacity-85 capitalize mt-4! cursor-pointer hover:text-black/70 duration-200'>
                         logout
                     </h1>
                 </div> 

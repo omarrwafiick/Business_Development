@@ -237,8 +237,8 @@ export default function Home() {
           </div> 
         </motion.div>
 
-        <motion.div className='w-full bg-dark flex flex-col justify-evenly items-center pt-20 pb-20'>
-          <h1 ref={serviceRef} id="services" className='text-white capitalize font-bold text-5xl'>what we do to serve your best</h1>
+        <motion.div ref={serviceRef} id="services" className='w-full bg-dark flex flex-col justify-evenly items-center pt-20 pb-20'>
+          <h1 className='text-white capitalize font-bold text-5xl'>what we do to serve your best</h1>
           <p className='font-inter text-white opacity-70 text-sm w-8/12 text-center mt-8! leading-6 capitalize mb-10!'>We provide tailored solutions designed to match your business needs. From strategic planning to hands-on support, every service we offer is focused on delivering maximum value, helping you operate smarter and achieve lasting success.</p>
           
           <div className='w-10/12 grid grid-cols-3 gap-8 mt-6'>
@@ -282,7 +282,7 @@ export default function Home() {
                   title="Location analysis"
                   content="Choose the best place to grow. Our Location Analysis studies customer demographics, market demand, and competition to help you select optimal locations for expansion and ensure maximum business visibility and performance."/> 
                 </Link>
-                <Link to="/integrated-report" onClick={()=>{ setServiceName("Integrated Report") }}><Card2 
+                <Link to="/report" onClick={()=>{ setServiceName("Integrated Report") }}><Card2 
                   style='text-white'
                   mode={false}
                   icon={ <Paperclip size={45} color="#FFFFFF " /> }
