@@ -11,17 +11,25 @@ export default function ForgetPassword() {
   const form = useRef(); 
   const [email, SetEmail] = useState('');
   const navigate = useNavigate();
+  const [disable, setDisable] = useState(false);
+
   const forgetPasswordSubmit = async (e) => {   
+    setDisable(true);
     e.preventDefault(); 
     try { 
-    await forgetPassword({email});
+    const response = await forgetPassword({email});
+    if(!response.ok()){
+       throw new Error(`Request failed with status ${response.status}`);
+    }
     toaster.success("Request sent successfully");
     navigate("/reset-password"); 
     } catch (error) {
       toaster.error(`Error : ${error}`);
       form.current.reset();
     }
+    setDisable(false);
   };
+  
   return (
     <div  className='flex justify-center items-center flex-col w-full h-dvh font-gelasio'>
         <motion.div
@@ -37,7 +45,7 @@ export default function ForgetPassword() {
 
             <form ref={form} onSubmit={forgetPasswordSubmit} className='w-full mt-3'>
                 <CustomeInput value={email} onClick={(e)=> SetEmail(e.target.value)} name={"email"} type={"email"}/>
-                <CustomeButton name={"submit"} />
+                <CustomeButton disabled={disable} name={"submit"} />
             </form>
         </motion.div>
     </div>

@@ -780,25 +780,16 @@ const consultancyService  = async (req, res) => {
 
 const getConsultancyResult = async (req, res) => { 
   try {  
-     const applicantId = req.params.applicantid;
-     const applicationId = req.params.applicationid;
-
-     const application = await VerifyApplication(applicantId, applicationId);
-
-     if (!application) {
-       return res.status(404).json({ success: false, message: "Application not found" });
-     }
-
-     const serviceExist = await Consultancy.findOne({applicantId: applicantId, applicationId: applicationId});
-
-     if (!serviceExist) {
+     const applicantId = req.params.applicantid; 
+     
+     const data = await Consultancy.find({applicantId: applicantId});
+ 
+     if (!data) {
        return res.status(404).json({ success: false, message: "No service was found" });
      }  
      
      return res.status(200).json({ success: true, 
-         data :{
-             ...serviceExist
-         }
+         data
       });
  
    } catch (error) {

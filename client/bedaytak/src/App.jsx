@@ -6,10 +6,21 @@ import { useEffect } from 'react';
 import { checkAuth } from './services/auth-service'
 import AppStore from './store/store';
 import { HeadProvider } from 'react-head';
+import { Toaster } from 'react-hot-toast'
 
-function App() {    
-  const setAuth = AppStore.getState().setApplicationId;
-  const {isAuthenticated} = AppStore();
+function App() {     
+  const {setIsAuthenticated, isAuthenticated, setToken} = AppStore();
+
+  const manageToken = ()=>{
+    const token = Cookies.get('token');
+    if(!token){
+      navigate('/login');
+    }
+    else{
+      setToken(token);
+    }
+  };
+
   // const req = async ()=>{
   //   return await checkAuth();
   // };
@@ -17,16 +28,18 @@ function App() {
   //   if(!isAuthenticated){
   //     const response = req();
   //     if(response.success){
-  //       setAuth(true);
+  //       setIsAuthenticated(true);
   //     }  
   //   }
   // },[]);
+  
   const location = useLocation();
   return (
     <div className='font-gelasio'> 
       {location.pathname === '/' && <Header />}
       <HeadProvider>  
         <RoutesConfig />
+        <Toaster />
       </HeadProvider>
       {location.pathname === '/' && <Footer />}
     </div> 

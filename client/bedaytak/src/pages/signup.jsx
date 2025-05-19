@@ -9,6 +9,8 @@ import { useNavigate } from 'react-router-dom';
 import toaster from 'react-hot-toast'
 import { register } from '../services/auth-service';
 import AppStore from '../store/store';
+import { passwordRegex } from '../utils/main';
+
 
 export default function Signup() {   
   const form = useRef();  
@@ -17,15 +19,17 @@ export default function Signup() {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [phone, setPhone] = useState(''); 
   const [fullname, setFullname] = useState('');
-  const [role, setRole] = useState('');
-
+  const [role, setRole] = useState(''); 
   const setUser = AppStore.getState().setUser;
   const navigate = useNavigate();
+  const [disable, setDisable] = useState(false);
+
   const signupSubmit = async (e) => {
+    setDisable(true);
     e.preventDefault();  
     try {
-      if(password!==confirmPassword){
-        toaster.error("Passwords doesn't match");
+      if(password!==confirmPassword || !passwordRegex.test(password)){
+        toaster.error("Passwords doesn't match or not strong");
         return;
       }
       const response = await register({
@@ -34,6 +38,9 @@ export default function Signup() {
         password, 
         phoneNumber: phone, 
         role});
+      if(!response.ok()){
+        throw new Error(`Request failed with status ${response.status}`);
+      }
       setUser(response.user);
       toaster.success("Signed up successfully");
       if(role === 'BusinessOwner'){  
@@ -44,7 +51,9 @@ export default function Signup() {
       toaster.error(`Error : ${error}`);
       form.current.reset();
     }
+    setDisable(false);
   };
+  
   return (
     <div className='flex justify-center items-center flex-col w-full h-dvh font-gelasio mt-12 mb-12'>
         <motion.div
@@ -74,8 +83,8 @@ export default function Signup() {
                       value="Entrepreneur" 
                       checked={role === 'Entrepreneur'}
                       onChange={(e) => setRole(e.target.value)}
-                      className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600" />
-                      <label htmlFor="default-radio-1" className="ms-2 text-md font-medium text-gray-900 dark:text-gray-300 capitalize">entrepreneur</label>
+                      className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 focus:ring-2 " />
+                      <label htmlFor="default-radio-1" className="ms-2 text-md font-medium text-gray-900 capitalize">entrepreneur</label>
                   </div>
                   <div class="flex items-center">
                       <input 
@@ -85,11 +94,11 @@ export default function Signup() {
                       name="default-radio2"
                       checked={role === 'BusinessOwner'}
                       onChange={(e) => setRole(e.target.value)} 
-                      className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600" />
-                      <label htmlFor="default-radio-2" className="ms-2 text-md font-medium text-gray-900 dark:text-gray-300 capitalize">business owner</label>
+                      className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 focus:ring-2" />
+                      <label htmlFor="default-radio-2" className="ms-2 text-md font-medium text-gray-900 capitalize">business owner</label>
                   </div>  
                 </div>
-                <CustomeButton name={"signup"} />
+                <CustomeButton disabled={disable} name={"signup"} />
             </form>
             <p className='opacity-80 text-center text-sm w-6/12 leading-6 mt-3!'>By clicking continue, you agree to our Terms of Service and Privacy Policy.</p>
         </motion.div>

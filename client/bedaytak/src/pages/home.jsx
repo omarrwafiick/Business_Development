@@ -5,7 +5,8 @@ import SmallButton from '../components/small-button'
 import Card from '../components/card';
 import Card2 from '../components/card2';
 import { BriefcaseBusiness, User, Clock, MessageSquare, Users, Heart, CircleDollarSign, 
-        NotebookIcon, BanknoteArrowUp, HeartHandshake, IdCard, LocationEdit, CodesandboxIcon, 
+        NotebookIcon, BanknoteArrowUp, HeartHandshake, IdCard, LocationEdit, CodesandboxIcon,
+        Paperclip, 
 } from 'lucide-react';
 import Team from '../components/team';
 import CustomeInput from '../components/custome_input';
@@ -32,23 +33,31 @@ export default function Home() {
   const { user } = AppStore();
   const [message, setMessage] = useState('');
   const [subject, setSubject] = useState('');
+  const [disable, setDisable] = useState(false);
 
   const messageSubmit = async (e) =>{
+    setDisable(true);
+    e.preventDefault();
     try { 
-      await businessGuideService(user._id, {subject, message}); 
+      const response = await businessGuideService(user._id, {subject, message}); 
+      if(!response.ok()){
+          throw new Error(`Request failed with status ${response.status}`);
+      }
       toaster.success("Message was sent successfully");
     } catch (error) {
       toaster.error(`Error : ${error}`);
     }
     form.current.reset();
+    setDisable(false);
   };  
-  const setServiceName = AppStore.getState().setchosenService;
-  const heroRef = useRef(null); 
+
+  const setServiceName = AppStore.getState().setchosenService; 
   const contactRef = useRef(null); 
   const serviceRef = useRef(null); 
   const pricingRef = useRef(null); 
   const aboutRef = useRef(null); 
   const location = useLocation();
+  
   useLayoutEffect(() => {
     if (location.hash === '#contact') {
       contactRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -61,10 +70,7 @@ export default function Home() {
     }
     else if(location.hash === '#pricing'){
       pricingRef.current?.scrollIntoView({ behavior: 'smooth' });
-    }
-    else if(location.hash === '#hero'){
-      heroRef.current?.scrollIntoView({ behavior: 'smooth' });
-    }
+    } 
   }, [location])
 
   //first section 
@@ -96,11 +102,19 @@ export default function Home() {
     visible: { opacity: 1, y: 0, transition: { duration: 0.8 } }
   };
 
+  const pageDescription = `Bedaytak is a business intelligence platform designed to help
+                  entrepreneurs in Alexandria, Egypt, make data-driven decisions when
+                  starting or expanding their businesses. The platform provides insights
+                  on optimal business locations, market competition, financial modeling,
+                  networking, and legal procedures, tailored specifically to the Egyptian
+                  market.`;
+
   return ( 
     <div className='w-full flex flex-col justify-center items-center'>
         <Title>Bedaytak - Home</Title>
-        <Meta name="description" content="My app description" />
-        <motion.div ref={heroRef} id="hero"
+        <Meta name="description" content={pageDescription} />
+
+        <motion.div
           variants={{
             hidden:{opacity:0, y:75},
             visible:{opacity:1, y:0},
@@ -117,13 +131,8 @@ export default function Home() {
                   <span className='me-3'>consultation</span> 
                   <BriefcaseBusiness size={55} color="#F66A35" />
                 </a>
-                <p className='opacity-70 text-sm w-10/12 text-start mt-8! leading-7 capitalize font-inter'>
-                  Bedaytak is a business intelligence platform designed to help
-                  entrepreneurs in Alexandria, Egypt, make data-driven decisions when
-                  starting or expanding their businesses. The platform provides insights
-                  on optimal business locations, market competition, financial modeling,
-                  networking, and legal procedures, tailored specifically to the Egyptian
-                  market.   
+                <p className='opacity-70 text-sm w-10/12 z-10! text-start mt-8! leading-7 capitalize font-inter'>
+                    {pageDescription}
                 </p> 
                 <div className='flex justify-start items-center w-full mt-8'> 
                     <SmallButton name="Get Started" style={'bg-primary text-white!'} to="signup"/>
@@ -135,7 +144,7 @@ export default function Home() {
               </div> 
             </div>
             <div className='w-6/12 h-full flex justify-end items-center'>
-                <img src={cover} className="rounded-2xl w-full mt-5" alt="bedaytak cover" />
+                <img src={cover} className="rounded-2xl w-full mt-5" alt="bedaytak cover" loading='lazy' />
             </div>
         </motion.div>
          
@@ -144,7 +153,7 @@ export default function Home() {
           variants={variants}
           initial="hidden"
           animate={introControls}
-          className='tablet:w-2/12 w-full bg-dark flex justify-evenly items-center pt-16 pb-16'>
+          className='w-full bg-dark flex justify-evenly items-center pt-16 pb-16'>
           <div className='w-10/12 grid grid-cols-3 gap-8'>
              <Card   
                   icon={ <BriefcaseBusiness size={55} color="#FFFFFF" /> }
@@ -165,11 +174,11 @@ export default function Home() {
         </motion.div>
 
         <motion.div  
-        className='w-10/12 flex justify-center items-center pt-32 pb-16'>
+          className='w-10/12  h-screen flex justify-center items-center pt-20 pb-20'>
           <div className='w-6/12 flex justify-between items-center relative'> 
-            <img src={Business1} className="h-80 absolute rounded-tl-2xl rounded-2xl opacity-60" alt="image 1" />
-            <img src={Business2} className="h-80 absolute ml-8 -mt-8 rounded-tl-2xl rounded-2xl opacity-80" alt="image 2" />
-            <img src={Business3} className="h-80 absolute ml-16 -mt-16 rounded-tl-2xl rounded-2xl " alt="image 3" />
+            <img src={Business1} className="h-80 absolute rounded-tl-2xl rounded-2xl opacity-60" alt="image 1" loading='lazy' />
+            <img src={Business2} className="h-80 absolute ml-8 -mt-8 rounded-tl-2xl rounded-2xl opacity-80" alt="image 2" loading='lazy' />
+            <img src={Business3} className="h-80 absolute ml-16 -mt-16 rounded-tl-2xl rounded-2xl " alt="image 3" loading='lazy' />
           </div>
           <div className='w-6/12 flex flex-col justify-center items-center'>
             <h1 className='capitalize font-bold text-4xl'>we are trusted consulting</h1>
@@ -185,7 +194,7 @@ export default function Home() {
           variants={variants}
           initial="hidden"
           animate={featureControls}
-          className='w-full flex justify-evenly items-center pt-16 pb-16'>
+          className='w-full flex justify-evenly items-center pb-32'>
           <div className='w-10/12 grid grid-cols-3 gap-8'>
              <Card2 
                   mode={true} 
@@ -209,7 +218,7 @@ export default function Home() {
         </motion.div>
 
         <motion.div 
-          ref={aboutRef} id="about" className='w-full flex flex-col justify-evenly items-center pt-16 pb-16'>
+          ref={aboutRef} id="about" className='w-full  h-screen flex flex-col justify-evenly items-center pt-16 pb-16'>
           <h1 className='capitalize font-bold text-5xl'>meet our perfect advisors</h1>
           <p className='font-inter opacity-50 text-sm w-8/12 text-center mt-8! leading-6 capitalize mb-10!'>Seasoned professionals with deep industry knowledge and a passion for helping businesses succeed. They offer clear, actionable guidance tailored to your goals, ensuring every step you take leads to progress.</p>
           <div className='w-10/12 grid grid-cols-3 gap-8'> 
@@ -228,7 +237,7 @@ export default function Home() {
           </div> 
         </motion.div>
 
-        <motion.div ref={serviceRef} id="services" className='w-full bg-dark flex flex-col justify-evenly items-center pt-32 pb-32'>
+        <motion.div ref={serviceRef} id="services" className='w-full bg-dark flex flex-col justify-evenly items-center pt-20 pb-20'>
           <h1 className='text-white capitalize font-bold text-5xl'>what we do to serve your best</h1>
           <p className='font-inter text-white opacity-70 text-sm w-8/12 text-center mt-8! leading-6 capitalize mb-10!'>We provide tailored solutions designed to match your business needs. From strategic planning to hands-on support, every service we offer is focused on delivering maximum value, helping you operate smarter and achieve lasting success.</p>
           
@@ -273,18 +282,18 @@ export default function Home() {
                   title="Location analysis"
                   content="Choose the best place to grow. Our Location Analysis studies customer demographics, market demand, and competition to help you select optimal locations for expansion and ensure maximum business visibility and performance."/> 
                 </Link>
-                <Link to="/application" onClick={()=>{ setServiceName("Location and markrt analysis") }}><Card2 
+                <Link to="/report" onClick={()=>{ setServiceName("Integrated Report") }}><Card2 
                   style='text-white'
                   mode={false}
-                  icon={ <IdCard size={45} color="#FFFFFF " /> }
+                  icon={ <Paperclip size={45} color="#FFFFFF " /> }
                   color={"bg-pink-400"}
-                  title="markrt analysis"
-                  content="Stay ahead with in-depth Market Analysis. We explore trends, consumer behavior, and competitor activity to uncover opportunities and guide your strategy—ensuring your business moves with confidence in any environment."/>  
+                  title="integrated report"
+                  content="After geting a try with our services and tools you can get and visualize your data and analysis an integrated report with all necessary data to make your business better and better, you can download a copy to your local device."/>  
                 </Link>
           </div> 
         </motion.div> 
 
-        <motion.div ref={pricingRef} id="pricing" className='w-full bg-secondary flex flex-col justify-evenly items-center pt-16 pb-16'>
+        <motion.div ref={pricingRef} id="pricing" className='w-full h-full bg-secondary flex flex-col justify-evenly items-center pt-20 pb-20'>
           <h1 className='text-white capitalize font-bold text-5xl'>our prices!</h1>
           <p className='font-inter text-white opacity-90 text-sm w-8/12 text-center mt-8! leading-6 capitalize mb-10!'>Our pricing is simple, transparent, and designed to fit every stage of your business journey. Whether you're starting out or scaling up, our plans offer real value—packed with expert services to help you grow smarter at every step.</p>
           <SmallButton name="Apply Now" style={'bg-primary text-white! ms-3!'} to="#services"/>
@@ -307,7 +316,7 @@ export default function Home() {
           </div> 
         </motion.div> 
 
-        <motion.div ref={contactRef} id="contact" className='w-full flex flex-col justify-center items-center pt-16 pb-32'>
+        <motion.div ref={contactRef} id="contact" className='w-full h-full flex flex-col justify-center items-center pt-20 pb-20'>
           <h1 className='capitalize font-bold text-6xl'>contact us</h1>
           <p className='font-inter opacity-70 text-sm w-8/12 text-center mt-8! leading-6 capitalize mb-10!'>Have questions or need support? Our team is here to help! Reach out to us for personalized assistance, expert advice, or to learn more about our services. We're ready to guide you toward your business goals—contact us today!</p>
           <div className='flex justify-evenly items-center  w-10/12'>
@@ -315,10 +324,10 @@ export default function Home() {
                 <span className='w-full flex justify-center'><CodesandboxIcon size={115} color="#F66A35" /></span>
                 <CustomeInput value={message} onChange={(e)=> setMessage(e.target.value)} name={"message"} type={"text"}/> 
                 <CustomeTextarea value={subject} onChange={(e)=> setSubject(e.target.value)} name={"subject"} rowNum="5" type={"text"}/>   
-                <CustomeButton name={"contact"} /> 
+                <CustomeButton disabled={disable} name={"contact"} /> 
             </form> 
             <div className='w-6/12'>
-              <img className='rounded-2xl' src={contactImg} alt="contact image" />
+              <img className='rounded-2xl' src={contactImg} alt="contact image" loading='lazy' />
             </div>
           </div>
         </motion.div>

@@ -20,11 +20,16 @@ export default function Login() {
     const setServices = AppStore.getState().setServices;
     const setUser= AppStore.getState().setUser;
     const setToken = AppStore.getState().setToken;
+    const [disable, setDisable] = useState(false);
     const navigate = useNavigate();
-    const loginSubmit = async (e) => {   
+    const loginSubmit = async (e) => {  
+        setDisable(true); 
         e.preventDefault();  
         try { 
             const response = await login({email, password});
+            if(!response.ok()){
+                throw new Error(`Request failed with status ${response.status}`);
+            }
             const categories = await getAllCategories();
             const service = await getAllServices();
             setUser(response.user);
@@ -38,6 +43,7 @@ export default function Login() {
             toaster.error(`Error : ${error.message}`);
             form.current.reset();
         }
+        setDisable(false);
     };
     return (
       <div className='flex justify-center items-center flex-col w-full h-dvh '>
@@ -56,14 +62,10 @@ export default function Login() {
               <form ref={form} onSubmit={loginSubmit} className='w-full mt-3'> 
                   <CustomeInput value={email} onChange={ (e) => setEmail(e.target.value) } name={"email"} type={"email"}/> 
                   <PasswordInput value={password} onChange={ (e) => setPassword(e.target.value) } name={"password"} />
-                  <div className='w-full flex justify-between mb-2'>
-                    <div className="flex items-center">
-                        <input id="checked-checkbox" type="checkbox" value="" className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded-sm focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600" />
-                        <label htmlFor="checked-checkbox" className="ms-2 text-sm font-medium capitalize text-gray-900 dark:text-gray-300">remeber me?</label>
-                    </div>
+                  <div className='w-full flex justify-between mb-2'> 
                     <Link className='capitalize cursor-pointer' to="/forget-password">forget password</Link>
                   </div>
-                  <CustomeButton name={"login"} />
+                  <CustomeButton disabled={disable} name={"login"} />
               </form>
               <p className='capitalize mt-3!'>don't have an account? <Link className='underline underline-offset-2 font-medium cursor-pointer' to="/signup">signup</Link></p>
           </motion.div>

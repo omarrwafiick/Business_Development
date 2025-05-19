@@ -11,7 +11,7 @@ const AppStore = create((set) => ({
   applicationId:null,
   setApplicationId:(data) => set({ applicationId: data }),
   applicantId:null,
-  setApplicantId:(data) => set({ applicantId: data }),
+  setApplicantId:(data) => set({ applicantId: data }), 
   consultandId:null,
   setConsultandId:(data) => set({ consultandId: data }),
   services:[],
@@ -24,13 +24,12 @@ const AppStore = create((set) => ({
   setCategories: (data) => set({ categories: data }),
   user:null,
   setUser: (data) => set({ user: data }),
-  token:'',
-  setToken: (data) => set({ token: data }),
+  token:'', 
   isAuthenticated:false,
   setIsAuthenticated: (data) => set({ isAuthenticated: data }),
   isLoading:false,  
   setIsLoading: (data) => set({ isLoading: data }),
-  role: null,
+  role: 'user',
   setToken: (newToken) => {
     const userRole = extractRole(newToken);
     set({ token: newToken, role: userRole, isAuthenticated: true });
@@ -42,5 +41,4 @@ const AppStore = create((set) => ({
 }));
 
 export default AppStore;
-
-//  const { count, increment, decrement, reset } = useStore(); // Access the store state and actions
+ 

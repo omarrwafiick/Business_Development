@@ -57,7 +57,7 @@ router.put('/update/paymentstatus/:id', validateInputs(paymentStatusSchema), upd
 
 router.post('/seed-consultant/:applicantid/:applicationid', validateInputs(seedConsultantSchema), seedDataToConsultant);
 
-router.get('/consultancy/:applicantid/:applicationid', getConsultancyResult);
+router.get('/consultancy/:applicantid', getConsultancyResult);
 
 router.get('/report/:applicantid', integratedReport);
 

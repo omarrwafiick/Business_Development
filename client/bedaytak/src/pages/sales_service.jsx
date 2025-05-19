@@ -16,9 +16,11 @@ export default function SalesService() {
   const [sales, setSales] = useState(0);
   const [days, setDays] = useState(0);
   const [revenue, setRevenue] = useState(0);
-
   const { applicationId, applicantId } = AppStore();
-  const serviceSubmit = async (e) => {   
+  const [disable, setDisable] = useState(false);
+
+  const serviceSubmit = async (e) => {    
+    setDisable(true);
     e.preventDefault(); 
     try { 
       const data = {
@@ -28,13 +30,18 @@ export default function SalesService() {
         workingDays: days, 
         estimatedRevenue: revenue
       };
-      await salesOptimizationService(applicantId, applicationId, data);
+      const response = await salesOptimizationService(applicantId, applicationId, data);
+      if(!response.ok()){
+          throw new Error(`Request failed with status ${response.status}`);
+      }
       toaster.success("Service request was sent successfully");
       navigate("/payment");
     } catch (error) {
       toaster.error(`Error : ${error}`);
     }
+    setDisable(false);
   };
+  
   return (
     <div className='flex justify-center items-center flex-col w-full h-dvh mb-2'>
         <motion.div
@@ -56,7 +63,7 @@ export default function SalesService() {
                 <CustomeInput value={days} onChange={(e)=> setDays(e.target.value)} name={"Working Days"} type={"number"}/> 
                 <CustomeInput value={revenue} onChange={(e)=> setRevenue(e.target.value)} name={"Estimated Revenue"} type={"number"}/> 
                 
-                <CustomeButton name={"submit"} />
+                <CustomeButton disabled={disable} name={"submit"} />
             </form>
             <p className='capitalize mt-3!'>back{"  "}<Link className='underline underline-offset-2 font-medium cursor-pointer' to="/">home?</Link></p>
         </motion.div>

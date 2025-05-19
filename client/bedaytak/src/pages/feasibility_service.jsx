@@ -15,7 +15,10 @@ export default function FeasibilityService() {
   const [sCost, setSCost] = useState(0);
   const navigate = useNavigate();
   const { applicationId, applicantId } = AppStore();
+  const [disable, setDisable] = useState(false);
+
   const serviceSubmit = async (e) => {   
+    setDisable(true);
     e.preventDefault(); 
     try { 
       const data = {
@@ -23,13 +26,18 @@ export default function FeasibilityService() {
         monthlyCosts: mCost, 
         startupCost: sCost
       };
-      await financialPlanningService(applicantId, applicationId, data);
+      const response = await financialPlanningService(applicantId, applicationId, data);
+      if(!response.ok()){
+          throw new Error(`Request failed with status ${response.status}`);
+      }
       toaster.success("Service request was sent successfully");
       navigate("/payment"); 
     } catch (error) {
-    toaster.error(`Error : ${error}`);
+      toaster.error(`Error : ${error}`);
     }
+    setDisable(false);
   };
+  
   return (
     <div className='flex justify-center items-center flex-col w-full h-dvh mb-2'>
         <motion.div
@@ -48,7 +56,7 @@ export default function FeasibilityService() {
                 <CustomeInput value={revenue} onChange={(e)=> { setRevenue(e.target.value)}} name={"Monthly Revenue"} type={"number"}/> 
                 <CustomeInput value={mCost} onChange={(e)=> { setMCost(e.target.value)}} name={"Monthly Costs"} type={"number"}/> 
                 <CustomeInput value={sCost} onChange={(e)=> { setSCost(e.target.value)}} name={"Startup Cost"} type={"number"}/>  
-                <CustomeButton name={"submit"} />
+                <CustomeButton disabled={disable} name={"submit"} />
             </form>
             <p className='capitalize mt-3!'>back{"  "}<Link className='underline underline-offset-2 font-medium cursor-pointer' to="/">home?</Link></p>
         </motion.div>
