@@ -5,6 +5,7 @@ const Joi = require('joi');
   description: Joi.string().min(10).required(),  
   ownerId: Joi.string().length(24).required(),  
   categoryId: Joi.string().length(24).required(), 
+  locationName: Joi.string().min(3).required()
 });
 
 module.exports = { createBusinessSchema };

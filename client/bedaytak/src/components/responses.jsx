@@ -83,7 +83,7 @@ export default function Responses({ data }) {
                 e.preventDefault();
                 exportExcel([data]);
             }}
-            name="Excel" style={'bg-secondary text-white!'}/>
+            name="Export" style={'bg-secondary text-white!'}/>
       </div> 
                    
       <div className="text-sm text-gray-500 mt-6 text-right">

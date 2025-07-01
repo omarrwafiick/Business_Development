@@ -32,10 +32,10 @@ export default function ChooseConsultant() {
           <span className='h-4 w-4 bg-yellow-400 rounded-sm me-1'></span> <a className='capitalize me-2'>junior</a> 
           <span className='h-4 w-4 bg-green-400 rounded-sm me-1'></span> <a className='capitalize me-2'>senior</a> 
         </div>
-        <div className='w-10/12 grid grid-cols-3 gap-8'>
+        <div className='w-10/12 grid grid-cols-4 gap-8'>
             {
               consultants?.map((consultant, index)=>(
-                <ConsultantCard id={consultant._id} name={consultant.userId.fullName} experienceYears={consultant.experienceYears} qualifications={consultant.qualificationsIds} /> 
+                <ConsultantCard key={index} id={consultant._id} name={consultant.userId.fullName} experienceYears={consultant.experienceYears} qualifications={consultant.qualificationsIds} /> 
               ))
             }
             

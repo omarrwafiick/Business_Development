@@ -11,10 +11,12 @@ const SignUp = async (req, res) => {
     try {
         const { fullName, email, password, phoneNumber, role } = req.body;
         
-        if(role.toLowerCase() !== process.env.ENTREPRENEUR.toLowerCase() || role.toLowerCase() !== process.env.BUSINESS_OWNER.toLowerCase() )
+        if(role.toLowerCase() !== process.env.ENTREPRENEUR.toLowerCase() 
+        && role.toLowerCase() !== process.env.BUSINESS_OWNER.toLowerCase())
         {
-            return res.status(400).json({ success: false, message: "You can not modify role" });
+            return res.status(400).json({ success: false, message: `You can't assign yourself to role -> ${role}` });
         }
+
         if (!fullName || !email || !password || !phoneNumber || !role) {
             return res.status(400).json({ success: false, message: "All fields are required!" });
         }
@@ -24,23 +26,20 @@ const SignUp = async (req, res) => {
 
         res.status(201).json({
             success: true,
-            message: "User is created successfully"
+            message: "User was created successfully",
+            user: {...result._doc, password: undefined} 
         });
 
     } catch (error) {
-        return res.status(400).json({ success: false, user: {...result._doc, password: undefined} });
+        return res.status(400).json({ success: false, message: "User couldn't be created"});
     }
-}; 
+};  
 
 const Login = async (req, res) =>{  
     try {
         const { email, password } = req.body;
-    
-        if(!email || !password){
-            throw new Error("All fields are required!");
-        }
-
-        const user = await User.findOne({email});
+     
+        const user = await User.findOne({email}).select('+password');
         if(!user){
             return res.status(404).json({success : false, message : `User was not found using this email : ${email}`}); 
         }
@@ -66,7 +65,7 @@ const ForgetPassword = async (req, res) => {
       const user = await User.findOne({ email: email });
       if (!user) {
         return res.status(404).json({ success: false, message: "User was not found" });
-      }
+      } 
   
       const resetToken = crypto.randomBytes(20).toString("hex");
       const resetTokenExpiration = Date.now() + 1 * 24 * 60 * 60 * 1000;  
@@ -97,9 +96,10 @@ const ForgetPassword = async (req, res) => {
 };
  
 const ResetPassword = async (req, res) =>{ 
-    const { token } = req.params; 
-    const { password } = req.body; 
     try { 
+        const { token } = req.params; 
+        const { password } = req.body; 
+
         const user = await User.findOne({
             resetToken: token,
             resetTokenExpiration: { $gt: Date.now() } 
@@ -144,11 +144,7 @@ const CheckAuth = async (req, res) =>{
 
 const Contact = async (req, res) =>{  
     try { 
-        const { message, subject } = req.body; 
-    
-        if(!message || !subject){
-            throw new Error("All fields are required!");
-        }
+        const { message, subject } = req.body;  
 
         const userId = req.params.id;
 
@@ -176,19 +172,4 @@ const Contact = async (req, res) =>{
     }
 }
 
-const getAllRoles = async (req, res) => {
-    try {        
-        const roles = await Role.find().where('name').nin([process.env.CONSULTANT, process.env.ADMIN]);
-            
-        if(!roles){
-            return res.status(404).json({ success: false, message: "No role was found"}); 
-        };  
-    
-        return res.status(200).json({ success: true, roles });    
-    
-        } catch (error) {
-            return res.status(500).json({ message: 'Internal server error' });
-        } 
-};
-
-module.exports = { SignUp, Login, ForgetPassword, ResetPassword, LogOut, CheckAuth, Contact, getAllRoles };
+module.exports = { SignUp, Login, ForgetPassword, ResetPassword, LogOut, CheckAuth, Contact };

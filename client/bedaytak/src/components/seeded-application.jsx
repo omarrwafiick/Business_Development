@@ -22,25 +22,31 @@ export default function SeededApplication({ data, onClick }) {
   };
 
   return (
-  <div className="group flex flex-col items-center border border-gray-200 rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition duration-300 cursor-pointer max-w-md mx-auto">
-       
-      <div className="w-full h-20 bg-primary transition-all duration-300 group-hover:brightness-105" />
+      <div className="bg-white rounded-xl shadow-md p-6 max-w-md mx-auto mt-6 cursor-pointer group transition-all duration-300 hover:shadow-lg">
  
-      <div className="flex flex-col items-start w-full p-6 space-y-4">
-        <div className="text-lg text-gray-800 flex flex-col">
-          <span className="font-semibold">Business Idea:</span>
-          <a>{data.businessIdea}</a>
-        </div>
+        <div className="w-full h-2 rounded-full mb-4 bg-gradient-to-r from-primary/80 to-primary" />
+ 
+        <div className="space-y-4 text-sm text-gray-700">
+          <div>
+            <span className="font-semibold text-lg">Business Idea:</span>
+            <p className="mt-2!">{data.businessIdea}</p>
+          </div>
 
-        <div className="text-lg text-gray-700 flex flex-col ">
-          <span className="font-bold">Business Stage:</span> 
-          <a>{data.stageOfBusiness}</a>
+          <div>
+            <span className="font-semibold text-lg">Stage of Business:</span>
+            <p className="mt-2!">{data.stageOfBusiness}</p>
+          </div>
         </div>
-
-        <form onSubmit={submit} className="w-full">
-          <CustomeButton onClick={()=> onClick(data)} disabled={disable} name="Respond" styles="bg-primary w-full rounded-lg" />
+ 
+        <form onSubmit={submit} className="mt-4">
+          <CustomeButton
+            onClick={() => onClick(data)}
+            disabled={disable}
+            name="Respond"
+            styles="bg-primary text-white w-full rounded-lg py-2!"
+          />
         </form>
       </div>
-    </div>
+
   )
 }

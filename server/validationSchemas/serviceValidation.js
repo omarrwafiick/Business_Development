@@ -1,5 +1,5 @@
 const Joi = require('joi');
-//reusables
+//reusable schemas
 const paymentStatus = Joi.boolean().required();
 const status = Joi.string().valid('Pending', 'Approved', 'Rejected').required();
 const consultantId = Joi.string().length(24).required(); 
@@ -11,11 +11,10 @@ const paymentStatusSchema = Joi.object({
  
 const updateApplicationSchema = Joi.object({
     paymentStatus,
-    status: Joi.boolean().required()
+    status: Joi.string().min(7).required()
 });
  
-const consultancyServiceSchema = Joi.object({
-    consultantId,   
+const consultancyServiceSchema = Joi.object({ 
     businessOverview: Joi.string().min(10).required(),
     industryAnalysis: Joi.string().min(10).required(),
     competitorInsights: Joi.string().min(10).required(),
@@ -46,8 +45,7 @@ const financialPlanningServiceSchema = Joi.object({
  
 const addApplicationSchema = Joi.object({  
     serviceId,
-    status, 
-    paymentStatus 
+    status
 });
 
 const salesOptimizationSchema = Joi.object({ 
@@ -59,11 +57,11 @@ const salesOptimizationSchema = Joi.object({
 });
 
 const businessGuideSchema = Joi.object({  
-    stageBusiness: Joi.number().required(), 
-    currentlymakingMonthlyProfit: Joi.number().required(), 
-    customersDoYouGetPerMonth: Joi.number().required(), 
-    repeatCustomers: Joi.number().required(), 
-    mainChallengeRightNow: Joi.number().required(), 
+    stageOfBusiness: Joi.number().required(), 
+    monthlyProfitStatus: Joi.number().required(), 
+    monthlyCustomerCount: Joi.number().required(), 
+    repeatCustomerLevel: Joi.number().required(), 
+    currentChallenge: Joi.number().required(), 
 }); 
 
 module.exports = { 

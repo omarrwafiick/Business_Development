@@ -1,7 +1,7 @@
 import api from './api';
 const domain = "/admin";
 
-export const addAdmin = async (newAdmin) => api.post(domain+'/add-admin', newAdmin);
+export const addAdmin = async (newAdmin) => api.post(domain+'', newAdmin);
 
 export const addConsultant = async (newConsultant) => api.post(domain+'add-consultant-by-admin', newConsultant);
 

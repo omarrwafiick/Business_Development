@@ -6,15 +6,15 @@ const { updateConsultantSchema } = require("../validationSchemas/consultantValid
 const router = express.Router();
 
 router.use(VerifyToken); 
-
-router.get('/getall', getAllConsultants);
  
-router.get('/get/:id', getConsultantById);
+router.get('', getAllConsultants);
 
-router.put('/update/:id', validateInputs(updateConsultantSchema), updateConsultant);
-
-router.delete('/delete/:id', deleteConsultant);
-
-router.get('/get/qualifications', getQualifications);
+router.get('/qualifications', getQualifications);
  
+router.get('/:id', getConsultantById);
+
+router.put('/:id', validateInputs(updateConsultantSchema), updateConsultant);
+
+router.delete('/:id', deleteConsultant);
+  
 module.exports = router;

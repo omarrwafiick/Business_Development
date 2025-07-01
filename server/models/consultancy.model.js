@@ -5,7 +5,7 @@ const consultancySchema = new mongoose.Schema({
   applicantId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },  
   applicationId: { type: mongoose.Schema.Types.ObjectId, ref: 'Application Service', required: true },  
   businessIdea: { type: String, required: true  },
-  stageOfBusiness : { type: String , enum: ["Just an idea","Starting soon","Already running"], required: true },
+  stageOfBusiness : { type: String , enum: ['Idea', 'Startup', 'Growth', 'Mature'], required: true },
   targetMarket: { type: String, required: true  },
   monthlyBudget: { type: Number, required: true },
   mainGoal: { type: String, required: true  },
@@ -19,8 +19,7 @@ const consultancySchema = new mongoose.Schema({
   legalConsiderations: { type: String }, // Registration, license, permits
   growthStrategy: { type: String }, // Consultant’s plan to scale the businessS
   commonPitfalls: { type: String }, // What to avoid based on industry/context
-  summaryRecommendation: { type: String }, // Final clear call-to-action or conclusion   
-  reportPublishedAt: { type: Date, default: Date.now}
+  summaryRecommendation: { type: String }, // Final clear call-to-action or conclusion     
 });  
 
 const Consultancy = mongoose.model('Consultancy', consultancySchema);

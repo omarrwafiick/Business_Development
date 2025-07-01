@@ -1,7 +1,6 @@
 const mongoose = require('mongoose');  
-const consultantSchema = new mongoose.Schema({
-  salary: { type: mongoose.Types.Decimal128, required: true },
-  bonus: { type: mongoose.Types.Decimal128, required: true },
+
+const consultantSchema = new mongoose.Schema({ 
   userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true }, 
   qualificationsIds: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Qualification' }],
   experienceYears: { type: Number },

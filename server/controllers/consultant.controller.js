@@ -1,6 +1,5 @@
 const Consultant = require("../models/consultant.model");  
-const User = require("../models/user.model");  
-const Qualifications = require("../models/qualification.model");  
+const User = require("../models/user.model");    
 const Qualification = require("../models/qualification.model");
 
 const getAllConsultants = async (req, res) => {
@@ -16,7 +15,7 @@ const getAllConsultants = async (req, res) => {
         } catch (error) {
             return res.status(500).json({ message: 'Internal server error' });
         } 
-};   
+};    
   
 const getConsultantById = async (req, res) => {
     try {       
@@ -36,11 +35,8 @@ const getConsultantById = async (req, res) => {
 
 const updateConsultant = async (req, res) => {
     try {       
-        const { salary, bonus, qualificationsIds, experienceYears } = req.body;
-
-        if(!salary || !bonus || !qualificationsIds || !experienceYears){
-            throw new Error("All fields are required!");
-        }    
+        const { qualificationsIds, experienceYears } = req.body;
+ 
         const consultantId = req.params.id;
         const consultant = await Consultant.findById(consultantId);
             
@@ -48,14 +44,12 @@ const updateConsultant = async (req, res) => {
             return res.status(404).json({ success: false, message: "No consultant was found"}); 
         };   
         
-        const qualifications = await Qualifications.find();
+        const qualifications = await Qualification.find();
         const matchedIds = qualifications
                                 .filter(q => qualificationsIds.includes(q._id.toString()))
                                 .map(q => q._id);
 
         consultant.qualificationsIds = matchedIds;
-        consultant.salary = salary;
-        consultant.bonus = bonus;
         consultant.experienceYears = experienceYears;
   
         if (!consultant.isModified()) { 
@@ -110,4 +104,5 @@ const getQualifications = async (req, res) => {
             return res.status(500).json({ message: 'Internal server error' });
         } 
 };   
+
 module.exports = { getAllConsultants, getConsultantById, updateConsultant, deleteConsultant, getQualifications }; 

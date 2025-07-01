@@ -31,6 +31,3 @@ const generateChart = async ({ labels, data, colors, title }) => {
 
 module.exports = { generateChart };
 
-//<img src="data:image/png;base64, iVBORw0KGgoAAAANSUhEUgAA..." />
-//for client
-//const base64Image = `data:${financialPlanning.chartImageType};base64,${financialPlanning.chartImage.toString('base64')}`;

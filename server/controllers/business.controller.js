@@ -1,13 +1,9 @@
 const Business = require("../models/business.model"); 
-const Categories = require("../models/category.model");     
+const Category = require("../models/category.model");     
 
 const addBusiness = async (req, res) => {
     try {   
         const { name, description, ownerId, categoryId, locationName } = req.body;
- 
-        if(!name || !description || !ownerId || !categoryId || !locationName){
-            throw new Error("All fields are required!");
-        }  
         
         const businessExist = await Business.findOne({ name, ownerId, categoryId});
 
@@ -48,7 +44,7 @@ const getAllBusinesses = async (req, res) => {
             return res.status(500).json({ message: 'Internal server error' });
         } 
 };
- 
+  
 const getBusinessById = async (req, res) => {
     try {       
         const businessId = req.params.id;
@@ -66,18 +62,19 @@ const getBusinessById = async (req, res) => {
 };
 
 const getAllCategories = async (req, res) => {
-    try {        
-        const categories = await Categories.find();
+    try {         
+        const categories = await Category.find();
             
-        if(!categories){
+        if(categories.length <= 0){
             return res.status(404).json({ success: false, message: "No category was found"}); 
-        };  
-    
+        };   
+        
         return res.status(200).json({ success: true, categories });    
     
-        } catch (error) {
-            return res.status(500).json({ message: 'Internal server error' });
-        } 
+        }  catch (error) {
+            console.error("Category fetch error:", error);  
+            return res.status(500).json({ success: false, message: 'Internal server error' });
+        }
 };
 
 module.exports = { addBusiness, getAllBusinesses, getBusinessById, getAllCategories };

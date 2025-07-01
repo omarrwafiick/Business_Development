@@ -1,10 +1,11 @@
 const express = require('express'); 
 const { getAllLocation } = require('../controllers/location.controller');
 const router = express.Router();
-const { VerifyTokenByRole } = require('../middlewares/verifyByRole'); 
+const { VerifyToken } = require('../middlewares/verifyToken'); 
+require('dotenv').config();
 
-router.use(VerifyTokenByRole(String(process.env.BUSINESS_OWNER)));
+router.use(VerifyToken); 
     
-router.get('/getall', getAllLocation);  
+router.get('', getAllLocation);  
 
 module.exports = router;

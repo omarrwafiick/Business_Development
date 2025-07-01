@@ -4,8 +4,7 @@ import AppStore from '../store/store';
 import { BadgeDollarSignIcon, ClipboardList, HelpCircleIcon, LocationEditIcon, Users } from 'lucide-react';
 import ReportSection from '../components/report-section';
 import { BarChartGraph, LineChartGraph, AreaChartGraph, PieChartGraph } from '../components/graph';
-import SmallButton from '../components/small-button'; 
-import { exportPDF } from '../services/exportPdf'; 
+import SmallButton from '../components/small-button';  
 import { exportExcel } from '../services/exportExcel'; 
 
 export default function IntegratedReport() {
@@ -28,18 +27,8 @@ export default function IntegratedReport() {
             <span className='m-4'>
                 <ClipboardList size={65} color="#F66A35" /> 
             </span>
-            <h4 className='capitalize mb-2! text-4xl font-bold font-gelasio'>bedaytak integrated report report</h4>
-            <p className='text-md mt-4! mb-4! leading-7 opacity-80 text-center'>Choose your own format to get data as you wish.</p>
-            <div className=''> 
-                <SmallButton onClick={(e) => {
-                      e.preventDefault();
-                      exportPDF([ 
-                        { name: "Ali", age: 25, status: "active" },
-                        { name: "Sara", age: 30, status: "inactive" },
-                      ]);
-                    }}
-                    name="Pdf" style={'bg-secondary text-white! ms-3!'}/>
-
+            <h4 className='capitalize mb-2! text-4xl font-bold font-gelasio'>bedaytak integrated report report</h4> 
+            <div className='mt-4'>   
                 <SmallButton onClick={(e)=> {
                       e.preventDefault();
                       exportExcel( 
@@ -48,7 +37,7 @@ export default function IntegratedReport() {
                         { name: "Sara", age: 30, status: "inactive" },
                       ]);
                     }}
-                  name="Excel" style={'bg-secondary text-white! ms-3!'}/> 
+                  name="Export" style={'bg-secondary text-white! ms-3!'}/> 
             </div>
           </div>
         </div>

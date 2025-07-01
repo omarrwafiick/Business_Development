@@ -12,9 +12,9 @@ const VerifyTokenByRole = (requiredRole) => {
             const decodedToken = jwtToken.verify(token, process.env.JWT_SECRET);
  
             req.userId = decodedToken.userId;
-            req.userRole = decodedToken.userRole;  
+            req.userRole = decodedToken.userRole;    
             
-            if (decodedToken.userRole.name !== requiredRole) {
+            if (decodedToken.userRole.name.toLowerCase() !== requiredRole.toLowerCase()) {
                 return res.status(403).json({ success: false, message: 'Forbidden - You do not have the required role' });
             }
 

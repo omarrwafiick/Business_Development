@@ -2,7 +2,8 @@ const { default: mongoose } = require('mongoose');
 const Application = require('../models/application.model');
 const Consultancy = require('../models/consultancy.model'); 
 const Service = require('../models/service.model'); 
-const Consultant = require('../models/consultant.model');  
+const Consultant = require('../models/consultant.model');   
+const Location = require('../models/location.model');  
 const FinancialPlanning = require('../models/financialPlanning.model');
 const Business = require('../models/business.model'); 
 const LocationMarketAnalysis = require('../models/locationMarkrtAnalysis.model'); 
@@ -10,14 +11,12 @@ const SalesRevenueOptimization = require('../models/salesRevenueOptimization.mod
 const User = require('../models/user.model'); 
 const { VerifyApplication, VerifyService } = require('../utilities/common');
 const Mailing = require('../services/mailing.service');
+require('dotenv').config();
 
 const addServiceApplication = async (req, res) => {  
     try {  
-        const { serviceId, status, paymentStatus } = req.body;
+        const { serviceId, status } = req.body;  
 
-        if(!serviceId || !status ){
-            throw new Error("All fields are required!");
-        }   
         const applicantId = req.params.applicantid;
  
         const userExist = await User.findById(applicantId);
@@ -30,17 +29,11 @@ const addServiceApplication = async (req, res) => {
         if (!service) {
           return res.status(404).json({ success: false, message: "Service not found" });
         }
-         
-        const applicationExist = await Application.findOne({ applicantId: applicantId, serviceId: serviceId });
-
-        if (applicationExist) {
-            return res.status(400).json({success: false, message: "Application already exists" });}  
-
+          
         const newApplication = await Application.create({
             applicantId,
             serviceId, 
-            status, 
-            paymentStatus
+            status
         });
 
         if (!newApplication || !newApplication._id) { 
@@ -64,23 +57,20 @@ const businessGuideService = async (req, res) => {
     const {  
       stageOfBusiness,          
       monthlyProfitStatus,     
-      monthlyCustomerCount,  
+      monthlyCustomerCount,   
       repeatCustomerLevel,     
       currentChallenge          
-    } = req.body;
+    } = req.body; 
 
-    if(!stageOfBusiness || !monthlyProfitStatus || !monthlyCustomerCount || !repeatCustomerLevel || !currentChallenge ){
-      throw new Error("All fields are required!");
-    }   
     const applicationId = req.params.applicationid;
     const applicantId = req.params.applicantid; 
-  
-    const application = await VerifyApplication(applicantId, applicationId);
  
+    const application = await VerifyApplication(applicantId, applicationId);
+   
     if (!application) {
       return res.status(404).json({ success: false, message: "Application not found" });
     }
-
+    
     const service = await VerifyService(process.env.BUSINESS_GUIDE, application.serviceId);
  
     if (!service) {
@@ -161,7 +151,7 @@ const locationMarkrtAnalysisService = async (req, res) => {
   try {
     const applicationId = req.params.applicationid;
     const applicantId = req.params.applicantid; 
-  
+    //verifications
     const application = await VerifyApplication(applicantId, applicationId);
  
     if (!application) {
@@ -174,24 +164,23 @@ const locationMarkrtAnalysisService = async (req, res) => {
       return res.status(404).json({ success: false, message: "Service was not found" });
     }
 
-    const serviceFullfilled = await LocationMarketAnalysis.find({applicationId, applicantId}); 
- 
-    if (serviceFullfilled) {
-      return res.status(400).json({ success: false, message: "Service is already exists with this application" });
-    }
- 
-    const business = await Business.findOne({ ownerId: applicantId }).populate('categoryId locationId'); 
+    const applicationExpired = await LocationMarketAnalysis.find({applicationId: applicationId});
+
+    if (applicationExpired.length > 0) {
+      return res.status(400).json({ success: false, message: "Application expired please apply again" });
+    } 
+    //business logic
+    const business = await Business.findOne({ ownerId: applicantId }).populate('categoryId'); 
  
     if (!business) {
       return res.status(404).json({ success: false, message: "Business was not found" });
     } 
 
-    const businessLocation = business.locationId;
-    const businessCategory = business.categoryId;
+    const businessCategoryId = business.categoryId;
  
-    const nearbyBusinessesLocations = await Location.find({name: businessLocation.name, 'businesses.categoryId': businessCategory });
+    const nearbyBusinessesLocations = await Location.find({name: business.locationName, 'businesses.categoryId': businessCategoryId });
 
-    const sameCategoryNearby = nearbyBusinessesLocations.count; 
+    const sameCategoryNearby = nearbyBusinessesLocations.filter(l => l.businesses.categoryId === businessCategoryId).length; 
 
     const competitionLevel = sameCategoryNearby > 10
       ? "High competition in this location"
@@ -203,7 +192,7 @@ const locationMarkrtAnalysisService = async (req, res) => {
     let finalLocationAdvice = ""; 
 
     //todos make it dynamic
-    switch (businessCategory.name) {
+    switch (business.categoryId.name) {
       case process.env.RETAIL: 
         marketingStrategies.push("Launch local influencer campaigns", "Use bold storefront visuals");
         finalLocationAdvice = competitionLevel.includes("Low")
@@ -213,18 +202,29 @@ const locationMarkrtAnalysisService = async (req, res) => {
       default:
         marketingStrategies.push("Test localized ad campaigns", "Engage through community events");
         finalLocationAdvice = "Observe your category’s local presence and align your strategy with underserved needs.";
-    }
- 
-    const totalNearbyBusinesses = await Location.find({name: businessLocation.name});
+    } 
 
+    let bestLocation = nearbyBusinessesLocations
+      .filter(loc => loc.businesses.some(b => b.categoryId.toString() === businessCategoryId._id.toString()))
+      .sort((a, b) => {
+        const aCount = a.businesses.filter(b => b.categoryId.toString() === businessCategoryId._id.toString()).length;
+        const bCount = b.businesses.filter(b => b.categoryId.toString() === businessCategoryId._id.toString()).length;
+        return aCount - bCount;
+      })[0];
+
+    //fallback
+    if (!bestLocation && nearbyBusinessesLocations.length > 0) {
+      bestLocation = nearbyBusinessesLocations[0];
+    }
+        
     const analysisData = {
       applicantId,
       businessId: business._id,
       applicationId,
       serviceId: application.serviceId,
-      locationId: location._id,
+      locationId: bestLocation._id,
       sameCategoryCount : sameCategoryNearby,
-      totalNearbyBusinesses: totalNearbyBusinesses.count, 
+      totalNearbyBusinesses: nearbyBusinessesLocations.length,
       competitionLevel,
       marketingStrategies,
       finalLocationAdvice
@@ -235,6 +235,8 @@ const locationMarkrtAnalysisService = async (req, res) => {
     if (!newLocation || !newLocation._id) { 
       return res.status(400).json({ success: false, message: 'Failed to create new Service' });
     }
+
+    await approveApplication(application); 
 
     return res.status(201).json({ success: true, serviceId: newLocation._id });
 
@@ -253,13 +255,15 @@ const locationMarkrtAnalysisFreeTrialService = async (req, res) => {
     if (!application) {
       return res.status(404).json({ success: false, message: "Application not found" });
     }
+    
+    var serviceExist = await LocationMarketAnalysis.find({applicantId: applicantId, applicationId: applicationId});
 
-    const serviceExist = await LocationMarketAnalysis.findOne({applicantId: applicantId, applicationId: applicationId});
- 
-    if (!serviceExist) {
+    if (serviceExist.length <= 0) {
       return res.status(404).json({ success: false, message: "No service was found" });
     }  
     
+    serviceExist = serviceExist[serviceExist.length-1];
+
     return res.status(200).json({ success: true, 
         data :{ 
             competitionLevel: serviceExist.competitionLevel,
@@ -279,19 +283,18 @@ const locationMarkrtAnalysisPremiumService = async (req, res) => {
     
     const application = await VerifyApplication(applicantId, applicationId);
  
-    if (!application) {
+    if (!application || !application.paymentStatus) {
       return res.status(404).json({ success: false, message: "Application not found" });
     }
 
-    const serviceExist = await LocationMarketAnalysis.findOne({applicantId: applicantId, applicationId: applicationId});
+    const serviceExist = await LocationMarketAnalysis.find({applicantId: applicantId, applicationId: applicationId});;
  
-    if (!serviceExist || !application.paymentStatus) {
+    if (serviceExist.length <= 0) {
       return res.status(404).json({ success: false, message: "User has not completed payment for the service." });
-    }   
+    }  
+
     return res.status(200).json({ success: true, 
-        data : {
-          ...serviceExist
-        }
+        data : serviceExist[serviceExist.length-1]
      });
 
   } catch (error) {
@@ -301,11 +304,7 @@ const locationMarkrtAnalysisPremiumService = async (req, res) => {
 
 const salesRevenueOptimizationService = async (req, res) => {
   try {
-    const { numberOfEmployees, averagePrice, expectedDailySales, workingDays, estimatedRevenue } = req.body;
-
-    if(!numberOfEmployees || !averagePrice || !expectedDailySales || !workingDays || !estimatedRevenue ){
-      throw new Error("All fields are required!");
-    }      
+    const { numberOfEmployees, averagePrice, expectedDailySales, workingDays, estimatedRevenue } = req.body;  
         
     const applicationId = req.params.applicationid;
     const applicantId = req.params.applicantid;
@@ -321,11 +320,11 @@ const salesRevenueOptimizationService = async (req, res) => {
     if (!service) {
       return res.status(404).json({ success: false, message: "Service was not found" });
     }
+ 
+    const applicationExpired = await SalesRevenueOptimization.find({applicationId: applicationId});
 
-    const serviceFullfilled = await SalesRevenueOptimization.find({applicationId, applicantId}); 
-
-    if (serviceFullfilled) {
-      return res.status(400).json({ success: false, message: "Service is already exists with this application" });
+    if (applicationExpired.length>0) {
+      return res.status(400).json({ success: false, message: "Application expired please apply again" });
     }
 
     const business = await Business.findOne({ ownerId: applicantId }).populate('categoryId'); 
@@ -385,6 +384,8 @@ const salesRevenueOptimizationService = async (req, res) => {
       return res.status(400).json({ success: false, message: "Failed to create new Service" });
     }
 
+    await approveApplication(application); 
+
     return res.status(201).json({ success: true, serviceId :newSales._id }); 
   } catch (error) {
     return res.status(500).json({ success: false, message: "Internal server error", error: error.message });
@@ -402,11 +403,13 @@ const salesRevenueOptimizationFreeTrialService  = async (req, res) => {
       return res.status(404).json({ success: false, message: "Application not found" });
     }
  
-    const serviceExist = await SalesRevenueOptimization.findOne({applicantId: applicantId, applicationId: applicationId});
+    var serviceExist = await SalesRevenueOptimization.find({applicantId: applicantId, applicationId: applicationId});
 
-    if (!serviceExist) {
+    if (serviceExist.length <= 0) {
       return res.status(404).json({ success: false, message: "No service was found" });
-    }   
+    }    
+
+    serviceExist = serviceExist[serviceExist.length-1];
     
     return res.status(200).json({ success: true, 
         data :{
@@ -430,16 +433,15 @@ const salesRevenueOptimizationPremiumService  = async (req, res) => {
     if (!application || !application.paymentStatus) { 
         return res.status(400).json({success: false, message: "User has not completed payment for the service."});
     }     
-    const serviceExist = await SalesRevenueOptimization.findOne({applicantId: applicantId, applicationId: applicationId}); 
+    const serviceExist = await SalesRevenueOptimization.find({applicantId: applicantId, applicationId: applicationId}); 
  
-    if (!serviceExist) {
+    if (serviceExist.length <= 0) {
       return res.status(404).json({ success: false, message: "No service was found" });
     }  
     
-    return res.status(200).json({ success: true, 
-        data :{
-            ...serviceExist
-        }
+    return res.status(200).json({ 
+        success: true, 
+        data : serviceExist[serviceExist.length-1]
      });
 
   } catch (error) {
@@ -453,11 +455,7 @@ const financialPlanningService = async (req, res) => {
       monthlyRevenue, 
       monthlyCosts, 
       startupCost 
-    } = req.body; 
-    
-    if(!monthlyRevenue || !monthlyCosts || !startupCost ){
-        throw new Error("All fields are required!");
-    } 
+    } = req.body;  
 
     const applicationId = req.params.applicationid;
     const applicantId = req.params.applicantid;   
@@ -473,11 +471,11 @@ const financialPlanningService = async (req, res) => {
     if (!service) {
       return res.status(404).json({ success: false, message: "Service was not found" });
     }
-
-    const serviceFullfilled = await FinancialPlanning.find({applicationId, applicantId}); 
  
-    if (serviceFullfilled) {
-      return res.status(400).json({ success: false, message: "Service is already exists with this application" });
+    const applicationExpired = await FinancialPlanning.find({applicationId: applicationId});
+
+    if (applicationExpired.length > 0) {
+      return res.status(400).json({ success: false, message: "Application expired please apply again" });
     }
  
     const business = await Business.findOne({ownerId: applicantId}).populate('categoryId');
@@ -543,8 +541,7 @@ const financialPlanningService = async (req, res) => {
       suggestedStrategy
     });
     
-    application.status = 'Approved';
-    await application.save();
+    await approveApplication(application); 
     
     return res.status(201).json({
       success: true,
@@ -566,13 +563,16 @@ const financialPlanningFreeTrialService  = async (req, res) => {
         return res.status(404).json({ success: false, message: "Application not found" });
       }
 
-      const serviceExist = await FinancialPlanning.findOne({applicantId: applicantId, applicationId: applicationId});
+      var serviceExist = await FinancialPlanning.find({applicantId: applicantId, applicationId: applicationId});
 
-      if (!serviceExist) {
+      if (serviceExist.length <= 0) {
         return res.status(404).json({ success: false, message: "No service was found" });
       }  
-      
-      return res.status(200).json({ success: true, 
+
+      serviceExist = serviceExist[serviceExist.length-1];
+
+      return res.status(200).json({ 
+          success: true, 
           data :{
               breakEvenMonths: serviceExist.breakEvenMonths,
               financialHealthIndex: serviceExist.financialHealthIndex
@@ -594,16 +594,16 @@ const financialPlanningPremiumService  = async (req, res) => {
       if (!application || !application.paymentStatus) { 
           return res.status(400).json({success: false, message: "User has not completed payment for the service."});
       }     
-      const serviceExist = await FinancialPlanning.findOne({applicantId: applicantId, applicationId: applicationId}); 
+      const serviceExist = await FinancialPlanning.find({applicantId: applicantId, applicationId: applicationId}); 
    
-      if (!serviceExist) {
+      if ( serviceExist.length <= 0 ) {
         return res.status(404).json({ success: false, message: "No service was found" });
       }   
  
       return res.status(200).json({ 
         success: true,
         data: {
-          ...serviceExist
+          ...serviceExist[serviceExist.length-1]
         }
       }); 
   
@@ -621,13 +621,14 @@ const seedDataToConsultant  = async (req, res) => {
           targetMarket,
           monthlyBudget,
           mainGoal
-          } = req.body;
+      } = req.body; 
+     
+      const consultant = await Consultant.findOne({ _id: consultantId });
+      
+      if (!consultant) { 
+        return res.status(404).json({success: false, message: "Consultant was not found "});
+      } 
 
-      if(!consultantId  || !businessIdea || !stageOfBusiness 
-       || !targetMarket || !monthlyBudget || !mainGoal 
-      ){
-          throw new Error("All fields are required!");
-      }     
       const applicantId = req.params.applicantid;
       const applicationId = req.params.applicationid;
 
@@ -643,20 +644,11 @@ const seedDataToConsultant  = async (req, res) => {
         return res.status(404).json({ success: false, message: "Service was not found" });
       }
   
-      const serviceFullfilled = await Consultancy.find({applicationId, applicantId}); 
-   
-      if (serviceFullfilled) {
-        return res.status(400).json({ success: false, message: "Service is already exists with this application" });
-      }      const user = await User.findOne({ _id: applicantId });
+      const applicationExpired = await Consultancy.find({applicationId: applicationId});
 
-      if (!user) { 
-          return res.status(404).json({success: false, message: "User was not found "});
-      }   
-
-      const consultant = await Consultant.findOne({ _id: consultantId });
-      if (!consultant) { 
-        return res.status(404).json({success: false, message: "Consultant was not found "});
-      }   
+      if (applicationExpired.length > 0) {
+        return res.status(400).json({ success: false, message: "Application expired please apply again" });
+      }  
 
       const newConsultancyService = await Consultancy.create({
           consultantId ,
@@ -699,14 +691,7 @@ const consultancyService  = async (req, res) => {
             commonPitfalls,
             summaryRecommendation
         } = req.body;
-
-        if(!businessOverview || !industryAnalysis || !competitorInsights || !locationRecommendation 
-           || !targetAudienceDefinition || !marketingSuggestions || !operationsAdvice || !legalConsiderations ||
-           !growthStrategy || !commonPitfalls || !summaryRecommendation
-        ){
-            throw new Error("All fields are required!");
-        }    
-
+   
         const consultencyId = req.params.consultencyid;
         const applicantId = req.params.applicantid;
         const applicationId = req.params.applicationid;
@@ -715,19 +700,14 @@ const consultancyService  = async (req, res) => {
  
         if (!application) {
           return res.status(404).json({ success: false, message: "Application not found" });
-        }
+        } 
 
-        const serviceFullfilled = await Consultancy.find({applicationId, applicantId}); 
-     
-        if (!serviceFullfilled) {
-          return res.status(400).json({ success: false, message: "Service does not exist with this application" });
+        var consultancyService = await Consultancy.find({_id: consultencyId});
+        
+        if (consultancyService.length <= 0 || consultancyService.length > 1) { 
+          return res.status(404).json({success: false, message: "Service was not found or application was expired"});
         }
-
-        const consultancyService = await Consultancy.findById(consultencyId);
-
-        if (!consultancyService) { 
-          return res.status(404).json({success: false, message: "Service was not found "});
-        }
+        consultancyService = consultancyService[consultancyService.length-1];
 
         consultancyService.businessOverview = businessOverview;
         consultancyService.industryAnalysis = industryAnalysis;
@@ -745,32 +725,21 @@ const consultancyService  = async (req, res) => {
           return res.status(400).json({ success: false, message: 'Failed to create new Service' });
         }
 
-        const consultancyServiceResult = await consultancyService.save();
+        await consultancyService.save();
 
-        application.status = 'Approved';
-        await application.save();
+        await approveApplication(application); 
 
         const user = await User.findById(applicantId);
+
         await Mailing(
           user.email,
           'Consultancy Service Response',
           `
-            <p>This is your consultancy results as you applied for - all fields corresponds to your business data you provided</p>  
-            <p>Business Overview : ${businessOverview}}</p>
-            <p>Industry Analysis : ${industryAnalysis}}</p>
-            <p>Competitor Insights: ${competitorInsights}}</p>
-            <p>Location Recommendation : ${locationRecommendation}}</p>
-            <p>Target Audience Definition : ${targetAudienceDefinition}}</p>
-            <p>Marketing Suggestions : ${marketingSuggestions}}</p>
-            <p>Operations Advice : ${operationsAdvice}}</p>
-            <p>Legal Considerations : ${legalConsiderations}}</p>
-            <p>Growth Strategy : ${growthStrategy}}</p>
-            <p>Common Pit falls : ${commonPitfalls}}</p>
-            <p>Summary Recommendation : ${summaryRecommendation}}</p>
+            <p>A consultant of id ${consultancyService.consultantId} respond to your request please check your box on our platform</p>  
           `
         );
 
-        return res.status(201).json({ success: true, consultsncyId : consultancyServiceResult._id });
+        return res.status(201).json({ success: true });
 
     } catch (error) {
         console.error('Error in addLocation:', error); 
@@ -789,13 +758,13 @@ const getConsultancyResult = async (req, res) => {
      }  
      
      return res.status(200).json({ success: true, 
-         data
+        data: data[data.length-1]
       });
  
    } catch (error) {
      return res.status(500).json({ message: 'Internal server error', error: error.message });
    }
-};
+}; 
 
 const getApplicationStatus = async (req, res) => {
     try {
@@ -839,12 +808,14 @@ const getConsultantApplications = async (req, res) => {
   try { 
     const consultantId = req.params.consultantid;
 
-    const consultations = await Consultancy.findById(consultantId).limit(10); 
-
+    var consultations = await Consultancy.find({consultantId: consultantId}).populate('applicationId'); 
+ 
     if (!consultations) {  
       return res.status(404).json({ success: false, message: "No consultation was found" });
     }  
 
+    consultations = consultations.filter(c => c.applicationId.status !== "Approved");
+    
     return res.status(200).json({ success: true, data: consultations });
 
   } catch (error) {
@@ -885,10 +856,6 @@ const getAllServices = async (req, res) => {
 const updateApplication = async (req, res) => {
     try {     
         const { status, paymentStatus } = req.body;
-    
-        if(!status || !paymentStatus){
-            throw new Error("All fields are required!");
-        }
 
         const applicationid = req.params.id;
 
@@ -900,29 +867,21 @@ const updateApplication = async (req, res) => {
 
         application.status = status;
 
-        application.paymentStatus = paymentStatus;
-        
-        if(!application.isModified()){
-          return res.status(400).json({ success: false, message: "Application couldn't be updated"}); 
-        };  
+        application.paymentStatus = paymentStatus; 
  
         await application.save();
  
-        return res.status(200).json({ success: true, application});    
+        return res.status(200).json({ success: true, application });    
     
         } catch (error) {
-            return res.status(500).json({ message: 'Internal server error', error });
+            return res.status(500).json({ message: 'Internal server error', error: error.message });
         } 
 };
  
 const updatePaymentStatus = async (req, res) => {
     try {     
         const { paymentStatus } = req.body;
-    
-        if(!paymentStatus){
-            throw new Error("All fields are required!");
-        }
-
+     
         const applicationid = req.params.id;
 
         const application = await Application.findById(applicationid);
@@ -932,17 +891,13 @@ const updatePaymentStatus = async (req, res) => {
         };  
 
         application.paymentStatus = paymentStatus;
-
-        if(!application.isModified()){
-          return res.status(400).json({ success: false, message: "Application couldn't be updated"}); 
-        };  
  
         await application.save();
  
         return res.status(200).json({ success: true, paymentStatus});    
     
         } catch (error) {
-            return res.status(500).json({ message: 'Internal server error', error });
+            return res.status(500).json({ message: 'Internal server error', error: error.message });
         } 
 };
 
@@ -955,10 +910,10 @@ const integratedReport = async (req, res) => {
     if (!user) { 
         return res.status(400).json({success: false, message: "No service result was found"});
     }  
-    const consultancyResult = await Consultancy.find({applicantId}).populate('applicationId');
-    const financialPlannigResult = await FinancialPlanning.find({applicantId}).populate('applicationId');
-    const locationAnalysisResult = await LocationMarketAnalysis.find({applicantId}).populate('applicationId');
-    const salesOptimizationResult = await SalesRevenueOptimization.find({applicantId}).populate('applicationId');
+    var consultancyResult = await Consultancy.find({applicantId});
+    var financialPlannigResult = await FinancialPlanning.find({applicantId});
+    var locationAnalysisResult = await LocationMarketAnalysis.find({applicantId});
+    var salesOptimizationResult = await SalesRevenueOptimization.find({applicantId});
 
     consultancyResult = consultancyResult[consultancyResult.length-1];
     financialPlannigResult = financialPlannigResult[financialPlannigResult.length-1];
@@ -971,14 +926,25 @@ const integratedReport = async (req, res) => {
       !locationAnalysisResult.applicantId.paymentStatus ||
       !salesOptimizationResult.applicantId.paymentStatus
     ){
-      return res.status(400).json({success: false, message: "Service is not paid"});
+      return res.status(400).json({success: false, message: "Services or some was not paid"});
     }
+
     return res.status(200).json({ success: true, servicesResult : {
       consultancyResult,
       financialPlannigResult,
       locationAnalysisResult,
       salesOptimizationResult
     }});    
+  
+    }catch (error) {
+        return res.status(500).json({ message: 'Internal server error', error });
+    } 
+};
+
+const approveApplication = async (application) => {
+  try {     
+    application.status = 'Approved';
+    await application.save();   
   
     }catch (error) {
         return res.status(500).json({ message: 'Internal server error', error });

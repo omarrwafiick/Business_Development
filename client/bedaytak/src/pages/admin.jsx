@@ -15,9 +15,7 @@ export default function Admin() {
   const [showConsultantPopup, setShowConsultantPopup] = useState(false);
   var qualifications = [];
   var allUsers = [];
-  //consultant inputs
-  const [salary, setSalary] = useState('');   
-  const [bonus, setBonus] = useState(''); 
+  //consultant inputs 
   const [experience, setExperience] = useState(0); 
   const [qualificationsC, setQualificationsC] = useState('');
   const [disable, setDisable] = useState(false);
@@ -63,9 +61,7 @@ export default function Admin() {
                 const qualificationsIds = qualifications
                     .filter(q => qualificationsC.includes(q._id))
                     .map(q => q._id);
-                response = await addConsultant({
-                    salary, 
-                    bonus, 
+                response = await addConsultant({ 
                     qualificationsIds, 
                     experienceYears: experience, 
                     fullName: fullname, 
@@ -177,8 +173,6 @@ export default function Admin() {
                     <CustomeInput value={email} onChange={(e)=> SetEmail(e.target.value)} name={"email"} type={"email"}/>
                     <CustomeInput value={phone} onChange={(e)=> setPhone(e.target.value)} name={"phone"} type={"text"}/> 
                     <PasswordInput value={password} onChange={(e)=> setPassword(e.target.value)} name={"password"} />
-                    <CustomeInput value={salary} onChange={ (e) => setSalary(e.target.value) } name={"salary"} type={"text"}/> 
-                    <CustomeInput value={bonus} onChange={ (e) => setBonus(e.target.value) } name={"bonus"} type={"text"}/> 
                     <CustomeInput value={experience} onChange={ (e) => setExperience(e.target.value) } name={"experience years"} type={"number"}/> 
                     <CustomeMultipleSelect value={qualificationsC} onChange={ (e) => setQualificationsC(e.target.value) } name={"Qualifications"} data={[]}/>  
                     <CustomeButton disabled={disable} name={"submit"} />

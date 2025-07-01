@@ -5,7 +5,8 @@ const cookieParser = require('cookie-parser');
 const userRoutes = require('./routes/user.routes'); 
 const businessRoutes = require('./routes/business.routes');
 const locationRoutes = require('./routes/location.routes');
-const serviceRoutes = require('./routes/service.routes');
+const entrepreneurServiceRoutes = require('./routes/entrepreneurService.routes');
+const consultantServiceRoutes = require('./routes/consultantService.routes');
 const consultantRoutes = require('./routes/consultant.routes');
 const adminRoutes = require('./routes/admin.routes');
 
@@ -24,7 +25,8 @@ app.use(cookieParser());
 app.use(`${process.env.BASE_URL}${process.env.USER_URL}`, userRoutes); 
 app.use(`${process.env.BASE_URL}${process.env.BUSINESS_URL}`, businessRoutes);
 app.use(`${process.env.BASE_URL}${process.env.LOCATION_URL}`, locationRoutes);
-app.use(`${process.env.BASE_URL}${process.env.SERVICE_URL}`, serviceRoutes);
+app.use(`${process.env.BASE_URL}${process.env.SERVICE_URL}/entrepreneur`, entrepreneurServiceRoutes);
+app.use(`${process.env.BASE_URL}${process.env.SERVICE_URL}/consultant`, consultantServiceRoutes);
 app.use(`${process.env.BASE_URL}${process.env.CONSULTANT_URL}`, consultantRoutes);
 app.use(`${process.env.BASE_URL}${process.env.ADMIN_URL}`, adminRoutes);
  

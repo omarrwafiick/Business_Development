@@ -5,7 +5,7 @@ export default function ApplicationOverview({data, onClick, seedData}) {
   return ( 
     <div onClick={onClick} className="bg-white rounded-xl shadow-md p-6 max-w-md mx-auto mt-6">
       <h2 className="text-xl font-semibold text-gray-800 mb-4!">Business Summary</h2>
-
+ 
       <div className="space-y-3 text-sm text-gray-700">
         <div>
           <span className="font-semibold">Business Idea:</span>

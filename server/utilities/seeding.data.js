@@ -300,8 +300,6 @@ const seedConsultants = async () => {
   
     const ConsultantDocs = await Consultant.create(
         {
-          salary: mongoose.Types.Decimal128.fromString(process.env.DEFAULT_SALARY || 0.00) ,
-          bonus:  mongoose.Types.Decimal128.fromString(process.env.DEFAULT_BONUS || 0.00),
           userId: consultantUser._id, 
           servicesIds: [services[0]._id, services[1]._id], 
           qualificationsIds: [qualifications[1]._id], 

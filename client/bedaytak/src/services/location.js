@@ -1,4 +1,4 @@
 import api from './api';
 const domain = "/location";
 
-export const getAllLocations= async () => api.get(domain+'/getall'); 
+export const getAllLocations= async () => api.get(domain); 
