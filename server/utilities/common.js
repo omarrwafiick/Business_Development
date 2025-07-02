@@ -6,53 +6,82 @@ const bcrypt = require('bcryptjs');
 const Role = require('../models/role.model'); 
  
 const createUser = async ({ fullName, email, password, phoneNumber, roleName }) => {
-    const existingUser = await User.findOne({ email });
-    if (existingUser) throw new Error("User already exists. Try to sign in!");
+    try {     
+        const existingUser = await User.findOne({ email });
+        if (existingUser) throw new Error("User already exists. Try to sign in!");
 
-    const hashedPassword = await bcrypt.hash(password, Number(process.env.CRYPTO_KEY));
-    const role = await Role.findOne({ name: roleName });
+        const hashedPassword = await bcrypt.hash(password, Number(process.env.CRYPTO_KEY));
+        const role = await Role.findOne({ name: roleName });
 
-    const newUser = new User({
-        email,
-        password: hashedPassword,
-        fullName,
-        phoneNumber,
-        rolesId: role.id
-    });
- 
-    if (!newUser || !newUser._id) throw new Error("User couldn't be created");
+        const newUser = new User({
+            email,
+            password: hashedPassword,
+            fullName,
+            phoneNumber,
+            rolesId: role.id
+        });
+    
+        if (!newUser || !newUser._id) throw new Error("User couldn't be created");
 
-    await newUser.save();
+        await newUser.save();
 
-    return newUser;
+        return newUser;  
+    }catch (error) {
+        throw error;
+    } 
 };
 
 const createConsultant = async ({ userId, qualificationsIds, experienceYears }) => {
-    const userExist = await User.findById(userId);
-    console.log(userExist)
-    if (!userExist) throw new Error("User was not found");
+    try {      
+        const userExist = await User.findById(userId);
+        console.log(userExist)
+        if (!userExist) throw new Error("User was not found");
 
-    const consultantExist = await Consultant.findOne({ userId });
-    if (consultantExist) throw new Error("Consultant already exists");
+        const consultantExist = await Consultant.findOne({ userId });
+        if (consultantExist) throw new Error("Consultant already exists");
 
-    const newConsultant = await Consultant.create({ 
-        userId,
-        qualificationsIds,
-        experienceYears
-    });
+        const newConsultant = await Consultant.create({ 
+            userId,
+            qualificationsIds,
+            experienceYears
+        });
 
-    if (!newConsultant || !newConsultant._id) throw new Error('Failed to create new consultant');
+        if (!newConsultant || !newConsultant._id) throw new Error('Failed to create new consultant');
 
-    await newConsultant.save();
+        await newConsultant.save();
 
-    return newConsultant;
+        return newConsultant;   
+    }catch (error) {
+        throw error;
+    } 
 }; 
  
-const VerifyApplication = async (applicantId, applicationId) => await Application.findOne({_id: applicationId, applicantId: applicantId});
- 
-const VerifyService = async (serviceName, serviceId) => { 
-    const service = await Service.findOne({_id: serviceId}); 
-    
-    return service.name.toLowerCase() === serviceName.toLowerCase();
+const VerifyApplication = async (applicantId, applicationId) => {
+    try {     
+        return await Application.findOne({_id: applicationId, applicantId: applicantId});  
+    }catch (error) {
+        throw error;
+    } 
 }
-module.exports = {createUser, createConsultant, VerifyApplication, VerifyService}
+
+const VerifyService = async (serviceName, serviceId) => { 
+    try {       
+        const service = await Service.findOne({_id: serviceId}); 
+        return service.name.toLowerCase() === serviceName.toLowerCase(); 
+    }catch (error) {
+        throw error;
+    } 
+};
+
+const approveApplication = async (application) => {
+  try {     
+        application.status = 'Approved';
+        await application.save();    
+    }catch (error) {
+        throw error;
+    } 
+};
+
+const applicationExpired = (serviceByApplicationId) => serviceByApplicationId.length > 0;
+   
+module.exports = {createUser, createConsultant, VerifyApplication, VerifyService, approveApplication, applicationExpired }

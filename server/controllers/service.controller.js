@@ -8,7 +8,7 @@ const Business = require('../models/business.model');
 const LocationMarketAnalysis = require('../models/locationMarkrtAnalysis.model'); 
 const SalesRevenueOptimization = require('../models/salesRevenueOptimization.model'); 
 const User = require('../models/user.model'); 
-const { VerifyApplication, VerifyService } = require('../utilities/common');
+const { VerifyApplication, VerifyService, approveApplication, applicationExpired } = require('../utilities/common');
 const Mailing = require('../services/mailing.service');
 require('dotenv').config();
 
@@ -36,11 +36,11 @@ const businessGuideService = async (req, res) => {
       return res.status(404).json({ success: false, message: "Application not found" });
     }
     
-    const service = await VerifyService(process.env.BUSINESS_GUIDE, application.serviceId);
- 
-    if (!service) {
-      return res.status(404).json({ success: false, message: "Service not found" });
-    }
+    const serviceResult = await VerifyService(process.env.BUSINESS_GUIDE, application.serviceId);
+
+    if (!serviceResult) {
+      return res.status(404).json({ success: false, message: "Service was not found" });
+    } 
 
     let recommendation = '';
     let suggestion = '';
@@ -123,15 +123,15 @@ const locationMarkrtAnalysisService = async (req, res) => {
       return res.status(404).json({ success: false, message: "Application not found" });
     }
 
-    const service = await VerifyService(process.env.LOCATION_MARKET_ANALYSIS, application.serviceId);
+    const serviceResult = await VerifyService(process.env.LOCATION_MARKET_ANALYSIS, application.serviceId);
  
-    if (!service) {
+    if (!serviceResult) {
       return res.status(404).json({ success: false, message: "Service was not found" });
-    }
+    } 
 
-    const applicationExpired = await LocationMarketAnalysis.find({applicationId: applicationId});
+    const applicationExpiration = await LocationMarketAnalysis.find({applicationId: applicationId});
 
-    if (applicationExpired.length > 0) {
+    if(applicationExpired(applicationExpiration)){
       return res.status(400).json({ success: false, message: "Application expired please apply again" });
     } 
     //business logic
@@ -208,7 +208,7 @@ const locationMarkrtAnalysisService = async (req, res) => {
   } catch (error) {
     return res.status(500).json({ success: false, message: "Internal server error", error: error.message });
   }
-};
+}; 
 
 const locationMarkrtAnalysisFreeTrialService = async (req, res) => {
   try {  
@@ -280,17 +280,17 @@ const salesRevenueOptimizationService = async (req, res) => {
       return res.status(404).json({ success: false, message: "Application not found" });
     }
 
-    const service = await VerifyService(process.env.SALES_REVENUE_OPTIMIZATION, application.serviceId);
+    const serviceResult = await VerifyService(process.env.SALES_REVENUE_OPTIMIZATION, application.serviceId);
 
-    if (!service) {
+    if(!serviceResult) {
       return res.status(404).json({ success: false, message: "Service was not found" });
-    }
- 
-    const applicationExpired = await SalesRevenueOptimization.find({applicationId: applicationId});
+    } 
 
-    if (applicationExpired.length>0) {
+    const applicationExpiration = await SalesRevenueOptimization.find({applicationId: applicationId}); 
+
+    if(applicationExpired(applicationExpiration)){
       return res.status(400).json({ success: false, message: "Application expired please apply again" });
-    }
+    } 
 
     const business = await Business.findOne({ ownerId: applicantId }).populate('categoryId'); 
   
@@ -430,18 +430,17 @@ const financialPlanningService = async (req, res) => {
     if (!application) {
       return res.status(404).json({ success: false, message: "Application not found" });
     }
+    const serviceResult = await VerifyService(String(process.env.FINANCIAL_PLANNING), application.serviceId);
 
-    const service = await VerifyService(process.env.FINANCIAL_PLANNING, application.serviceId);
- 
-    if (!service) {
+    if(!serviceResult) {
       return res.status(404).json({ success: false, message: "Service was not found" });
-    }
+    } 
  
-    const applicationExpired = await FinancialPlanning.find({applicationId: applicationId});
+    const applicationExpiration = await FinancialPlanning.find({applicationId: applicationId}); 
 
-    if (applicationExpired.length > 0) {
+    if(applicationExpired(applicationExpiration)){
       return res.status(400).json({ success: false, message: "Application expired please apply again" });
-    }
+    } 
  
     const business = await Business.findOne({ownerId: applicantId}).populate('categoryId');
 
@@ -603,15 +602,15 @@ const seedDataToConsultant  = async (req, res) => {
         return res.status(404).json({ success: false, message: "Application not found" });
       }
   
-      const service = await VerifyService(process.env.CONSULTANCY, application.serviceId);
-   
-      if (!service) {
+      const serviceResult = await VerifyService(process.env.CONSULTANCY, application.serviceId);
+        
+      if(!serviceResult) {
         return res.status(404).json({ success: false, message: "Service was not found" });
-      }
+      } 
   
-      const applicationExpired = await Consultancy.find({applicationId: applicationId});
-
-      if (applicationExpired.length > 0) {
+      const applicationExpiration = await Consultancy.find({applicationId: applicationId}); 
+ 
+      if(applicationExpired(applicationExpiration)){
         return res.status(400).json({ success: false, message: "Application expired please apply again" });
       }  
 
@@ -780,16 +779,6 @@ const integratedReport = async (req, res) => {
       locationAnalysisResult,
       salesOptimizationResult
     }});    
-  
-    }catch (error) {
-        return res.status(500).json({ message: 'Internal server error', error });
-    } 
-};
-
-const approveApplication = async (application) => {
-  try {     
-    application.status = 'Approved';
-    await application.save();   
   
     }catch (error) {
         return res.status(500).json({ message: 'Internal server error', error });
