@@ -398,15 +398,15 @@ const salesRevenueOptimizationPremiumService  = async (req, res) => {
     if (!application || !application.paymentStatus) { 
         return res.status(400).json({success: false, message: "User has not completed payment for the service."});
     }     
-    const serviceExist = await SalesRevenueOptimization.find({applicantId: applicantId, applicationId: applicationId}); 
- 
+    let serviceExist = await SalesRevenueOptimization.find({applicantId: applicantId, applicationId: applicationId}); 
+
     if (serviceExist.length <= 0) {
       return res.status(404).json({ success: false, message: "No service was found" });
-    }  
-    
+    }   
+
     return res.status(200).json({ 
         success: true, 
-        data : serviceExist[serviceExist.length-1]
+        data : serviceExist[serviceExist.length - 1]
      });
 
   } catch (error) {
