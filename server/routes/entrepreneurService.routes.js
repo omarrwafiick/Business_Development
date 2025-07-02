@@ -1,26 +1,17 @@
 const express = require('express'); 
 const { 
     locationMarkrtAnalysisService, salesRevenueOptimizationService, salesRevenueOptimizationFreeTrialService, 
-    salesRevenueOptimizationPremiumService, financialPlanningService, financialPlanningFreeTrialService,financialPlanningPremiumService,
-    locationMarkrtAnalysisFreeTrialService, locationMarkrtAnalysisPremiumService, getApplicationStatus, updateApplication,
-    updatePaymentStatus, addServiceApplication, getUserApplications, getConsultantApplications, getAllConsultants, 
+    salesRevenueOptimizationPremiumService, financialPlanningService, financialPlanningFreeTrialService,
+    financialPlanningPremiumService,locationMarkrtAnalysisFreeTrialService, locationMarkrtAnalysisPremiumService, 
     getAllServices, seedDataToConsultant, businessGuideService, getConsultancyResult, integratedReport
 } = require('../controllers/service.controller');
-const router = express.Router(); 
-const { VerifyToken } = require('../middlewares/verifyToken');  
+const router = express.Router();  
 const { VerifyTokenByRole } = require('../middlewares/verifyByRole'); 
 const { validateInputs } = require('../middlewares/validateInputs'); 
-const {  
-    paymentStatusSchema, updateApplicationSchema,seedConsultantSchema,financialPlanningServiceSchema,
-    addApplicationSchema, salesOptimizationSchema, businessGuideSchema
-} = require("../validationSchemas/serviceValidation");  
+const { seedConsultantSchema,financialPlanningServiceSchema,salesOptimizationSchema, businessGuideSchema } = require("../validationSchemas/serviceValidation");  
 require('dotenv').config();
 
-router.use(VerifyToken); 
-
-router.post('/add-service-application/:applicantid', validateInputs(addApplicationSchema), addServiceApplication); 
-
-router.use(VerifyTokenByRole(String(process.env.ENTREPRENEUR)));
+router.use(VerifyTokenByRole([String(process.env.ENTREPRENEUR), String(process.env.BUSINESS_OWNER)]));
  
 router.post('/business-guide/:applicantid/:applicationid', validateInputs(businessGuideSchema) , businessGuideService); 
 
@@ -41,20 +32,8 @@ router.post('/financial-planning-service/:applicantid/:applicationid', validateI
 router.get('/financial-planning-free-trial-service/:applicantid/:applicationid', financialPlanningFreeTrialService);
 
 router.get('/financial-planning-premium-service/:applicantid/:applicationid', financialPlanningPremiumService);
-
-router.get('/get-consultants', getAllConsultants);
  
 router.get('', getAllServices); 
-
-router.get('/applications/:applicantId', getUserApplications);
-
-router.get('/consultant-applications/:consultantid', getConsultantApplications);
-
-router.get('/getstatus/:id', getApplicationStatus);
-
-router.put('/:id', validateInputs(updateApplicationSchema), updateApplication);
-
-router.put('/paymentstatus/:id', validateInputs(paymentStatusSchema), updatePaymentStatus);
 
 router.post('/seed-consultant/:applicantid/:applicationid', validateInputs(seedConsultantSchema), seedDataToConsultant);
 

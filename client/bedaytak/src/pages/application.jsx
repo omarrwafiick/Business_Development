@@ -6,7 +6,7 @@ import { ClipboardList } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import toaster from 'react-hot-toast'; 
 import AppStore from '../store/store';
-import { addApplicationForService } from '../services/service'; 
+import { addApplicationForService } from '../services/application'; 
 
 export default function Application() {
   const { serviceName, services, applicationId } = AppStore();

@@ -8,8 +8,11 @@ import toaster from 'react-hot-toast'
 import AppStore from '../store/store';
 import { getFinancialPlanningServiceFree, getSalesOptimizationServiceFree, getLocationMarkrtAnalysisServiceFree,
          getFinancialPlanningServicePremium, getLocationMarkrtAnalysisServicePremium, getSalesOptimizationServicePremium,
-         updatePaymentStatusService        
+        
 } from '../services/service';  
+import { updatePaymentStatusService } from '../services/application';  
+
+         
 import PaypalPayment from '../components/paypal';
 
 export default function Payment() {

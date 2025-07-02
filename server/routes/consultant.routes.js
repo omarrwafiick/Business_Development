@@ -1,11 +1,11 @@
 const express = require('express'); 
+const { VerifyTokenByRole } = require('../middlewares/verifyByRole');
 const { getAllConsultants, getConsultantById, updateConsultant, deleteConsultant, getQualifications } = require('../controllers/consultant.controller');
-const { VerifyToken } = require('../middlewares/verifyToken'); 
 const { validateInputs } = require('../middlewares/validateInputs'); 
 const { updateConsultantSchema } = require("../validationSchemas/consultantValidation");  
 const router = express.Router();
 
-router.use(VerifyToken); 
+router.use(VerifyTokenByRole([String(process.env.CONSULTANT)]));
  
 router.get('', getAllConsultants);
 

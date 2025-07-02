@@ -6,7 +6,7 @@ const { VerifyTokenByRole } = require('../middlewares/verifyByRole');
 const { validateInputs } = require('../middlewares/validateInputs'); 
 const { adminCreateConsultantSchema, createAdminSchema } = require("../validationSchemas/adminValidation");  
 
-router.use(VerifyTokenByRole(String(process.env.ADMIN))); 
+router.use(VerifyTokenByRole([String(process.env.ADMIN)])); 
 
 router.post('', validateInputs(createAdminSchema), addAdmin); 
  

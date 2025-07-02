@@ -1,9 +1,7 @@
 import api from './api';
 const entrepreneurDomain = "/service/entrepreneur";
-const consultantDomain = "/service/consultant";
-
-export const addApplicationForService = async (applicantid, data) => api.post(entrepreneurDomain+`/add-service-application/${applicantid}`, data);
-
+const consultantDomain = "/service/consultant"; 
+ 
 export const businessGuideService = async (applicantid, applicationid, data) => api.post(entrepreneurDomain+`/business-guide/${applicantid}/${applicationid}`, data);
 
 export const salesOptimizationService = async (applicantid, applicationid, data) => api.post(entrepreneurDomain+`/sales-revenue-optimization/${applicantid}/${applicationid}`, data);
@@ -23,14 +21,6 @@ export const financialPlanningService = async (applicantid, applicationid, data)
 export const getFinancialPlanningServiceFree = async (applicantid, applicationid) => api.get(entrepreneurDomain+`/financial-planning-free-trial-service/${applicantid}/${applicationid}`);
 
 export const getFinancialPlanningServicePremium= async (applicantid, applicationid) => api.get(entrepreneurDomain+`/financial-planning-premium-service/${applicantid}/${applicationid}`);
-
-export const getConsultantApplications= async (id) => api.get(entrepreneurDomain+`/consultant-applications/${id}`);
-
-export const getApplicationStatus = async ( applicationid ) => api.get(entrepreneurDomain+`/getstatus/${applicationid}`);
-
-export const updateApplicationForService = async (applicationid, data) => api.put(entrepreneurDomain+`/${applicationid}`, data);
-
-export const updatePaymentStatusService = async (applicationid, data) => api.put(entrepreneurDomain+`/paymentstatus/${applicationid}`, data);
 
 export const seedConsultantService = async (applicantid, applicationid, data) => api.post(entrepreneurDomain+`/seed-consultant/${applicantid}/${applicationid}`, data);
  

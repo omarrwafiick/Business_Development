@@ -6,7 +6,7 @@ const { validateInputs } = require('../middlewares/validateInputs');
 const { consultancyServiceSchema } = require("../validationSchemas/serviceValidation");  
 require('dotenv').config();
  
-router.use(VerifyTokenByRole(String(process.env.CONSULTANT)));
+router.use(VerifyTokenByRole([String(process.env.CONSULTANT)]));
  
 router.post('/consultancy/:applicantid/:applicationid/:consultencyid', validateInputs(consultancyServiceSchema), consultancyService);
 

@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 import toaster from 'react-hot-toast';
 import { ListCollapseIcon } from 'lucide-react';
 import SeededApplication from '../components/seeded-application';
-import { getConsultantApplications } from '../services/service'; 
+import { getConsultantApplications } from '../services/application'; 
 import AppStore from '../store/store';
 
 export default function ConsultantApplications() {
