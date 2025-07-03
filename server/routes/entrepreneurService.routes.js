@@ -24,7 +24,7 @@ router.get('/sales-revenue-optimization-premium-service/:applicantid/:applicatio
 router.post('/location-markrt-analysis-service/:applicantid/:applicationid', locationMarkrtAnalysisService);
 
 router.get('/location-markrt-analysis-free-trial-service/:applicantid/:applicationid', locationMarkrtAnalysisFreeTrialService);
-
+ 
 router.get('/location-markrt-analysis-premium-service/:applicantid/:applicationid', locationMarkrtAnalysisPremiumService);
  
 router.post('/financial-planning-service/:applicantid/:applicationid', validateInputs(financialPlanningServiceSchema), financialPlanningService); 

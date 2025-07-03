@@ -252,14 +252,24 @@ const locationMarkrtAnalysisPremiumService = async (req, res) => {
       return res.status(404).json({ success: false, message: "Application not found" });
     }
 
-    const serviceExist = await LocationMarketAnalysis.find({applicantId: applicantId, applicationId: applicationId});;
+    let serviceExist = await LocationMarketAnalysis.find({applicantId: applicantId, applicationId: applicationId}).populate('locationId');
  
     if (serviceExist.length <= 0) {
       return res.status(404).json({ success: false, message: "User has not completed payment for the service." });
     }  
 
+    serviceExist = serviceExist[serviceExist.length-1];
+
     return res.status(200).json({ success: true, 
-        data : serviceExist[serviceExist.length-1]
+        data :{ 
+            location: serviceExist.locationId.name,
+            competitionLevel: serviceExist.competitionLevel,
+            sameCategoryCount: serviceExist.sameCategoryCount,
+            totalNearbyBusinesses: serviceExist.totalNearbyBusinesses,
+            marketingStrategies: serviceExist.marketingStrategies,
+            finalLocationAdvice: serviceExist.finalLocationAdvice,
+            reportGeneratedAt: serviceExist.reportGeneratedAt
+        }
      });
 
   } catch (error) {
@@ -402,11 +412,25 @@ const salesRevenueOptimizationPremiumService  = async (req, res) => {
 
     if (serviceExist.length <= 0) {
       return res.status(404).json({ success: false, message: "No service was found" });
-    }   
+    }
 
+    serviceExist = serviceExist[serviceExist.length-1];
+    
     return res.status(200).json({ 
         success: true, 
-        data : serviceExist[serviceExist.length - 1]
+        data : { 
+            avgPrice: serviceExist.avgPrice,
+            numberOfEmployees: serviceExist.numberOfEmployees,
+            expectedDailySales: serviceExist.expectedDailySales,
+            workingDaysPerMonth: serviceExist.workingDaysPerMonth,
+            estimatedMonthlyRevenue: serviceExist.estimatedMonthlyRevenue, 
+            pricingStrategySuggestions: serviceExist.pricingStrategySuggestions,
+            upsellOpportunities: serviceExist.upsellOpportunities,
+            revenueBoostIdeas: serviceExist.revenueBoostIdeas,
+            revenueRiskFactors: serviceExist.revenueRiskFactors,
+            finalOptimizationAdvice: serviceExist.finalOptimizationAdvice,
+            reportGeneratedAt: serviceExist.reportGeneratedAt
+        }
      });
 
   } catch (error) {
@@ -558,16 +582,28 @@ const financialPlanningPremiumService  = async (req, res) => {
       if (!application || !application.paymentStatus) { 
           return res.status(400).json({success: false, message: "User has not completed payment for the service."});
       }     
-      const serviceExist = await FinancialPlanning.find({applicantId: applicantId, applicationId: applicationId}); 
+      let serviceExist = await FinancialPlanning.find({applicantId: applicantId, applicationId: applicationId}); 
    
       if ( serviceExist.length <= 0 ) {
         return res.status(404).json({ success: false, message: "No service was found" });
       }   
+
+      serviceExist = serviceExist[serviceExist.length-1];
  
       return res.status(200).json({ 
         success: true,
         data: {
-          ...serviceExist[serviceExist.length-1]
+            monthlyRevenue: serviceExist.monthlyRevenue,
+            monthlyCosts: serviceExist.monthlyCosts,
+            startupCost: serviceExist.startupCost,
+            netProfit: serviceExist.netProfit,
+            breakEvenMonths: serviceExist.breakEvenMonths,
+            roi6Months: serviceExist.roi6Months,
+            financialHealthIndex: serviceExist.financialHealthIndex,
+            locationMarketScore: serviceExist.locationMarketScore,
+            competitiveInsight: serviceExist.competitiveInsight,
+            suggestedStrategy: serviceExist.suggestedStrategy,
+            reportPublishedAt: serviceExist.reportPublishedAt,
         }
       }); 
   
